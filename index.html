@@ -14,6 +14,18 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     #0a0a0a; }
 #particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
 
+.moon-glow { position:fixed; border-radius:50%; pointer-events:none; z-index:0;
+  filter:blur(60px); opacity:0.35; animation:glowPulse 8s ease-in-out infinite; }
+#glow-1 { width:420px; height:420px; top:-120px; right:-100px;
+  background:radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%); }
+#glow-2 { width:520px; height:520px; bottom:-180px; left:-160px;
+  background:radial-gradient(circle, rgba(91,200,255,0.12), transparent 70%);
+  animation-delay:-4s; }
+@keyframes glowPulse {
+  0%,100% { opacity:0.25; transform:scale(1); }
+  50% { opacity:0.45; transform:scale(1.08); }
+}
+
 #gate-screen, #login-screen, #denied-screen {
   display:none; position:fixed; top:0; left:0; width:100%; height:100%;
   background:#0a0a0a; z-index:500; overflow-y:auto;
@@ -89,11 +101,12 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .kbd { background:rgba(255,255,255,0.08); border-radius:8px; padding:4px 8px; font-size:12px; color:#9a9a9a; }
 
 .cats { display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:16px; }
-.cat { background:transparent; border:none; color:#8a8a8a; padding:10px 18px; border-radius:12px;
-  cursor:pointer; font-size:14px; white-space:nowrap; position:relative; }
+.cat { transition:all 0.2s ease; background:transparent; border:1px solid transparent; color:#8a8a8a;
+  padding:10px 18px; border-radius:12px; cursor:pointer; font-size:14px; white-space:nowrap; position:relative; }
+.cat:hover { color:#e0e0e0; background:rgba(255,255,255,0.06); transform:scale(1.05); }
 .cat.active { color:#fff; }
-.cat.active::after { content:''; position:absolute; bottom:0; left:20%; right:20%; height:2px;
-  background:#e0e0e0; border-radius:2px; }
+.cat.active::after { content:''; position:absolute; bottom:2px; left:18%; right:18%; height:2px;
+  background:#e0e0e0; box-shadow:0 0 10px rgba(224,224,224,0.7); border-radius:2px; }
 
 .sort-row { display:flex; gap:12px; margin-bottom:20px; }
 .sort-select { flex:1; background:rgba(20,20,20,0.88); border:1px solid rgba(255,255,255,0.12);
@@ -416,6 +429,10 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
 <canvas id="particles"></canvas>
 
+<!-- Лунное свечение на фоне -->
+<div class="moon-glow" id="glow-1"></div>
+<div class="moon-glow" id="glow-2"></div>
+
 <!-- ===== ЭКРАН 1: ПРОВЕРКА 18+ ===== -->
 <div id="gate-screen" class="open">
   <div class="gate-card">
@@ -489,12 +506,12 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <span class="kbd">⌘K</span>
     </div>
     <div class="cats" id="cats">
-      <button class="cat active" onclick="showCategory('all', this)">Все</button>
-      <button class="cat" onclick="showCategory('pods', this)">Под-системы</button>
-      <button class="cat" onclick="showCategory('liquids', this)">Жидкости</button>
-      <button class="cat" onclick="showCategory('disposables', this)">Одноразки</button>
-      <button class="cat" onclick="showCategory('consumables', this)">Расходники</button>
-      <button class="cat" onclick="showCategory('snus', this)">Снюс</button>
+      <button class="cat active" onclick="showCategory('all', this)">🌙 Все</button>
+      <button class="cat" onclick="showCategory('pods', this)">🔋 Под-системы</button>
+      <button class="cat" onclick="showCategory('liquids', this)">🧪 Жидкости</button>
+      <button class="cat" onclick="showCategory('disposables', this)">⚡ Одноразки</button>
+      <button class="cat" onclick="showCategory('consumables', this)">⚙️ Расходники</button>
+      <button class="cat" onclick="showCategory('snus', this)">🌿 Снюс</button>
     </div>
     <div class="sort-row">
       <select class="sort-select" id="sort-select" onchange="renderCatalog()">
@@ -587,6 +604,18 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="tab-page" id="page-owner">
     <h2 class="owner-head">Панель владельца <span class="owner-tag">ТОЛЬКО ДЛЯ АДМИНА</span></h2>
     <p class="owner-hint">Заказы, диалоги, модерация клиентов, добавление товаров и фото.</p>
+
+    <div class="sort-row" style="margin-bottom:14px;">
+      <select class="sort-select" id="adm-date-filter" onchange="renderOwner()">
+        <option value="all">Все даты</option>
+        <option value="today">Сегодня</option>
+        <option value="yesterday">Вчера</option>
+        <option value="week">Последние 7 дней</option>
+      </select>
+      <input class="chat-input" id="adm-client-filter" placeholder="Поиск клиента (@ник или имя)" oninput="renderOwner()">
+    </div>
+
+    <button class="btn-done w100" style="margin-bottom:16px;" onclick="markAllDone()">✅ Отметить все «Ожидает» как «Выполнен»</button>
 
     <button class="clients-toggle-btn wait" onclick="toggleBlock('adm-wait')">
       <span>⏳ Заказы ожидают</span><span class="cnt" id="adm-wait-cnt">0</span>
@@ -1615,6 +1644,46 @@ function renderOrders(){
   }
 }
 
+// ===== ФИЛЬТР ЗАКАЗОВ =====
+function dateShiftISO(days){
+  var d=new Date();
+  d.setDate(d.getDate()+days);
+  var m=d.getMonth()+1, dd=d.getDate();
+  return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(dd<10?'0':'')+dd;
+}
+
+function orderPassesFilter(o){
+  var sel=document.getElementById('adm-date-filter');
+  var mode=sel?sel.value:'all';
+  if(mode==='today' && o.date!==dateShiftISO(0)) return false;
+  if(mode==='yesterday' && o.date!==dateShiftISO(-1)) return false;
+  if(mode==='week'){
+    var t=new Date((o.date||'')+'T00:00:00');
+    var from=new Date(); from.setDate(from.getDate()-6); from.setHours(0,0,0,0);
+    if(isNaN(t.getTime()) || t<from) return false;
+  }
+  var inp=document.getElementById('adm-client-filter');
+  if(inp && inp.value.trim()){
+    var q=inp.value.toLowerCase().replace('@','');
+    if(String(o.customer).toLowerCase().indexOf(q)===-1) return false;
+  }
+  return true;
+}
+
+function markAllDone(){
+  var changed=0;
+  for(var i=0;i<orders.length;i++){
+    if(orders[i].status==='Ожидает' && orderPassesFilter(orders[i])){
+      orders[i].status='Выполнен';
+      changed++;
+    }
+  }
+  if(!changed){ alert('Под текущий фильтр не попало ни одного заказа со статусом «Ожидает»'); return; }
+  saveState();
+  renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
+  alert('Отмечено выполненными заказов: '+changed);
+}
+
 // ===== ПАНЕЛЬ ВЛАДЕЛЬЦА: ЗАКАЗЫ =====
 function setOrderStatus(idx,status){
   var o=orders[idx];
@@ -1645,6 +1714,7 @@ function renderOwner(){
     for(var j=0;j<orders.length;j++){
       var o=orders[j];
       if(o.status!==gr.st) continue;
+      if(!orderPassesFilter(o)) continue;
       cnt++;
       var box=document.createElement('div');
       box.className='order-box';
@@ -2014,7 +2084,7 @@ function updateClientsCount(){
 }
 function renderOwnerPhotos(){
   var list=document.getElementById('owner-photos');
-  list.innerHTML='<p class="owner-hint">Здесь можно поменять фото у существующих товаров или удалить товар целиком. Новый товар добавляется в блоке «➕ Добавить товар».</p>';
+  list.innerHTML='<p class="owner-hint">Здесь можно поменять фото у существующих товаров или удалить товар целиком. Новый товар добавляется в блоке «➕ Добавить товар». Плюс у каждого товара есть карандашик ✏️ прямо в каталоге — быстро поправить цену или остатки.</p>';
   for(var i=0;i<products.length;i++){
     var p=products[i];
     var row=document.createElement('div');
