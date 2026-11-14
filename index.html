@@ -14,57 +14,35 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     #0a0a0a; }
 #particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
 
-/* ===== ВХОД: 18+ и Telegram ===== */
 #gate-screen, #login-screen, #denied-screen {
   display:none; position:fixed; top:0; left:0; width:100%; height:100%;
   background:#0a0a0a; z-index:500; overflow-y:auto;
   align-items:center; justify-content:center; padding:20px;
 }
 #gate-screen.open, #login-screen.open, #denied-screen.open { display:flex; }
-.gate-card {
-  max-width:520px; width:100%;
-  background:rgba(22,22,22,0.95);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:20px; padding:28px;
-}
+.gate-card { max-width:520px; width:100%; background:rgba(22,22,22,0.95);
+  border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:28px; }
 .gate-title { font-size:24px; font-weight:bold; margin-bottom:8px; }
 .gate-sub { color:#8a8a8a; font-size:14px; line-height:1.5; margin-bottom:22px; }
 .gate-actions { display:flex; gap:12px; }
-.gate-btn {
-  flex:1; padding:16px; border-radius:14px; cursor:pointer;
-  font-size:16px; font-weight:bold; border:1px solid rgba(255,255,255,0.16);
-  background:rgba(255,255,255,0.08); color:#f0f0f0;
-}
+.gate-btn { flex:1; padding:16px; border-radius:14px; cursor:pointer; font-size:16px; font-weight:bold;
+  border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.08); color:#f0f0f0; }
 .gate-btn:hover { background:rgba(255,255,255,0.14); }
 .gate-btn.yes { background:#e0e0e0; color:#0a0a0a; border:none; }
 .gate-btn.yes:hover { background:#fff; }
 .gate-btn.no { background:rgba(255,123,123,0.12); border-color:rgba(255,123,123,0.35); color:#ff7b7b; }
-.denied-card {
-  max-width:520px; width:100%;
-  background:rgba(22,22,22,0.95);
-  border:1px solid rgba(255,123,123,0.4);
-  border-radius:20px; padding:30px; text-align:center;
-}
+.denied-card { max-width:520px; width:100%; background:rgba(22,22,22,0.95);
+  border:1px solid rgba(255,123,123,0.4); border-radius:20px; padding:30px; text-align:center; }
 .denied-card .big-ic { font-size:52px; margin-bottom:12px; }
 .denied-card .t { font-size:24px; font-weight:bold; color:#ff7b7b; margin-bottom:10px; }
 .denied-card .d { color:#b0b0b0; font-size:14px; line-height:1.5; }
-.login-card {
-  max-width:520px; width:100%;
-  background:rgba(22,22,22,0.95);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:20px; padding:30px; text-align:center;
-}
-.login-card .logo-big {
-  width:72px; height:72px; border-radius:20px; margin:0 auto 14px;
-  background:linear-gradient(135deg,#3a3a3a,#141414);
-  display:flex; align-items:center; justify-content:center; font-size:34px;
-  border:1px solid rgba(255,255,255,0.2);
-}
-.login-btn {
-  width:100%; padding:16px; border-radius:14px; cursor:pointer; margin-top:18px;
-  font-size:16px; font-weight:bold; border:none;
-  background:#e0e0e0; color:#0a0a0a;
-}
+.login-card { max-width:520px; width:100%; background:rgba(22,22,22,0.95);
+  border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:30px; text-align:center; }
+.login-card .logo-big { width:72px; height:72px; border-radius:20px; margin:0 auto 14px;
+  background:linear-gradient(135deg,#3a3a3a,#141414); display:flex; align-items:center; justify-content:center;
+  font-size:34px; border:1px solid rgba(255,255,255,0.2); }
+.login-btn { width:100%; padding:16px; border-radius:14px; cursor:pointer; margin-top:18px;
+  font-size:16px; font-weight:bold; border:none; background:#e0e0e0; color:#0a0a0a; }
 .login-btn:hover { background:#fff; }
 .gate-user-line { color:#8a8a8a; font-size:13px; margin-top:14px; }
 
@@ -131,6 +109,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .pcard-img .emo { font-size:52px; }
 .pcard-body { padding:16px; display:flex; flex-direction:column; flex:1; }
 .pcard-name { font-weight:bold; font-size:15px; margin-bottom:6px; }
+.pcard-desc { color:#9a9a9a; font-size:12px; margin-bottom:6px; line-height:1.4; }
 .pcard-price { color:#e0e0e0; font-size:19px; font-weight:bold; margin-bottom:6px; }
 .pcard-stock { color:#ffb84d; font-size:12px; margin-bottom:12px; }
 .pcard .btn { margin-top:auto; }
@@ -300,11 +279,9 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .chat-empty { color:#6e6e6e; font-size:13px; text-align:center; padding:14px 0; }
 .dm-hint { color:#6e6e6e; font-size:11px; text-align:center; margin-top:8px; }
 
-.dialog-row {
-  display:flex; align-items:center; gap:12px; padding:12px 14px;
+.dialog-row { display:flex; align-items:center; gap:12px; padding:12px 14px;
   border:1px solid rgba(255,255,255,0.1); border-radius:14px; margin-bottom:10px;
-  background:rgba(255,255,255,0.04); cursor:pointer;
-}
+  background:rgba(255,255,255,0.04); cursor:pointer; }
 .dialog-row:hover { background:rgba(255,255,255,0.09); }
 .dialog-row .last { color:#8a8a8a; font-size:12px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .unread-badge { background:#ff5252; color:#fff; font-size:11px; font-weight:bold;
@@ -576,7 +553,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
           <div class="member-name" id="profile-name-line">—</div>
           <div class="member-handle" id="profile-handle-line">@—</div>
           <div class="member-tags" style="margin-top:8px;">
-            <span class="tag" style="background:rgba(255,255,255,0.12); color:#fff; font-weight:bold;">Nº1</span>
+            <span class="tag" id="profile-num-tag">№ —</span>
             <span class="tag" id="profile-id-tag">ID: —</span>
             <span id="profile-perk-tags"></span>
           </div>
@@ -588,20 +565,20 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
         <div class="stat"><div class="l">Сделки</div><div class="v" id="stat-deals">0</div></div>
       </div>
     </div>
-    <button class="profile-btn" onclick="openDM('@loonshop','client')">💬 Сообщения от LoonShop</button>
+    <button class="profile-btn" onclick="openDM('@loonshop','client')">✉️ Написать в LoonShop</button>
     <button class="profile-btn" onclick="showTab('orders')">📦 Мои заказы</button>
     <button class="profile-btn" onclick="showTab('reviews')">⭐ Отзывы</button>
     <button class="profile-btn" onclick="showTab('chat')">💬 Общий чат</button>
     <button class="profile-btn" onclick="openRules()">📜 Правила магазина</button>
     <button class="profile-btn bazar" onclick="openBazar()">🛒 Наша барахолка</button>
     <button class="profile-btn" id="owner-btn" style="display:none;" onclick="showTab('owner')">🔒 Панель владельца</button>
-    <p class="hint" style="text-align:center;">Данные сохраняются на этом устройстве (localStorage).</p>
+    <p class="hint" style="text-align:center;">Данные синхронизируются между устройствами через Firebase.</p>
   </div>
 
   <!-- ПАНЕЛЬ ВЛАДЕЛЬЦА -->
   <div class="tab-page" id="page-owner">
     <h2 class="owner-head">Панель владельца <span class="owner-tag">ТОЛЬКО ДЛЯ АДМИНА</span></h2>
-    <p class="owner-hint">Заказы, диалоги, модерация клиентов и фото товаров.</p>
+    <p class="owner-hint">Заказы, диалоги, модерация клиентов, добавление товаров и фото.</p>
 
     <button class="clients-toggle-btn wait" onclick="toggleBlock('adm-wait')">
       <span>⏳ Заказы ожидают</span><span class="cnt" id="adm-wait-cnt">0</span>
@@ -626,6 +603,33 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div class="hidden-block" id="adm-dm-list"></div>
 
     <div class="section-gap"></div>
+    <button class="clients-toggle-btn" onclick="toggleBlock('owner-addproduct')">
+      <span>➕ Добавить товар</span><span class="cnt">новый</span>
+    </button>
+    <div class="hidden-block" id="owner-addproduct">
+      <div class="chat-box" style="margin-top:0;">
+        <div class="photo-row"><span class="nm">Название товара</span><input class="photo-input" id="np-name" placeholder="Например: Xros 5 Mini"></div>
+        <div class="photo-row"><span class="nm">Категория</span>
+          <select class="sort-select" id="np-cat" style="flex:1;">
+            <option value="pods">Под-системы</option>
+            <option value="liquids">Жидкости</option>
+            <option value="disposables">Одноразки</option>
+            <option value="consumables">Расходники</option>
+            <option value="snus">Снюс</option>
+          </select>
+        </div>
+        <div class="photo-row"><span class="nm">Цена (₽)</span><input class="photo-input" id="np-price" type="number" placeholder="1300" min="0"></div>
+        <div class="photo-row"><span class="nm">Фото (ссылка)</span><input class="photo-input" id="np-img" placeholder="https://... (.jpg/.png/.webp)"></div>
+        <div class="photo-row"><span class="nm">Эмодзи (если без фото)</span><input class="photo-input" id="np-emoji" placeholder="🟣"></div>
+        <div class="photo-row"><span class="nm">Характеристики</span><input class="photo-input" id="np-desc" placeholder="Например: CORE 3.0, 3 ml"></div>
+        <div class="photo-row"><span class="nm">Количество (шт.)</span><input class="photo-input" id="np-stock" type="number" placeholder="10" min="0"></div>
+        <div class="photo-row"><span class="nm">Цвета</span><input class="photo-input" id="np-colors" placeholder="Розовый,#ff9ecb,5; Синий,#5bc8ff,3"></div>
+        <p class="owner-hint" style="margin-top:10px;">Цвета — необязательно. Формат: <b>Название,#hex,количество</b>, несколько цветов через точку с запятой. Если цвета заданы — общее количество не нужно, оно берётся по цветам.</p>
+        <button class="btn w100" onclick="addProduct()">Добавить товар в каталог</button>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
     <button class="clients-toggle-btn" onclick="toggleBlock('owner-clients')">
       <span>👥 Клиенты</span><span class="cnt" id="clients-count">0</span>
     </button>
@@ -633,7 +637,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
     <div class="section-gap"></div>
     <button class="clients-toggle-btn" onclick="toggleBlock('owner-photos')">
-      <span>📷 Фото товаров</span><span class="cnt" id="photos-count">0</span>
+      <span>📷 Фото и товары</span><span class="cnt" id="photos-count">0</span>
     </button>
     <div class="hidden-block" id="owner-photos"></div>
 
@@ -794,16 +798,19 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
 <script>
 // ================== НАСТРОЙКИ ==================
-var STORAGE_KEY = 'loonshop_v7';
+var STORAGE_KEY = 'loonshop_v8';
 var BAZAR_URL = 'https://t.me/VapeTolyatti63';
+
+// Адрес общей базы Firebase (Realtime Database)
+var DB_URL = 'https://loonshop63-default-rtdb.europe-west1.firebasedatabase.app';
 
 // Админы по ID Telegram (ID не меняется никогда — надёжнее юзернейма)
 var ADMIN_IDS = [8914120660, 5009894330];
 function isAdmin(username, tgId) {
-  if (tgId && ADMIN_IDS.indexOf(tgId) !== -1) return true;      // по числовому ID
+  if (tgId && ADMIN_IDS.indexOf(tgId) !== -1) return true;
   if (username) {
     for (var i = 0; i < ADMIN_IDS.length; i++) {
-      if (username === '@id' + ADMIN_IDS[i]) return true;        // если у аккаунта нет юзернейма
+      if (username === '@id' + ADMIN_IDS[i]) return true;
     }
   }
   return false;
@@ -811,9 +818,9 @@ function isAdmin(username, tgId) {
 
 // ================== ДАННЫЕ ==================
 var defaultProducts = [
-  { id:1, category:'pods', name:'Xros 5 Mini Leather Edition', price:1300, emoji:'🟣', img:'',
+  { id:1, category:'pods', name:'Xros 5 Mini Leather Edition', color:'Под-система, 1000 mAh', price:1300, emoji:'🟣', img:'',
     colors:[{name:'Розовый',hex:'#ff9ecb',stock:5},{name:'Оранжевый',hex:'#ffa64d',stock:3}] },
-  { id:2, category:'pods', name:'Feelin', price:600, emoji:'🔵', img:'',
+  { id:2, category:'pods', name:'Feelin', color:'Под-система, 800 mAh', price:600, emoji:'🔵', img:'',
     colors:[{name:'Розовый',hex:'#ff9ecb',stock:4},{name:'Красный',hex:'#ff5252',stock:6},{name:'Голубой',hex:'#5bc8ff',stock:2}] },
   { id:3, category:'liquids', name:'Пошлая Рабыня', color:'Жидкость 30ml', price:300, emoji:'🧪', img:'', stock:10 },
   { id:4, category:'consumables', name:'Картридж XROS 0.6 Ω', color:'CORE 3.0, 3 ml', price:250, emoji:'⚙', img:'', stock:15 }
@@ -821,14 +828,12 @@ var defaultProducts = [
 
 var places = ['ТЦ Космос', 'Дом быта', 'ДК Тольятти'];
 
-// Клиентов-заготовок больше нет — все реальные люди входят через Telegram
 var defaultClients = [];
-
-// Общий чат пустой — только реальные сообщения
 var defaultChatMsgs = [];
 
 var products, clients, chatMsgs, orders, reviews, dms, cart;
 var me = null;
+var firstSyncDone = false; // база прочитана хотя бы раз — только после этого разрешаем запись
 
 function saveState() {
   try {
@@ -836,6 +841,20 @@ function saveState() {
       products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms
     }));
   } catch(e) { }
+  // Отправляем всё состояние в общую базу — его увидят все устройства.
+  // Пока база не прочитана хотя бы раз, не пишем — чтобы не затереть чужие данные пустотой.
+  if (DB_URL && firstSyncDone) {
+    try {
+      fetch(DB_URL + '.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          products: products, clients: clients, chatMsgs: chatMsgs,
+          orders: orders, reviews: reviews, dms: dms
+        })
+      });
+    } catch(e) { }
+  }
 }
 
 function loadState() {
@@ -864,6 +883,13 @@ loadState();
 function findClient(username) {
   for (var i = 0; i < clients.length; i++) if (clients[i].username === username) return clients[i];
   return null;
+}
+
+// Номер клиента: максимальный существующий + 1
+function nextClientNum() {
+  var m = 0;
+  for (var i = 0; i < clients.length; i++) if (clients[i].num && clients[i].num > m) m = clients[i].num;
+  return m + 1;
 }
 
 // ===== ХЕЛПЕРЫ =====
@@ -909,8 +935,16 @@ function statusBadge(st) {
   if(st==='Отменён') cls='st-cancel';
   return '<span class="status-badge '+cls+'">'+st+'</span>';
 }
+function catName(cat) {
+  var map = { pods:'Под-системы', liquids:'Жидкости', disposables:'Одноразки', consumables:'Расходники', snus:'Снюс', all:'Все' };
+  return map[cat] || cat;
+}
 
 // ===== ВХОД: 18+ / TELEGRAM =====
+if (window.Telegram && Telegram.WebApp) {
+  try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch(e) { }
+}
+
 function getTgUser() {
   if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
     return Telegram.WebApp.initDataUnsafe.user;
@@ -918,20 +952,28 @@ function getTgUser() {
   return null;
 }
 
-// Зашёл из Telegram — входим автоматически, без кнопки входа
 function gateYes() {
-  var hasTg = !!getTgUser();
   document.getElementById('gate-screen').classList.remove('open');
-  if (hasTg) {
-    doLogin();
-  } else {
-    document.getElementById('login-screen').classList.add('open');
-  }
+  tryTgLogin(0);
 }
+
+// Ждём данные от Telegram до ~3 секунд, потом показываем запасной экран
+function tryTgLogin(attempt) {
+  if (getTgUser()) { doLogin(); return; }
+  if (attempt < 10) {
+    setTimeout(function(){ tryTgLogin(attempt + 1); }, 300);
+    return;
+  }
+  document.getElementById('login-hint').textContent =
+    'Telegram не передал данные. Открывайте магазин через кнопку меню бота.';
+  document.getElementById('login-screen').classList.add('open');
+}
+
 function gateNo() {
   document.getElementById('gate-screen').classList.remove('open');
   document.getElementById('denied-screen').classList.add('open');
 }
+
 function doLogin() {
   var tgUser = getTgUser();
   var name, username, tgId = null;
@@ -944,21 +986,23 @@ function doLogin() {
     return;
   }
 
-  // Открыто в браузере — тестовый вход без админки
-  name = 'тест';
+  name = 'Тестовый гость';
   username = '@browser_test';
   document.getElementById('login-hint').textContent = 'Открыто в браузере — вход под тестовым аккаунтом (без админки)';
   enterAs(name, username, null);
 }
+
 function enterAs(name, username, tgId) {
   var c = findClient(username);
   if (!c) {
-    c = { name:name, username:username, tgId:tgId||null, isMe:true, verified:false, vip:false, girl:false, mod:false,
+    c = { name:name, username:username, tgId:tgId||null, num:nextClientNum(), isMe:true,
+          verified:false, vip:false, girl:false, mod:false,
           online:true, banned:false, mutedUntil:0, admin:isAdmin(username, tgId) };
     clients.push(c);
   }
-  // Обновляем ID, если раньше не сохранялся
   if (!c.tgId && tgId) c.tgId = tgId;
+  if (!c.num) c.num = nextClientNum();
+  c.admin = isAdmin(c.username, c.tgId);
   if (c.banned) {
     document.getElementById('login-screen').classList.remove('open');
     document.getElementById('denied-screen').classList.add('open');
@@ -1001,7 +1045,7 @@ for (var i=0;i<45;i++) dots.push({
   requestAnimationFrame(drawDots);
 })();
 
-// ===== ВЕРХНЯЯ СТРОЧКА: ДАТА/ВРЕМЯ/ОНЛАЙН =====
+// ===== ВЕРХНЯЯ СТРОЧКА =====
 function updateTopInfo() {
   var n = new Date();
   var months=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
@@ -1022,11 +1066,11 @@ function getStock(p,colorName){
   return 0;
 }
 function changeStock(p,colorName,delta){
-  if(!p.colors||!colorName){ p.stock+=delta; return; }
+  if(!p.colors||!colorName){ p.stock=(p.stock||0)+delta; return; }
   for(var i=0;i<p.colors.length;i++) if(p.colors[i].name===colorName){ p.colors[i].stock+=delta; return; }
 }
 function getTotalStock(p){
-  if(!p.colors) return p.stock;
+  if(!p.colors) return p.stock||0;
   var s=0; for(var i=0;i<p.colors.length;i++) s+=p.colors[i].stock; return s;
 }
 function findColor(p,colorName){
@@ -1090,12 +1134,14 @@ function renderCatalog(){
     var imgHtml = p2.img
       ? '<img src="'+esc(p2.img)+'" alt="" onerror="this.style.display=\'none\'; this.parentNode.querySelector(\'.emo\').style.display=\'block\';">'
       : '';
+    var descHtml = (p2.color && p2.color!=='—') ? '<div class="pcard-desc">'+esc(p2.color)+'</div>' : '';
     var card=document.createElement('div');
     card.className='pcard';
     card.innerHTML =
       '<div class="pcard-img">'+imgHtml+'<span class="emo" style="display:'+(p2.img?'none':'block')+';">'+p2.emoji+'</span></div>'+
       '<div class="pcard-body">'+
         '<div class="pcard-name">'+esc(p2.name)+'</div>'+
+        descHtml+
         '<div class="pcard-price">'+p2.price+' ₽</div>'+
         '<div class="pcard-stock">'+(total>0?'В наличии: '+total+' шт.':'Нет в наличии')+'</div>'+
         '<button class="btn"'+(disabled?' disabled':'')+' onclick="openChoose('+p2.id+')">В корзину</button>'+
@@ -1128,10 +1174,10 @@ function openChoose(id){
   } else {
     var b2=document.createElement('div');
     b2.className='color-option selected';
-    b2.innerHTML='<span><span class="color-dot" style="background:#555"></span>'+esc(chooseProduct.color)+'</span>'+
+    b2.innerHTML='<span><span class="color-dot" style="background:#555"></span>Без цвета</span>'+
       '<span class="color-left">Осталось: '+chooseProduct.stock+' шт.</span>';
     box.appendChild(b2);
-    chooseColor=chooseProduct.color;
+    chooseColor=null;
   }
   updateChooseView();
   document.getElementById('overlay-choose').className='overlay open';
@@ -1162,7 +1208,8 @@ function updateChooseView(){
   document.getElementById('choose-qty').textContent=chooseQty;
   var hint=document.getElementById('choose-stock-hint');
   var confirmBtn=document.getElementById('confirm-add-btn');
-  if(chooseProduct.colors&&chooseProduct.colors.length>0&&!chooseColor){
+  var hasColors = chooseProduct.colors && chooseProduct.colors.length>0;
+  if(hasColors && !chooseColor){
     hint.textContent='Сначала выберите цвет';
     confirmBtn.disabled=true;
     confirmBtn.textContent='Добавить в корзину';
@@ -1177,7 +1224,8 @@ function updateChooseView(){
 var pendingAdd=null, modalPlace=null, modalTime='12:00', modalDate='';
 
 function confirmAddToCart(){
-  if(chooseProduct.colors&&chooseProduct.colors.length>0&&!chooseColor){
+  var hasColors = chooseProduct.colors && chooseProduct.colors.length>0;
+  if(hasColors && !chooseColor){
     alert('Сначала выберите цвет!'); return;
   }
   if(chooseQty>getStock(chooseProduct,chooseColor)){
@@ -1405,6 +1453,7 @@ function renderOrders(){
     for(var j=0;j<orders.length;j++){
       var o=orders[j];
       if(o.status!==gr.st) continue;
+      if(o.customer!==me.username) continue;
       cnt++;
       var itemsHtml='';
       for(var k=0;k<o.items.length;k++){
@@ -1511,7 +1560,7 @@ function dmUnread(username){
   var msgs = dms[dmKey(username)];
   if(!msgs) return 0;
   var n=0;
-  for(var i=0;i<msgs.length;i++) if(msgs[i].from==='client' && !msgs[i].read) n++;
+  for(var i=0;i<msgs.length;i++) if((msgs[i].from==='client'||msgs[i].from==='me') && !msgs[i].read) n++;
   return n;
 }
 
@@ -1535,7 +1584,7 @@ function renderAdminDialogs(){
     totalUnread+=unread;
     var msgs=dms[dmKey(u)];
     var last=msgs[msgs.length-1];
-    var lastText=(last.from==='shop'?'Вы: ':(last.from==='client'?c.name+': ':''))+last.text;
+    var lastText=(last.from==='shop'?'Вы: ':c.name+': ')+last.text;
 
     var row=document.createElement('div');
     row.className='dialog-row';
@@ -1561,7 +1610,7 @@ function openAdminDialog(username){
 function markDmRead(username){
   var msgs=dms[dmKey(username)];
   if(!msgs) return;
-  for(var i=0;i<msgs.length;i++) if(msgs[i].from==='client') msgs[i].read=true;
+  for(var i=0;i<msgs.length;i++) if(msgs[i].from==='client'||msgs[i].from==='me') msgs[i].read=true;
   saveState();
 }
 
@@ -1644,7 +1693,7 @@ function renderOwnerClients(){
       '<div class="client-row">'+
         '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
-          '<div class="client-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
+          '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+'</div>'+
           '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
         '</div>'+
         '<button class="profile-link-btn" onclick="openClientProfile('+i+')">Профиль ›</button>'+
@@ -1718,10 +1767,11 @@ function openClientProfile(idx){
       '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
       '<div>'+
         '<div class="member-name" style="font-size:20px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
-        '<div class="member-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
+        '<div class="member-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
       '</div>'+
     '</div>'+
     '<div class="member-tags" style="margin-bottom:16px;">'+
+      '<span class="tag" style="background:rgba(255,255,255,0.12); color:#fff; font-weight:bold;">№ '+(c.num||'—')+'</span>'+
       '<span class="tag">ID: '+(c.tgId?c.tgId:'—')+'</span>'+
       (c.verified?'<span class="tag" style="color:#7ef0a8;">✓ Верифицирован</span>':'<span class="tag">Не верифицирован</span>')+
     '</div>'+
@@ -1745,6 +1795,81 @@ function closeClientProfile(){
   document.getElementById('client-window').style.display='none';
 }
 
+// ===== ДОБАВЛЕНИЕ / УДАЛЕНИЕ ТОВАРОВ =====
+function parseColors(str){
+  var out=[];
+  if(!str) return out;
+  var parts=str.split(';');
+  for(var i=0;i<parts.length;i++){
+    var t=parts[i].trim();
+    if(!t) continue;
+    var seg=t.split(',');
+    var name=(seg[0]||'').trim();
+    var hex=(seg[1]||'').trim();
+    var stock=parseInt((seg[2]||'0'),10);
+    if(isNaN(stock)) stock=0;
+    if(!hex) hex='#888888';
+    if(name) out.push({name:name,hex:hex,stock:stock});
+  }
+  return out;
+}
+
+function addProduct(){
+  var name=document.getElementById('np-name').value.trim();
+  var cat=document.getElementById('np-cat').value;
+  var price=parseInt(document.getElementById('np-price').value,10);
+  var img=document.getElementById('np-img').value.trim();
+  var emoji=document.getElementById('np-emoji').value.trim()||'🛒';
+  var desc=document.getElementById('np-desc').value.trim();
+  var stock=parseInt(document.getElementById('np-stock').value,10);
+  if(isNaN(stock)) stock=0;
+  var colorsRaw=document.getElementById('np-colors').value.trim();
+
+  if(!name){ alert('Введите название товара'); return; }
+  if(isNaN(price)||price<=0){ alert('Укажите цену больше нуля'); return; }
+
+  var colors=parseColors(colorsRaw);
+  var maxId=0;
+  for(var i=0;i<products.length;i++) if(products[i].id>maxId) maxId=products[i].id;
+
+  var p={ id:maxId+1, category:cat, name:name, price:price, emoji:emoji, img:img };
+  if(colors.length>0){
+    p.colors=colors;
+    if(desc) p.color=desc;
+  } else {
+    p.color=desc||'—';
+    p.stock=stock;
+  }
+  products.push(p);
+  saveState();
+
+  document.getElementById('np-name').value='';
+  document.getElementById('np-price').value='';
+  document.getElementById('np-img').value='';
+  document.getElementById('np-emoji').value='';
+  document.getElementById('np-desc').value='';
+  document.getElementById('np-stock').value='';
+  document.getElementById('np-colors').value='';
+
+  renderCatalog();
+  renderOwnerPhotos();
+  updateClientsCount();
+  alert('Товар «'+name+'» добавлен в каталог! Категория: '+catName(cat));
+}
+
+function deleteProduct(id){
+  var p=findProduct(id);
+  if(!p) return;
+  if(!confirm('Удалить товар «'+p.name+'» из каталога?')) return;
+  var np=[];
+  for(var i=0;i<products.length;i++) if(products[i].id!==id) np.push(products[i]);
+  products=np;
+  saveState();
+  renderCatalog();
+  renderOwnerPhotos();
+  updateClientsCount();
+}
+
 // ===== ФОТО ТОВАРОВ =====
 function updateClientsCount(){
   document.getElementById('clients-count').textContent=clients.length;
@@ -1752,15 +1877,16 @@ function updateClientsCount(){
 }
 function renderOwnerPhotos(){
   var list=document.getElementById('owner-photos');
-  list.innerHTML='<p class="owner-hint">Вставьте прямую ссылку на фото (.jpg / .png / .webp). Пусто — останется эмодзи.</p>';
+  list.innerHTML='<p class="owner-hint">Здесь можно поменять фото у существующих товаров или удалить товар целиком. Новый товар добавляется в блоке «➕ Добавить товар».</p>';
   for(var i=0;i<products.length;i++){
     var p=products[i];
     var row=document.createElement('div');
     row.className='photo-row';
     row.innerHTML=
-      '<span class="nm">'+p.emoji+' '+esc(p.name)+'</span>'+
+      '<span class="nm">'+p.emoji+' '+esc(p.name)+' <span style="color:#8a8a8a; font-weight:normal;">('+catName(p.category)+' · '+p.price+' ₽)</span></span>'+
       '<input class="photo-input" id="photo-'+p.id+'" value="'+esc(p.img||'')+'" placeholder="https://... фото товара">'+
-      '<button class="chat-send" style="padding:9px 14px;" onclick="savePhoto('+p.id+')">ОК</button>';
+      '<button class="chat-send" style="padding:9px 14px;" onclick="savePhoto('+p.id+')">ОК</button>'+
+      '<button class="btn-cancel-order" style="flex:none; min-width:0; padding:9px 12px;" onclick="deleteProduct('+p.id+')">🗑</button>';
     list.appendChild(row);
   }
 }
@@ -1779,6 +1905,7 @@ function renderProfileLine(){
   if(!me) return;
   document.getElementById('profile-name-line').innerHTML=esc(me.name)+clientBadges(me);
   document.getElementById('profile-handle-line').textContent=me.username;
+  document.getElementById('profile-num-tag').textContent='№ '+(me.num||'—');
   document.getElementById('profile-id-tag').textContent='ID: '+(me.tgId?me.tgId:'—');
   document.getElementById('owner-btn').style.display = (me.admin || isAdmin(me.username, me.tgId)) ? 'block' : 'none';
 }
@@ -1844,7 +1971,7 @@ function renderRatingCard(){
 
 function hasUnreviewedDoneOrder(){
   for(var i=0;i<orders.length;i++)
-    if(orders[i].status==='Выполнен'&&orders[i].reviewIdx<0) return true;
+    if(orders[i].status==='Выполнен'&&orders[i].reviewIdx<0&&orders[i].customer===me.username) return true;
   return false;
 }
 function updateReviewButton(){
@@ -1871,19 +1998,17 @@ function submitReview(){
   if(!text){ alert('Напишите пару слов об отзыве'); return; }
   var targetIdx=-1;
   for(var i=0;i<orders.length;i++)
-    if(orders[i].status==='Выполнен'&&orders[i].reviewIdx<0){ targetIdx=i; break; }
+    if(orders[i].status==='Выполнен'&&orders[i].reviewIdx<0&&orders[i].customer===me.username){ targetIdx=i; break; }
   if(targetIdx<0){ closeReview(); updateReviewButton(); return; }
 
   var now=new Date();
   var months=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   var dateStr=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+'г.';
 
-  reviews.push({clientIdx:0, stars:pickedStars, text:text, date:dateStr, orderIdx:targetIdx, customer:me.username});
-  // привязываем отзыв к клиенту корректно
   var cIdx=0;
   for(var q=0;q<clients.length;q++) if(clients[q].username===me.username){ cIdx=q; break; }
-  reviews[reviews.length-1].clientIdx=cIdx;
 
+  reviews.push({clientIdx:cIdx, stars:pickedStars, text:text, date:dateStr, orderIdx:targetIdx, customer:me.username});
   orders[targetIdx].reviewIdx=reviews.length-1;
   saveState();
   renderReviews(); renderOwner(); updateReviewButton();
@@ -1942,7 +2067,6 @@ function sendChat(side){
   if(side==='owner'){
     if(!isAdmin(me.username, me.tgId)) return;
     chatMsgs.push({name:'LoonShop',username:'@loonshop',shop:true,verified:true,vip:false,girl:false,mod:false,online:true,text:text,time:nowTime()});
-    // ТУТ БУДЕТ РЕАЛЬНЫЙ БОТ: отправка через сервер (bot API sendMessage)
   } else {
     if(isMuted(me)){
       alert('🔇 Вы в муте до '+fmtTime(me.mutedUntil));
@@ -1990,6 +2114,25 @@ var dmPeer=null;
 var dmAsShop=false;
 
 function openDM(username, asSide){
+  var clientToShop = (username==='@loonshop' && asSide==='client' && me);
+  if (clientToShop) {
+    // Чат клиента с магазином храним по юзернейму клиента —
+    // тогда админ увидит его в списке диалогов
+    dmPeer = me.username;
+    dmAsShop = false;
+    var head =
+      '<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ С МАГАЗИНОМ</div>'+
+      '<h2 style="margin-top:0;">🌙 LoonShop</h2>'+
+      '<p class="m-sub">Напишите сообщение — владелец увидит его в панели и ответит вам здесь же.</p>';
+    document.getElementById('dm-head').innerHTML=head;
+    document.getElementById('dm-input').value='';
+    document.getElementById('dm-hint-line').textContent='Ваше сообщение получит владелец магазина.';
+    renderDM();
+    document.getElementById('overlay-dm').className='overlay open';
+    document.getElementById('dm-window').style.display='block';
+    return;
+  }
+
   dmPeer=username;
   dmAsShop=(asSide==='shop');
   var c=findClient(username);
@@ -2009,7 +2152,7 @@ function openDM(username, asSide){
   document.getElementById('dm-head').innerHTML=head;
   document.getElementById('dm-input').value='';
   document.getElementById('dm-hint-line').textContent = dmAsShop
-    ? 'Сообщение от LoonShop. ТУТ БУДЕТ РЕАЛЬНЫЙ БОТ: отправка в Telegram клиента через сервер.'
+    ? 'Вы отвечаете от имени LoonShop. Сообщение увидит клиент.'
     : 'Личные сообщения видят только вы и собеседник.';
   renderDM();
   document.getElementById('overlay-dm').className='overlay open';
@@ -2032,7 +2175,13 @@ function renderDM(){
     var div=document.createElement('div');
     var cls=(m.from==='shop'||m.from==='me')?'shop':'dm';
     div.className='chat-msg '+cls;
-    var who=(m.from==='shop')?'🌙 LoonShop':(m.from==='me'?esc(me?me.name:'вы'):esc(dmPeer));
+    var who;
+    if (m.from==='shop') who = dmAsShop ? '🌙 LoonShop (вы)' : '🌙 LoonShop';
+    else if (m.from==='me') {
+      var cc = findClient(dmPeer);
+      who = dmAsShop ? esc(cc?cc.name:dmPeer) : esc(me?me.name:'Вы');
+    }
+    else who = esc(dmPeer);
     div.innerHTML='<div class="who"><b>'+who+'</b><span class="tm">'+m.time+'</span></div><div>'+esc(m.text)+'</div>';
     el.appendChild(div);
   }
@@ -2048,8 +2197,6 @@ function sendDM(){
 
   if(dmAsShop){
     if(!isAdmin(me.username, me.tgId)) return;
-    // Админ пишет клиенту. В демке — просто записываем.
-    // ТУТ БУДЕТ РЕАЛЬНЫЙ БОТ: fetch на сервер -> bot.sendMessage(chatId, text)
     dms[key].push({from:'shop', text:text, time:nowTime(), read:true});
   } else {
     if(me && isMuted(me)){
@@ -2071,6 +2218,46 @@ setInterval(function(){
     renderOwnerClients();
   }
 }, 60000);
+
+// ===== СИНХРОНИЗАЦИЯ С ОБЩЕЙ БАЗОЙ =====
+var lastRemote = null;
+var syncing = false;
+function syncPull(){
+  if (!DB_URL) return;
+  if (syncing) return;
+  syncing = true;
+  fetch(DB_URL + '.json').then(function(r){ return r.json(); }).then(function(d){
+    syncing = false;
+    if (!d) { firstSyncDone = true; return; }
+    var s = JSON.stringify(d);
+    firstSyncDone = true;
+    if (s === lastRemote) return; // ничего нового — не дёргаем экран
+    lastRemote = s;
+    if (d.products) products = d.products;
+    if (d.clients) clients = d.clients;
+    if (d.chatMsgs) chatMsgs = d.chatMsgs;
+    if (d.orders) orders = d.orders;
+    if (d.reviews) reviews = d.reviews;
+    if (d.dms) dms = d.dms;
+    // после перезагрузки данных находим себя заново
+    var myName = me ? me.username : null;
+    me = null;
+    if (myName) {
+      for (var i = 0; i < clients.length; i++) {
+        if (clients[i].username === myName) { me = clients[i];
+    }
+    }
+    if (me && me.banned) {
+      document.getElementById('app-root').style.display = 'none';
+      document.getElementById('denied-screen').classList.add('open');
+      document.querySelector('.denied-card .t').textContent = '🚫 Аккаунт заблокирован';
+      return;
+    }
+    renderAll();
+  }).catch(function(){ syncing = false; /* база недоступна — работаем локально */ });
+}
+setInterval(syncPull, 3000);
+syncPull();
 
 // ===== ЗАПУСК =====
 updateTopInfo();
