@@ -440,6 +440,9 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div class="gate-title">Вход в LoonShop</div>
     <div class="gate-sub">Вы войдёте под своим аккаунтом Telegram. Имя и юзернейм подтянутся из профиля автоматически.</div>
     <button class="login-btn" onclick="doLogin()">🌐 Войти через Telegram</button>
+    <div style="margin-top:16px; color:#6e6e6e; font-size:12px; text-align:center;">или вход для владельца:</div>
+    <input type="password" class="pay-input" id="admin-code" placeholder="Код владельца" style="margin-top:10px; text-align:center;">
+    <button class="login-btn" style="margin-top:10px;" onclick="ownerLogin()">🔒 Войти как владелец</button>
     <div class="gate-user-line" id="login-hint">Ожидание входа…</div>
   </div>
 </div>
@@ -801,12 +804,26 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 var STORAGE_KEY = 'loonshop_v8';
 var BAZAR_URL = 'https://t.me/VapeTolyatti63';
 
+// Секретный код владельца для входа с компьютера (поменяй на свой!)
+var OWNER_CODE = 'LOON-OWNER-2026';
+
+function ownerLogin() {
+  var code = document.getElementById('admin-code').value.trim();
+  if (code !== OWNER_CODE) {
+    alert('Неверный код владельца');
+    return;
+  }
+  document.getElementById('login-screen').classList.remove('open');
+  enterAs('Владелец', '@owner_browser', null);
+}
+
 // Адрес общей базы Firebase (Realtime Database)
 var DB_URL = 'https://loonshop63-default-rtdb.europe-west1.firebasedatabase.app';
 
 // Админы по ID Telegram (ID не меняется никогда — надёжнее юзернейма)
 var ADMIN_IDS = [8914120660, 5009894330];
 function isAdmin(username, tgId) {
+  if (username === '@owner_browser') return true;
   if (tgId && ADMIN_IDS.indexOf(tgId) !== -1) return true;
   if (username) {
     for (var i = 0; i < ADMIN_IDS.length; i++) {
