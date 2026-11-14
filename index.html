@@ -833,7 +833,7 @@ var defaultChatMsgs = [];
 
 var products, clients, chatMsgs, orders, reviews, dms, cart;
 var me = null;
-var firstSyncDone = false; // база прочитана хотя бы раз — только после этого разрешаем запись
+var firstSyncDone = false;
 
 function saveState() {
   try {
@@ -841,12 +841,15 @@ function saveState() {
       products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms
     }));
   } catch(e) { }
-  // Отправляем всё состояние в общую базу — его увидят все устройства.
-  // Пока база не прочитана хотя бы раз, не пишем — чтобы не затереть чужие данные пустотой.
+  // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
+  // чтобы не затереть чужие данные пустотой. Таймаут 5 секунд — не зависаем.
   if (DB_URL && firstSyncDone) {
     try {
+      var sc = new AbortController();
+      setTimeout(function(){ sc.abort(); }, 5000);
       fetch(DB_URL + '.json', {
         method: 'PUT',
+        signal: sc.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           products: products, clients: clients, chatMsgs: chatMsgs,
@@ -885,7 +888,6 @@ function findClient(username) {
   return null;
 }
 
-// Номер клиента: максимальный существующий + 1
 function nextClientNum() {
   var m = 0;
   for (var i = 0; i < clients.length; i++) if (clients[i].num && clients[i].num > m) m = clients[i].num;
@@ -957,7 +959,6 @@ function gateYes() {
   tryTgLogin(0);
 }
 
-// Ждём данные от Telegram до ~3 секунд, потом показываем запасной экран
 function tryTgLogin(attempt) {
   if (getTgUser()) { doLogin(); return; }
   if (attempt < 10) {
@@ -2116,8 +2117,6 @@ var dmAsShop=false;
 function openDM(username, asSide){
   var clientToShop = (username==='@loonshop' && asSide==='client' && me);
   if (clientToShop) {
-    // Чат клиента с магазином храним по юзернейму клиента —
-    // тогда админ увидит его в списке диалогов
     dmPeer = me.username;
     dmAsShop = false;
     var head =
@@ -2211,7 +2210,6 @@ function sendDM(){
   renderAdminDialogs();
 }
 
-// Обновляем мут-бейджи раз в минуту
 setInterval(function(){
   var pg=document.getElementById('page-owner');
   if(pg && pg.className.indexOf('visible')>=0){
@@ -2222,45 +2220,52 @@ setInterval(function(){
 // ===== СИНХРОНИЗАЦИЯ С ОБЩЕЙ БАЗОЙ =====
 var lastRemote = null;
 var syncing = false;
+
 function syncPull(){
   if (!DB_URL) return;
   if (syncing) return;
   syncing = true;
-  fetch(DB_URL + '.json').then(function(r){ return r.json(); }).then(function(d){
-    syncing = false;
-    if (!d) { firstSyncDone = true; return; }
-    var s = JSON.stringify(d);
-    firstSyncDone = true;
-    if (s === lastRemote) return; // ничего нового — не дёргаем экран
-    lastRemote = s;
-    if (d.products) products = d.products;
-    if (d.clients) clients = d.clients;
-    if (d.chatMsgs) chatMsgs = d.chatMsgs;
-    if (d.orders) orders = d.orders;
-    if (d.reviews) reviews = d.reviews;
-    if (d.dms) dms = d.dms;
-    // после перезагрузки данных находим себя заново
-    var myName = me ? me.username : null;
-    me = null;
-    if (myName) {
-      for (var i = 0; i < clients.length; i++) {
-        if (clients[i].username === myName) { me = clients[i];
-    }
-    }
-    if (me && me.banned) {
-      document.getElementById('app-root').style.display = 'none';
-      document.getElementById('denied-screen').classList.add('open');
-      document.querySelector('.denied-card .t').textContent = '🚫 Аккаунт заблокирован';
-      return;
-    }
-    renderAll();
-  }).catch(function(){ syncing = false; /* база недоступна — работаем локально */ });
+
+  var controller = new AbortController();
+  var timer = setTimeout(function(){ controller.abort(); }, 5000);
+
+  fetch(DB_URL + '.json', { signal: controller.signal })
+    .then(function(r){ clearTimeout(timer); return r.json(); })
+    .then(function(d){
+      syncing = false;
+      firstSyncDone = true;
+      if (!d) return;
+      var s = JSON.stringify(d);
+      if (s === lastRemote) return;
+      lastRemote = s;
+      if (d.products) products = d.products;
+      if (d.clients) clients = d.clients;
+      if (d.chatMsgs) chatMsgs = d.chatMsgs;
+      if (d.orders) orders = d.orders;
+      if (d.reviews) reviews = d.reviews;
+      if (d.dms) dms = d.dms;
+      var myName = me ? me.username : null;
+      me = null;
+      if (myName) {
+        for (var i = 0; i < clients.length; i++) {
+          if (clients[i].username === myName) { me = clients[i]; break; }
+        }
+      }
+      if (me && me.banned) {
+        document.getElementById('app-root').style.display = 'none';
+        document.getElementById('denied-screen').classList.add('open');
+        document.querySelector('.denied-card .t').textContent = '🚫 Аккаунт заблокирован';
+        return;
+      }
+      renderAll();
+    })
+    .catch(function(){ clearTimeout(timer); syncing = false; });
 }
 setInterval(syncPull, 3000);
-syncPull();
 
 // ===== ЗАПУСК =====
 updateTopInfo();
+syncPull();
 </script>
 </body>
 </html>
