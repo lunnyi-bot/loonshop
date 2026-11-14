@@ -147,9 +147,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .dock-btn .ic { font-size:20px; }
 .dock-btn:hover { color:#e0e0e0; background:rgba(255,255,255,0.06); }
 .dock-btn.active { background:#e0e0e0; color:#0a0a0a; }
-.dock-badge { position:absolute; top:2px; right:6px; background:#ff5252; color:#fff; font-size:10px;
-  font-weight:bold; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center;
-  justify-content:center; padding:0 3px; }
 
 .tab-page { display:none; }
 .tab-page.visible { display:block; }
@@ -211,7 +208,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .btn-done { flex:1; min-width:120px; background:rgba(126,240,168,0.15); border:1px solid rgba(126,240,168,0.4); color:#7ef0a8;
   padding:10px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:bold; }
 .btn-done:hover { background:rgba(126,240,168,0.25); }
-.btn-cancel-order { flex:1; min-width:120px; background:rgba(255,123,123,0.12); border:1px solid rgba(255,123,123,0.35);
+.btn-cancel-order { flex:1; min-width:90px; background:rgba(255,123,123,0.12); border:1px solid rgba(255,123,123,0.35);
   color:#ff7b7b; padding:10px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:bold; }
 .btn-cancel-order:hover { background:rgba(255,123,123,0.22); }
 .btn-warn { flex:1; min-width:90px; background:rgba(255,184,77,0.12); border:1px solid rgba(255,184,77,0.35);
@@ -274,6 +271,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .r-online { background:rgba(126,240,168,0.12); color:#7ef0a8; font-weight:normal; }
 .r-banned { background:rgba(255,123,123,0.18); color:#ff7b7b; }
 .r-muted { background:rgba(255,184,77,0.15); color:#ffb84d; font-weight:normal; }
+.r-admin { background:rgba(255,255,255,0.15); color:#fff; }
 
 .rating-card { background:linear-gradient(135deg, rgba(120,90,20,0.55), rgba(60,45,12,0.55));
   border:1px solid rgba(255,200,60,0.3); border-radius:22px; padding:34px; text-align:center; margin-bottom:22px; }
@@ -419,7 +417,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   transition:transform 0.7s ease-in, opacity 0.7s ease-in; }
 
 .section-gap { height:26px; }
-.admin-section-title { font-size:18px; font-weight:bold; margin:0 0 14px; }
 .cp-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:16px; }
 .cp-stat { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px;
   padding:12px; text-align:center; }
@@ -494,7 +491,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <span>👥 Всего: <b id="info-total">0</b></span>
     </div>
     <div class="welcome">
-      <span>🌙 Добро пожаловать, <b id="welcome-name">@heavenlyloner</b></span>
+      <span>🌙 Добро пожаловать, <b id="welcome-name">…</b></span>
       <span class="right">Выберите идеальный вариант</span>
     </div>
     <div class="catalog-head">
@@ -580,7 +577,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
           <div class="member-handle" id="profile-handle-line">@—</div>
           <div class="member-tags" style="margin-top:8px;">
             <span class="tag" style="background:rgba(255,255,255,0.12); color:#fff; font-weight:bold;">Nº1</span>
-            <span class="tag" id="profile-id-tag">ID: 1</span>
+            <span class="tag" id="profile-id-tag">ID: —</span>
             <span id="profile-perk-tags"></span>
           </div>
         </div>
@@ -597,7 +594,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <button class="profile-btn" onclick="showTab('chat')">💬 Общий чат</button>
     <button class="profile-btn" onclick="openRules()">📜 Правила магазина</button>
     <button class="profile-btn bazar" onclick="openBazar()">🛒 Наша барахолка</button>
-    <button class="profile-btn" onclick="showTab('owner')">🔒 Панель владельца</button>
+    <button class="profile-btn" id="owner-btn" style="display:none;" onclick="showTab('owner')">🔒 Панель владельца</button>
     <p class="hint" style="text-align:center;">Данные сохраняются на этом устройстве (localStorage).</p>
   </div>
 
@@ -663,7 +660,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <button class="dock-btn active" id="dock-catalog" onclick="showTab('catalog')"><span class="ic">▦</span>Каталог</button>
     <button class="dock-btn" id="dock-reviews" onclick="showTab('reviews')"><span class="ic">☆</span>Отзывы</button>
     <button class="dock-btn" id="dock-orders" onclick="showTab('orders')"><span class="ic">📦</span>Заказы</button>
-    <button class="dock-btn" id="dock-chat" onclick="showTab('chat')"><span class="ic">💬</span>Чат<span class="dock-badge" id="chat-dock-badge" style="display:none;">0</span></button>
+    <button class="dock-btn" id="dock-chat" onclick="showTab('chat')"><span class="ic">💬</span>Чат</button>
     <button class="dock-btn" id="dock-profile" onclick="showTab('profile')"><span class="ic">👤</span>Профиль</button>
   </div>
 </div>
@@ -796,10 +793,23 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 </div><!-- /app-root -->
 
 <script>
-// ================== ДАННЫЕ ==================
-var STORAGE_KEY = 'loonshop_v5';
+// ================== НАСТРОЙКИ ==================
+var STORAGE_KEY = 'loonshop_v7';
 var BAZAR_URL = 'https://t.me/VapeTolyatti63';
 
+// Админы по ID Telegram (ID не меняется никогда — надёжнее юзернейма)
+var ADMIN_IDS = [8914120660, 5009894330];
+function isAdmin(username, tgId) {
+  if (tgId && ADMIN_IDS.indexOf(tgId) !== -1) return true;      // по числовому ID
+  if (username) {
+    for (var i = 0; i < ADMIN_IDS.length; i++) {
+      if (username === '@id' + ADMIN_IDS[i]) return true;        // если у аккаунта нет юзернейма
+    }
+  }
+  return false;
+}
+
+// ================== ДАННЫЕ ==================
 var defaultProducts = [
   { id:1, category:'pods', name:'Xros 5 Mini Leather Edition', price:1300, emoji:'🟣', img:'',
     colors:[{name:'Розовый',hex:'#ff9ecb',stock:5},{name:'Оранжевый',hex:'#ffa64d',stock:3}] },
@@ -811,21 +821,11 @@ var defaultProducts = [
 
 var places = ['ТЦ Космос', 'Дом быта', 'ДК Тольятти'];
 
-var defaultClients = [
-  { name:'кофе', username:'@heavenlyloner', isMe:true, verified:false, vip:false, girl:false, mod:false, online:true, banned:false, mutedUntil:0 },
-  { name:'Саймон', username:'@simon_tt', isMe:false, verified:true, vip:true, girl:false, mod:false, online:true, banned:false, mutedUntil:0 },
-  { name:'ハーレクイン夫人', username:'@Miss_Arlecchino', isMe:false, verified:false, vip:false, girl:true, mod:false, online:true, banned:false, mutedUntil:0 },
-  { name:'Алиса', username:'@alisa_luna', isMe:false, verified:false, vip:false, girl:false, mod:true, online:false, banned:false, mutedUntil:0 }
-];
+// Клиентов-заготовок больше нет — все реальные люди входят через Telegram
+var defaultClients = [];
 
-var defaultChatMsgs = [
-  { name:'Саймон', username:'@simon_tt', shop:false, verified:true, vip:true, girl:false, mod:false, online:true,
-    text:'Всем привет, кто брал Feelin в голубом? Как вкус?', time:'19:40' },
-  { name:'LoonShop', username:'@loonshop', shop:true, verified:true, vip:false, girl:false, mod:false, online:true,
-    text:'Привет! Голубой Feelin — свежая поставка, все довольны 🌙', time:'19:42' },
-  { name:'ハーレクイン夫人', username:'@Miss_Arlecchino', shop:false, verified:false, vip:false, girl:true, mod:false, online:true,
-    text:'А жидкости когда новые завезёте?', time:'19:45' }
-];
+// Общий чат пустой — только реальные сообщения
+var defaultChatMsgs = [];
 
 var products, clients, chatMsgs, orders, reviews, dms, cart;
 var me = null;
@@ -871,8 +871,10 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function nowTime() { return new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); }
+function fmtTime(ts) { return new Date(ts).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); }
 function clientBadges(c) {
   var h = '';
+  if (c.admin || isAdmin(c.username, c.tgId)) h += '<span class="r-badge r-admin">👑 Админ</span>';
   if (c.vip) h += '<span class="r-badge r-vip">VIP</span>';
   if (c.girl) h += '<span class="r-badge r-girl">Девушка</span>';
   if (c.mod) h += '<span class="r-badge r-mod">Модератор</span>';
@@ -881,7 +883,6 @@ function clientBadges(c) {
   if (c.mutedUntil && Date.now() < c.mutedUntil) h += '<span class="r-badge r-muted">🔇 мут до ' + fmtTime(c.mutedUntil) + '</span>';
   return h;
 }
-function fmtTime(ts) { return new Date(ts).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); }
 function onlineBadge(c) {
   return c.online ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
 }
@@ -910,35 +911,54 @@ function statusBadge(st) {
 }
 
 // ===== ВХОД: 18+ / TELEGRAM =====
+function getTgUser() {
+  if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+    return Telegram.WebApp.initDataUnsafe.user;
+  }
+  return null;
+}
+
+// Зашёл из Telegram — входим автоматически, без кнопки входа
 function gateYes() {
+  var hasTg = !!getTgUser();
   document.getElementById('gate-screen').classList.remove('open');
-  document.getElementById('login-screen').classList.add('open');
+  if (hasTg) {
+    doLogin();
+  } else {
+    document.getElementById('login-screen').classList.add('open');
+  }
 }
 function gateNo() {
   document.getElementById('gate-screen').classList.remove('open');
   document.getElementById('denied-screen').classList.add('open');
 }
 function doLogin() {
-  var name = null, username = null;
-  // Реальные данные, если открыто как мини-приложение Telegram
-  if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
-    var u = Telegram.WebApp.initDataUnsafe.user;
-    name = u.first_name || u.username || 'Клиент';
-    username = '@' + (u.username || ('id' + u.id));
-  }
-  if (!username) {
-    // Демо-вход (когда открыто в браузере)
-    name = 'кофе';
-    username = '@heavenlyloner';
-    document.getElementById('login-hint').textContent = 'Открыто в браузере — вход под тестовым аккаунтом';
+  var tgUser = getTgUser();
+  var name, username, tgId = null;
+
+  if (tgUser) {
+    name = tgUser.first_name || tgUser.username || 'Клиент';
+    username = '@' + (tgUser.username || ('id' + tgUser.id));
+    tgId = tgUser.id;
+    enterAs(name, username, tgId);
+    return;
   }
 
+  // Открыто в браузере — тестовый вход без админки
+  name = 'тест';
+  username = '@browser_test';
+  document.getElementById('login-hint').textContent = 'Открыто в браузере — вход под тестовым аккаунтом (без админки)';
+  enterAs(name, username, null);
+}
+function enterAs(name, username, tgId) {
   var c = findClient(username);
   if (!c) {
-    c = { name:name, username:username, isMe:true, verified:false, vip:false, girl:false, mod:false,
-          online:true, banned:false, mutedUntil:0 };
+    c = { name:name, username:username, tgId:tgId||null, isMe:true, verified:false, vip:false, girl:false, mod:false,
+          online:true, banned:false, mutedUntil:0, admin:isAdmin(username, tgId) };
     clients.push(c);
   }
+  // Обновляем ID, если раньше не сохранялся
+  if (!c.tgId && tgId) c.tgId = tgId;
   if (c.banned) {
     document.getElementById('login-screen').classList.remove('open');
     document.getElementById('denied-screen').classList.add('open');
@@ -1500,12 +1520,10 @@ function renderAdminDialogs(){
   listEl.innerHTML='';
   var totalUnread=0, convCount=0;
 
-  // Собираем юзернеймы, у кого есть переписка
   var users=[];
   for(var i=0;i<clients.length;i++){
     if(dms[dmKey(clients[i].username)]) users.push(clients[i].username);
   }
-  // Сортируем: непрочитанные сверху
   users.sort(function(a,b){ return dmUnread(b)-dmUnread(a); });
 
   for(var j=0;j<users.length;j++){
@@ -1560,7 +1578,7 @@ function togglePerk(clientIdx,perk){
 function banClient(username){
   var c=findClient(username);
   if(!c) return;
-  if(c.isMe){ alert('Нельзя забанить самого себя :)'); return; }
+  if(isAdmin(c.username, c.tgId)){ alert('Нельзя забанить администратора :)'); return; }
   if(c.banned){
     c.banned=false;
     alert('Разбанен: '+c.name);
@@ -1597,7 +1615,7 @@ function unmuteClient(username){
 function deleteClient(username){
   var c=findClient(username);
   if(!c) return;
-  if(c.isMe){ alert('Нельзя удалить самого себя :)'); return; }
+  if(isAdmin(c.username, c.tgId)){ alert('Нельзя удалить администратора :)'); return; }
   if(!confirm('Удалить клиента '+c.name+' полностью? Историю диалогов тоже удалим.')) return;
   var nc=[];
   for(var i=0;i<clients.length;i++) if(clients[i].username!==username) nc.push(clients[i]);
@@ -1627,7 +1645,7 @@ function renderOwnerClients(){
         '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
           '<div class="client-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
-          '<div class="client-handle">'+esc(c.username)+(c.isMe?' · это вы (тест)':'')+' · '+onlineBadge(c)+'</div>'+
+          '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
         '</div>'+
         '<button class="profile-link-btn" onclick="openClientProfile('+i+')">Профиль ›</button>'+
       '</div>'+
@@ -1682,8 +1700,17 @@ function openClientProfile(idx){
   }
   if(!has) histHtml='<div class="empty-msg">Заказов пока нет</div>';
 
-  var idxForActions = -1;
-  for(var q=0;q<clients.length;q++) if(clients[q].username===c.username) idxForActions=q;
+  var isAdm = isAdmin(c.username, c.tgId);
+
+  var actionsHtml='';
+  if(!isAdm){
+    actionsHtml=
+    '<div class="modal-actions">'+
+      '<button class="btn-neutral" onclick="openDM(\''+esc(c.username)+'\',\'shop\')">💬 Написать</button>'+
+      '<button class="btn-warn" onclick="muteClient(\''+esc(c.username)+'\')">🔇 Мут</button>'+
+      '<button class="btn-cancel-order" onclick="banClient(\''+esc(c.username)+'\')">🚫 Бан</button>'+
+    '</div>';
+  }
 
   document.getElementById('client-profile-body').innerHTML=
     '<div class="pickup-title" style="margin-bottom:6px;">ПРОФИЛЬ КЛИЕНТА</div>'+
@@ -1691,11 +1718,11 @@ function openClientProfile(idx){
       '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
       '<div>'+
         '<div class="member-name" style="font-size:20px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
-        '<div class="member-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
+        '<div class="member-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
       '</div>'+
     '</div>'+
     '<div class="member-tags" style="margin-bottom:16px;">'+
-      '<span class="tag">ID: '+(c.isMe?'1':'10'+(idx+1))+'</span>'+
+      '<span class="tag">ID: '+(c.tgId?c.tgId:'—')+'</span>'+
       (c.verified?'<span class="tag" style="color:#7ef0a8;">✓ Верифицирован</span>':'<span class="tag">Не верифицирован</span>')+
     '</div>'+
     '<div class="cp-stats">'+
@@ -1705,11 +1732,7 @@ function openClientProfile(idx){
     '</div>'+
     '<div class="pickup-title" style="margin-top:18px;">ИСТОРИЯ ЗАКАЗОВ</div>'+
     histHtml+
-    '<div class="modal-actions">'+
-      '<button class="btn-neutral" onclick="openDM(\''+esc(c.username)+'\',\'shop\')">💬 Написать</button>'+
-      '<button class="btn-warn" onclick="muteClient(\''+esc(c.username)+'\')">🔇 Мут</button>'+
-      '<button class="btn-cancel-order" onclick="banClient(\''+esc(c.username)+'\')">🚫 Бан</button>'+
-    '</div>'+
+    actionsHtml+
     '<div class="modal-actions" style="margin-top:0;">'+
       '<button class="btn-cancel" onclick="closeClientProfile()">Закрыть</button>'+
     '</div>';
@@ -1756,7 +1779,8 @@ function renderProfileLine(){
   if(!me) return;
   document.getElementById('profile-name-line').innerHTML=esc(me.name)+clientBadges(me);
   document.getElementById('profile-handle-line').textContent=me.username;
-  document.getElementById('profile-id-tag').textContent='ID: '+(me.isMe?'1':'—');
+  document.getElementById('profile-id-tag').textContent='ID: '+(me.tgId?me.tgId:'—');
+  document.getElementById('owner-btn').style.display = (me.admin || isAdmin(me.username, me.tgId)) ? 'block' : 'none';
 }
 function renderAll(){
   renderCatalog();
@@ -1854,7 +1878,12 @@ function submitReview(){
   var months=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   var dateStr=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+'г.';
 
-  reviews.push({clientIdx:0, stars:pickedStars, text:text, date:dateStr, orderIdx:targetIdx});
+  reviews.push({clientIdx:0, stars:pickedStars, text:text, date:dateStr, orderIdx:targetIdx, customer:me.username});
+  // привязываем отзыв к клиенту корректно
+  var cIdx=0;
+  for(var q=0;q<clients.length;q++) if(clients[q].username===me.username){ cIdx=q; break; }
+  reviews[reviews.length-1].clientIdx=cIdx;
+
   orders[targetIdx].reviewIdx=reviews.length-1;
   saveState();
   renderReviews(); renderOwner(); updateReviewButton();
@@ -1872,7 +1901,7 @@ function renderReviews(){
   renderRatingCard();
   for(var i=0;i<reviews.length;i++){
     var r=reviews[i];
-    var c=clients[r.clientIdx]||me;
+    var c=(r.clientIdx>=0&&clients[r.clientIdx])?clients[r.clientIdx]:me;
     var stars='';
     for(var s=0;s<5;s++) stars+=(s<r.stars?'★':'☆');
     var prodHtml='';
@@ -1911,6 +1940,7 @@ function sendChat(side){
   if(!text) return;
 
   if(side==='owner'){
+    if(!isAdmin(me.username, me.tgId)) return;
     chatMsgs.push({name:'LoonShop',username:'@loonshop',shop:true,verified:true,vip:false,girl:false,mod:false,online:true,text:text,time:nowTime()});
     // ТУТ БУДЕТ РЕАЛЬНЫЙ БОТ: отправка через сервер (bot API sendMessage)
   } else {
@@ -1931,7 +1961,7 @@ function whoHtmlFor(m){
     clientBadges(m)+'<span class="tm">'+m.time+'</span></div>';
 }
 function openChatProfile(username){
-  if(username===me.username){ showTab('profile'); return; }
+  if(me && username===me.username){ showTab('profile'); return; }
   for(var i=0;i<clients.length;i++){
     if(clients[i].username===username){ openClientProfile(i); return; }
   }
@@ -1958,7 +1988,6 @@ function renderChat(){
 // ===== ЛИЧНЫЕ СООБЩЕНИЯ =====
 var dmPeer=null;
 var dmAsShop=false;
-var newDmCount=0;
 
 function openDM(username, asSide){
   dmPeer=username;
@@ -2001,7 +2030,7 @@ function renderDM(){
   for(var i=0;i<msgs.length;i++){
     var m=msgs[i];
     var div=document.createElement('div');
-    var cls=(m.from==='shop')?'shop':(m.from==='me'?'shop':'dm');
+    var cls=(m.from==='shop'||m.from==='me')?'shop':'dm';
     div.className='chat-msg '+cls;
     var who=(m.from==='shop')?'🌙 LoonShop':(m.from==='me'?esc(me?me.name:'вы'):esc(dmPeer));
     div.innerHTML='<div class="who"><b>'+who+'</b><span class="tm">'+m.time+'</span></div><div>'+esc(m.text)+'</div>';
@@ -2018,11 +2047,12 @@ function sendDM(){
   if(!dms[key]) dms[key]=[];
 
   if(dmAsShop){
+    if(!isAdmin(me.username, me.tgId)) return;
     // Админ пишет клиенту. В демке — просто записываем.
     // ТУТ БУДЕТ РЕАЛЬНЫЙ БОТ: fetch на сервер -> bot.sendMessage(chatId, text)
     dms[key].push({from:'shop', text:text, time:nowTime(), read:true});
   } else {
-    if(isMuted(me)){
+    if(me && isMuted(me)){
       alert('🔇 Вы в муте до '+fmtTime(me.mutedUntil));
       return;
     }
@@ -2034,9 +2064,10 @@ function sendDM(){
   renderAdminDialogs();
 }
 
-// Проверка мута для бейджа — обновляем раз в минуту
+// Обновляем мут-бейджи раз в минуту
 setInterval(function(){
-  if(document.getElementById('page-owner').className.indexOf('visible')>=0){
+  var pg=document.getElementById('page-owner');
+  if(pg && pg.className.indexOf('visible')>=0){
     renderOwnerClients();
   }
 }, 60000);
