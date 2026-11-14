@@ -943,13 +943,15 @@ function catName(cat) {
 }
 
 // ===== ВХОД: 18+ / TELEGRAM =====
-if (window.Telegram && Telegram.WebApp) {
-  try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch(e) { }
+// Готовим Telegram при загрузке (работает и на телефоне, и в Telegram Desktop)
+var Tg = (window.Telegram && Telegram.WebApp) ? Telegram.WebApp : null;
+if (Tg) {
+  try { Tg.ready(); Tg.expand(); } catch(e) { }
 }
 
 function getTgUser() {
-  if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
-    return Telegram.WebApp.initDataUnsafe.user;
+  if (Tg && Tg.initDataUnsafe && Tg.initDataUnsafe.user) {
+    return Tg.initDataUnsafe.user;
   }
   return null;
 }
@@ -959,9 +961,12 @@ function gateYes() {
   tryTgLogin(0);
 }
 
+// Ждём данные от Telegram до ~5 секунд.
+// В Telegram Desktop данные иногда приходят с задержкой — поэтому терпеливо ждём
+// и только потом показываем запасной экран.
 function tryTgLogin(attempt) {
   if (getTgUser()) { doLogin(); return; }
-  if (attempt < 10) {
+  if (attempt < 16) {
     setTimeout(function(){ tryTgLogin(attempt + 1); }, 300);
     return;
   }
@@ -980,6 +985,7 @@ function doLogin() {
   var name, username, tgId = null;
 
   if (tgUser) {
+    // Реальный профиль Telegram (телефон или Telegram Desktop)
     name = tgUser.first_name || tgUser.username || 'Клиент';
     username = '@' + (tgUser.username || ('id' + tgUser.id));
     tgId = tgUser.id;
@@ -987,23 +993,28 @@ function doLogin() {
     return;
   }
 
+  // Данных нет — значит открыли в обычном браузере (не в Telegram).
   name = 'Тестовый гость';
   username = '@browser_test';
-  document.getElementById('login-hint').textContent = 'Открыто в браузере — вход под тестовым аккаунтом (без админки)';
+  document.getElementById('login-hint').textContent =
+    'Открыто в браузере — вход под тестовым аккаунтом (без админки). Для реального входа открывайте магазин из Telegram.';
   enterAs(name, username, null);
 }
 
 function enterAs(name, username, tgId) {
   var c = findClient(username);
   if (!c) {
-    c = { name:name, username:username, tgId:tgId||null, num:nextClientNum(), isMe:true,
+    c = { name:name, username:username, tgId:tgId||null, num:nextClientNum(),
           verified:false, vip:false, girl:false, mod:false,
           online:true, banned:false, mutedUntil:0, admin:isAdmin(username, tgId) };
     clients.push(c);
   }
-  if (!c.tgId && tgId) c.tgId = tgId;
+  // Обновляем профиль, если Telegram прислал свежие данные
+  if (tgId && !c.tgId) c.tgId = tgId;
   if (!c.num) c.num = nextClientNum();
   c.admin = isAdmin(c.username, c.tgId);
+  c.name = name;
+
   if (c.banned) {
     document.getElementById('login-screen').classList.remove('open');
     document.getElementById('denied-screen').classList.add('open');
