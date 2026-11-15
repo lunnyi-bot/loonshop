@@ -568,7 +568,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div id="ev-block" style="margin-bottom:4px;"></div>
     <div class="catalog-head">
       <div class="over">КОЛЛЕКЦИЯ</div>
-      <div class="catalog-head-row"><h2>Каталог</h2><div style="display:flex; gap:8px; align-items:center;"><span class="owner-tag">🛠 v17</span><div class="pos-count" id="pos-count">0 поз.</div></div></div>
+      <div class="catalog-head-row"><h2>Каталог</h2><div style="display:flex; gap:8px; align-items:center;"><span class="owner-tag">🛠 v18</span><div class="pos-count" id="pos-count">0 поз.</div></div></div>
     </div>
     <div class="search">
       <span>🔍</span>
@@ -1038,7 +1038,7 @@ var defaultProducts = [
   { id:2, category:'pods', name:'Feelin', color:'Под-система, 800 mAh', price:600, emoji:'🔵', img:'',
     colors:[{name:'Розовый',hex:'#ff9ecb',stock:4},{name:'Красный',hex:'#ff5252',stock:6},{name:'Голубой',hex:'#5bc8ff',stock:2}] },
   { id:3, category:'liquids', name:'Пошлая Рабыня', color:'Жидкость 30ml', price:300, emoji:'🧪', img:'', stock:10 },
-  { id:4, category:'consumables', name:'Картридж XROS 0.6 Ω', color:'CORE 3.0, 3 ml', price:250, emoji:'⚙', img:'', stock:15 }
+  { id:4, category:'consumables', name:'Картридж XROS 0.6 Ω', color:'CORE 3.0, 3 ml', price:250, emoji:'⚙', img:'', stock:15 },
   { id:5, category:'sets', name:'Feelin 2 + жидкость', color:'Сет: Feelin 2 фиолетовый + жидкость на выбор', price:900, emoji:'🎁', img:'',
     colors:[
     {name:'Жигуль №4 · Виноград, яблоко, алоэ · 20мг',hex:'#set',stock:1},
@@ -1143,7 +1143,7 @@ function loadState() {
     var raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       var d = JSON.parse(raw);
-      if (d.products) { products = d.products; ensureSet(); }
+      if (d.products) { products = d.products; ensureSet(); ensureSet2(); }
       if (d.clients) clients = d.clients;
       if (d.chatMsgs) chatMsgs = d.chatMsgs;
       if (d.orders) orders = d.orders;
@@ -1402,16 +1402,39 @@ setInterval(updateTopInfo, 1000);
 setInterval(renderEvents, 1000);
 
 // ===== СКЛАД =====
+function splitSet2(cn){ if(!cn) return null; var k=cn.indexOf(' · '); if(k<1) return null; return {c:cn.slice(0,k), f:cn.slice(k+3)}; }
+function isSet2Product(p){ return !!(p&&p.flavors&&p.flavors.length>0); }
+function getFlavorStockN(p,name){ if(!p.flavors) return 0; for(var i=0;i<p.flavors.length;i++) if(p.flavors[i].name===name) return p.flavors[i].stock; return 0; }
+function changeFlavorStockN(p,name,delta){ if(!p.flavors) return; for(var i=0;i<p.flavors.length;i++) if(p.flavors[i].name===name){ p.flavors[i].stock=Math.max(0,p.flavors[i].stock+delta); return; } }
 function getStock(p,colorName){
+  if(p&&p.flavors&&colorName){
+    var sp=splitSet2(colorName);
+    if(sp){
+      var cs=0, csFound=false;
+      if(p.colors){ for(var ci=0;ci<p.colors.length;ci++) if(p.colors[ci].name===sp.c){ cs=p.colors[ci].stock; csFound=true; break; } }
+      if(!csFound) return 0;
+      var fs=getFlavorStockN(p,sp.f);
+      return Math.min(cs,fs);
+    }
+  }
   if(!p.colors||!colorName) return p.stock;
   for(var i=0;i<p.colors.length;i++) if(p.colors[i].name===colorName) return p.colors[i].stock;
   return 0;
 }
 function changeStock(p,colorName,delta){
+  if(p&&p.flavors&&colorName){
+    var sp=splitSet2(colorName);
+    if(sp){ changeStock(p,sp.c,delta); changeFlavorStockN(p,sp.f,delta); return; }
+  }
   if(!p.colors||!colorName){ p.stock=(p.stock||0)+delta; return; }
   for(var i=0;i<p.colors.length;i++) if(p.colors[i].name===colorName){ p.colors[i].stock+=delta; return; }
 }
 function getTotalStock(p){
+  if(isSet2Product(p)){
+    var cs=0; for(var ci=0;ci<p.colors.length;ci++) cs+=p.colors[ci].stock;
+    var fs=0; for(var fi=0;fi<p.flavors.length;fi++) fs+=p.flavors[fi].stock;
+    return Math.min(cs,fs);
+  }
   if(!p.colors) return p.stock||0;
   var s=0; for(var i=0;i<p.colors.length;i++) s+=p.colors[i].stock; return s;
 }
@@ -1457,6 +1480,7 @@ function showCategory(cat, btn){
 
 function renderCatalog(){
   ensureSet();
+  ensureSet2();
   catalogEl.innerHTML='';
   var query = document.getElementById('search-input').value.toLowerCase();
   var sort = document.getElementById('sort-select').value;
@@ -1525,7 +1549,12 @@ function editProduct(id){
   var flavEl=document.getElementById('ed-flavors');
   if(flavEl){
     var flavStr='';
-    if(p.colors && p.colors[0] && p.colors[0].hex==='#set'){
+    if(p.flavors && p.flavors.length>0){
+      for(var fi=0;fi<p.flavors.length;fi++){
+        flavStr += p.flavors[fi].name+'|'+p.flavors[fi].stock;
+        if(fi < p.flavors.length-1) flavStr += '; ';
+      }
+    } else if(p.colors && p.colors[0] && p.colors[0].hex==='#set'){
       for(var fi=0;fi<p.colors.length;fi++){
         flavStr += p.colors[fi].name+'|'+p.colors[fi].stock;
         if(fi < p.colors.length-1) flavStr += '; ';
@@ -1567,9 +1596,8 @@ function saveEdit(){
   if(flavorsRaw){
     var fl = parseFlavors(flavorsRaw);
     if(fl.length>0){
-      p.colors = fl;
-      if(desc) p.color = desc;
-      delete p.stock;
+      if(isSet2Product(p)) { p.flavors = fl; if(desc) p.color = desc; }
+      else { p.colors = fl; if(desc) p.color = desc; delete p.stock; }
     }
   } else if(colorsRaw){
     var colors = parseColors(colorsRaw);
@@ -1649,6 +1677,87 @@ var SET_PRODUCT = { id:5, category:'sets', name:'Feelin 2 + жидкость', c
     {name:'OVERMUCH №25 · Маракуйя · 20мг',hex:'#set',stock:1},
     {name:'OVERMUCH №26 · Ананас и арбуз · 20мг',hex:'#set',stock:1}
     ] };
+var SET2_FLAVORS=[
+    {name:'Жигуль №4 · Виноград, яблоко, алоэ · 20мг',stock:1},
+    {name:'Жигуль №5 · Ананас, манго, апельсин · 20мг',stock:1},
+    {name:'Sun Strike №7 · Малина, мята, чёрная смородина, лёд · 12/20мг',stock:1},
+    {name:'Sun Strike №8 · Энергетик, киви, лимонад, зелёное яблоко, лёд · 12/20мг',stock:1},
+    {name:'Sun Strike №9 · Белый персик, сочный манго, мёд, лёд · 20мг',stock:1},
+    {name:'Sun Strike №11 · Чёрный чай, ваниль, черешня, лёд · 20мг',stock:1},
+    {name:'INDONJI №12 · Вишня/барбарис · 25/40мг',stock:1},
+    {name:'INDONJI №13 · Манго/виноград · 25мг',stock:1},
+    {name:'INDONJI №14 · Персик/яблоко · 25мг',stock:1},
+    {name:'INDONJI №15 · Черешня/яблоко · 25/40мг',stock:1},
+    {name:'INDONJI №16 · Апельсин/спрайт · 25/40мг',stock:1},
+    {name:'INDONJI №17 · Чёрная смородина/лимон · 25/40мг',stock:1},
+    {name:'Line UP №18 · Морс из кисло-сладких ягод и ароматных трав · 40мг',stock:1},
+    {name:'Line UP №19 · Прохладный тропический микс из ананаса, персика и манго · 40мг',stock:1},
+    {name:'Line UP №20 · Охлаждающие виноград, личи и чёрная смородина · 40мг',stock:1},
+    {name:'Хвоя №1 · Манго · 20мг',stock:1},
+    {name:'Хвоя №2 · Анис · 20мг',stock:1},
+    {name:'Хвоя №3 · Дыня · 20мг',stock:1},
+    {name:'Хвоя №4 · Айва · 20мг',stock:1},
+    {name:'Хвоя №5 · Хвоя · 20мг',stock:1},
+    {name:'Twice on ice №7 · Красный апельсин и драгонфрукт со льдом · 20/40мг',stock:1},
+    {name:'Twice on ice №8 · Киви, груша и мята со льдом · 40мг',stock:1},
+    {name:'Twice on ice №9 · Вишня и апельсин со льдом · 40мг',stock:1},
+    {name:'Twice on ice №11 · Гранат и личи со льдом · 40мг',stock:1},
+    {name:'Indo drinks №12 · Морс клюква брусника · 20мг',stock:1},
+    {name:'Indo drinks №13 · Ананас банан дыня · 20мг',stock:1},
+    {name:'Edition exo №14 · Микс из личи и алоэ со льдом · 20мг',stock:1},
+    {name:'TEA №15 · Клубника малина · 20мг',stock:1},
+    {name:'Taboo №17 · Прохладный апельсин, маракуйя и гуава · 20мг',stock:1},
+    {name:'OVERMUCH №20 · Виноград и чёрная смородина · 20мг',stock:1},
+    {name:'OVERMUCH №23 · Малина и личи · 20мг',stock:1},
+    {name:'OVERMUCH №25 · Маракуйя · 20мг',stock:1},
+    {name:'OVERMUCH №26 · Ананас и арбуз · 20мг',stock:1}
+    ];
+var SET2_PRODUCT={id:6,category:'sets',name:'Feelin + жидкость',color:'Сет: Feelin (розовый / голубой / тёмно-красный) + жидкость на выбор',price:900,emoji:'🎁',img:'',
+    colors:[
+    {name:'Розовый',hex:'#ff9ecb',stock:3},
+    {name:'Голубой',hex:'#5bc8ff',stock:3},
+    {name:'Тёмно-красный',hex:'#c0392b',stock:3}
+    ],
+    flavors:[
+    {name:'Жигуль №4 · Виноград, яблоко, алоэ · 20мг',stock:1},
+    {name:'Жигуль №5 · Ананас, манго, апельсин · 20мг',stock:1},
+    {name:'Sun Strike №7 · Малина, мята, чёрная смородина, лёд · 12/20мг',stock:1},
+    {name:'Sun Strike №8 · Энергетик, киви, лимонад, зелёное яблоко, лёд · 12/20мг',stock:1},
+    {name:'Sun Strike №9 · Белый персик, сочный манго, мёд, лёд · 20мг',stock:1},
+    {name:'Sun Strike №11 · Чёрный чай, ваниль, черешня, лёд · 20мг',stock:1},
+    {name:'INDONJI №12 · Вишня/барбарис · 25/40мг',stock:1},
+    {name:'INDONJI №13 · Манго/виноград · 25мг',stock:1},
+    {name:'INDONJI №14 · Персик/яблоко · 25мг',stock:1},
+    {name:'INDONJI №15 · Черешня/яблоко · 25/40мг',stock:1},
+    {name:'INDONJI №16 · Апельсин/спрайт · 25/40мг',stock:1},
+    {name:'INDONJI №17 · Чёрная смородина/лимон · 25/40мг',stock:1},
+    {name:'Line UP №18 · Морс из кисло-сладких ягод и ароматных трав · 40мг',stock:1},
+    {name:'Line UP №19 · Прохладный тропический микс из ананаса, персика и манго · 40мг',stock:1},
+    {name:'Line UP №20 · Охлаждающие виноград, личи и чёрная смородина · 40мг',stock:1},
+    {name:'Хвоя №1 · Манго · 20мг',stock:1},
+    {name:'Хвоя №2 · Анис · 20мг',stock:1},
+    {name:'Хвоя №3 · Дыня · 20мг',stock:1},
+    {name:'Хвоя №4 · Айва · 20мг',stock:1},
+    {name:'Хвоя №5 · Хвоя · 20мг',stock:1},
+    {name:'Twice on ice №7 · Красный апельсин и драгонфрукт со льдом · 20/40мг',stock:1},
+    {name:'Twice on ice №8 · Киви, груша и мята со льдом · 40мг',stock:1},
+    {name:'Twice on ice №9 · Вишня и апельсин со льдом · 40мг',stock:1},
+    {name:'Twice on ice №11 · Гранат и личи со льдом · 40мг',stock:1},
+    {name:'Indo drinks №12 · Морс клюква брусника · 20мг',stock:1},
+    {name:'Indo drinks №13 · Ананас банан дыня · 20мг',stock:1},
+    {name:'Edition exo №14 · Микс из личи и алоэ со льдом · 20мг',stock:1},
+    {name:'TEA №15 · Клубника малина · 20мг',stock:1},
+    {name:'Taboo №17 · Прохладный апельсин, маракуйя и гуава · 20мг',stock:1},
+    {name:'OVERMUCH №20 · Виноград и чёрная смородина · 20мг',stock:1},
+    {name:'OVERMUCH №23 · Малина и личи · 20мг',stock:1},
+    {name:'OVERMUCH №25 · Маракуйя · 20мг',stock:1},
+    {name:'OVERMUCH №26 · Ананас и арбуз · 20мг',stock:1}
+    ]};
+function ensureSet2(){
+  try{ if(localStorage.getItem('ls_set2_removed')==='1') return; }catch(e){}
+  for(var i=0;i<products.length;i++) if(products[i].id===6){ if(!products[i].flavors||!products[i].flavors.length) products[i].flavors=JSON.parse(JSON.stringify(SET2_FLAVORS)); return; }
+  products.push(JSON.parse(JSON.stringify(SET2_PRODUCT)));
+}
 function ensureSet(){
   try{ if(localStorage.getItem('ls_set_removed')==='1') return; }catch(e){}
   for(var i=0;i<products.length;i++) if(products[i].id===5) return;
@@ -1656,18 +1765,19 @@ function ensureSet(){
 }
 
 // ===== ВЫБОР ЦВЕТА =====
-var chooseProduct=null, chooseColor=null, chooseQty=1;
+var chooseProduct=null, chooseColor=null, chooseFlavor=null, chooseQty=1;
 
 function openChoose(id){
   chooseProduct=findProduct(id);
   if(!chooseProduct||getTotalStock(chooseProduct)<=0) return;
-  chooseColor=null; chooseQty=1;
+  chooseColor=null; chooseFlavor=null; chooseQty=1;
   document.getElementById('choose-title').textContent=chooseProduct.name;
   var isSet=isSetProduct(chooseProduct);
+  var isSet2=isSet2Product(chooseProduct);
   var devEl=document.getElementById('choose-device');
-  if(devEl){ devEl.style.display=isSet?'block':'none'; if(isSet) devEl.innerHTML='🎁 Устройство: <b>Feelin 2 · фиолетовый</b> — уже в сете. Осталось выбрать только вкус:'; }
+  if(devEl){ devEl.style.display=(isSet&&!isSet2)?'block':'none'; if(isSet&&!isSet2) devEl.innerHTML='🎁 Устройство: <b>Feelin 2 · фиолетовый</b> — уже в сете. Осталось выбрать только вкус:'; }
   var lblEl=document.getElementById('choose-color-label');
-  if(lblEl) lblEl.textContent=isSet?'Выберите вкус жидкости:':'Выберите цвет:';
+  if(lblEl) lblEl.textContent=isSet?'Выберите вкус жидкости:':(isSet2?'Шаг 1 из 3 — выберите цвет устройства:':'Выберите цвет:');
   var box=document.getElementById('choose-colors');
   box.innerHTML='';
   if(chooseProduct.colors&&chooseProduct.colors.length>0){
@@ -1708,20 +1818,86 @@ function selectColor(index){
       '<span class="color-left">'+(cc.stock>0?'Осталось: '+cc.stock+' шт.':'Нет в наличии')+'</span>';
     el.className=(i===index)?'color-option selected':'color-option';
   }
-  updateChooseView();
-}
-function chooseMinus(){ if(chooseQty>1) chooseQty--; updateChooseView(); }
+    updateChooseView();
+  if(isSet2Product(chooseProduct)) renderSet2Brands();
+}unction chooseMinus(){ if(chooseQty>1) chooseQty--; updateChooseView(); }
 function choosePlus(){
   var maxStock=getStock(chooseProduct,chooseColor);
   if(chooseQty<maxStock) chooseQty++;
   updateChooseView();
 }
+
+function renderSet2Brands(){
+  var box=document.getElementById('choose-colors');
+  var groups={}, order=[];
+  for(var i=0;i<chooseProduct.flavors.length;i++){
+    var f=chooseProduct.flavors[i];
+    var b=set2BrandOf(f.name);
+    if(!groups[b]){ groups[b]=[]; order.push(b); }
+    groups[b].push(f);
+  }
+  var html='<div class="color-option" style="border-color:rgba(91,200,255,.45);color:#5bc8ff;" onclick="backSet2Colors()">← К выбору цвета</div>';
+  for(var q=0;q<order.length;q++){
+    var b=order[q], arr=groups[b];
+    var free=0; for(var w=0;w<arr.length;w++) if(arr[w].stock>0) free++;
+    var dis=(free===0);
+    html+='<div class="color-option'+(dis?' empty':'')+'"'+(dis?'':' data-b="'+esc(b)+'"')+' data-act="brand">'+
+      '<span>'+(set2BrandIcons[b]||'🧪')+' '+esc(b)+'</span>'+
+      '<span class="color-left">'+(dis?'Нет в наличии':'Вкусов в наличии: '+free)+'</span></div>';
+  }
+  box.innerHTML=html;
+  var els=box.querySelectorAll('[data-act="brand"]');
+  for(var e=0;e<els.length;e++){
+    (function(el){ el.addEventListener('click', function(){ renderSet2Flavors(el.getAttribute('data-b')); }); })(els[e]);
+  }
+}
+function renderSet2Flavors(brand){
+  var box=document.getElementById('choose-colors');
+  var html='<div class="color-option" style="border-color:rgba(91,200,255,.45);color:#5bc8ff;" onclick="renderSet2Brands()">← К списку жидкостей</div>';
+  for(var i=0;i<chooseProduct.flavors.length;i++){
+    var f=chooseProduct.flavors[i];
+    if(set2BrandOf(f.name)!==brand) continue;
+    html+='<div class="color-option'+(chooseFlavor===f.name?' selected':'')+(f.stock<=0?' empty':'')+'" data-f="'+i+'">'+
+      '<span>'+(chooseFlavor===f.name?'✅ ':'')+esc(f.name)+'</span>'+
+      '<span class="color-left">'+(f.stock>0?'Осталось: '+f.stock+' шт.':'Нет в наличии')+'</span></div>';
+  }
+  box.innerHTML=html;
+  var els=box.querySelectorAll('[data-f]');
+  for(var e=0;e<els.length;e++){
+    (function(el){
+      el.addEventListener('click', function(){
+        var idx=parseInt(el.getAttribute('data-f'),10);
+        var f=chooseProduct.flavors[idx];
+        if(f.stock<=0) return;
+        chooseFlavor=f.name; chooseQty=1;
+        renderSet2Flavors(brand);
+        updateChooseView();
+      });
+    })(els[e]);
+  }
+}
+function backSet2Colors(){ openChoose(chooseProduct.id); }
+var set2BrandIcons={'Жигуль':'🚗','Sun Strike':'☀️','INDONJI':'🌋','Line UP':'🎯','Хвоя':'🌲','Twice on ice':'🧊','Indo drinks':'🥤','Edition exo':'💎','TEA':'🍵','Taboo':'🔮','OVERMUCH':'🔥'};
+function set2BrandOf(n){ var k=n.indexOf(' №'); return k>0?n.slice(0,k):n; }
 function updateChooseView(){
   document.getElementById('choose-qty').textContent=chooseQty;
   var hint=document.getElementById('choose-stock-hint');
   var confirmBtn=document.getElementById('confirm-add-btn');
   var hasColors = chooseProduct.colors && chooseProduct.colors.length>0;
-  if(hasColors && !chooseColor){
+  var isSet2=isSet2Product(chooseProduct);
+  if(isSet2){
+    chooseQty=1;
+    document.getElementById('choose-qty').textContent=chooseQty;
+    if(!chooseColor||!chooseFlavor){
+      hint.textContent=(!chooseColor)?'Сначала выберите цвет устройства':'Теперь выберите жидкость';
+      confirmBtn.disabled=true;
+      confirmBtn.textContent='Добавить в корзину';
+    } else {
+      hint.textContent='Доступно: '+getStock(chooseProduct,chooseColor+' · '+chooseFlavor)+' шт.';
+      confirmBtn.disabled=false;
+      confirmBtn.textContent='Добавить в корзину';
+    }
+  } else if(hasColors && !chooseColor){
     hint.textContent=isSetProduct(chooseProduct)?'Сначала выберите вкус':'Сначала выберите цвет';
     confirmBtn.disabled=true;
     confirmBtn.textContent='Добавить в корзину';
@@ -1743,7 +1919,9 @@ function confirmAddToCart(){
   if(chooseQty>getStock(chooseProduct,chooseColor)){
     alert('Столько штук этого цвета нет на складе!'); return;
   }
-  pendingAdd={id:chooseProduct.id,color:chooseColor,qty:chooseQty};
+  var isSet2=isSet2Product(chooseProduct);
+  if(isSet2 && !chooseFlavor){ alert('Выберите жидкость!'); return; }
+  pendingAdd={id:chooseProduct.id,color:isSet2?(chooseColor+' · '+chooseFlavor):chooseColor,qty:chooseQty};
   modalPlace=null; modalTime='12:00'; modalDate='';
   document.getElementById('pickup-sub').textContent='Выберите точку для «'+chooseProduct.name+'», затем нажмите «Добавить».';
   for(var i=0;i<places.length;i++) document.getElementById('mplace-'+i).className='place-btn';
@@ -2528,6 +2706,7 @@ function deleteProduct(id){
   for(var i=0;i<products.length;i++) if(products[i].id!==id) np.push(products[i]);
   products=np;
   if(id===5) { try{ localStorage.setItem('ls_set_removed','1'); }catch(e){} }
+  if(id===6) { try{ localStorage.setItem('ls_set2_removed','1'); }catch(e){} }
   saveState();
   renderCatalog();
   renderOwnerPhotos();
@@ -2931,7 +3110,7 @@ function syncPull(){
       var s = JSON.stringify(d);
       if (s === lastRemote) return;
       lastRemote = s;
-      if (d.products) { products = d.products; ensureSet(); }
+      if (d.products) { products = d.products; ensureSet(); ensureSet2(); }
       if (d.clients) clients = d.clients;
       if (d.chatMsgs) chatMsgs = d.chatMsgs;
       if (d.orders) orders = d.orders;
