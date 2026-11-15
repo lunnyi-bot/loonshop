@@ -423,6 +423,75 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .rule-num { font-weight:bold; font-size:14px; color:#e0e0e0; margin-bottom:6px; }
 
 @media (max-width:700px) { .brand { font-size:16px; } }
+
+/* ===== МОБИЛЬНЫЕ КАРТОЧКИ ===== */
+@media (max-width: 700px){
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .pcard { border-radius: 14px; }
+  .pcard-img { height: 110px; }
+  .pcard-img .emo { font-size: 38px; }
+  .pcard-body { padding: 10px; }
+  .pcard-name { font-size: 13px; margin-bottom: 4px; }
+  .pcard-desc { font-size: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+  .pcard-price { font-size: 15px; margin-bottom: 4px; }
+  .pcard-stock { font-size: 10px; margin-bottom: 8px; }
+  .pcard .btn { padding: 9px 6px; font-size: 12px; border-radius: 10px; }
+}
+
+/* Анимации вкладок и дока */
+.tab-page.visible { animation: tabIn .38s ease both; }
+@keyframes tabIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+.dock-btn .ic { display:inline-block; }
+.dock-btn:active .ic { transform:scale(.85); }
+.dock-btn.active .ic { animation: dockPop .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes dockPop { 0%{transform:scale(.7)} 60%{transform:scale(1.15)} 100%{transform:scale(1)} }
+/* Плавность */
+.smooth-lite .topbar, .smooth-lite .dock { backdrop-filter:none; }
+.smooth-lite .moon-glow { animation:none; }
+.smooth-lite .tab-page.visible { animation:none; }
+.smooth-off .topbar, .smooth-off .dock, .smooth-off .modal { backdrop-filter:none; }
+.smooth-off .moon-glow { display:none; }
+.smooth-off *, .smooth-off *::before, .smooth-off *::after { animation:none!important; transition:none!important; }
+/* Карта и регламент точки */
+.pmap { font-size:12px; font-weight:bold; color:#5bc8ff; cursor:pointer; padding:6px 10px; border:1px solid rgba(91,200,255,.35); border-radius:9px; flex-shrink:0; }
+.pmap:hover { background:rgba(91,200,255,.15); }
+.place-info { display:none; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:12px 14px; font-size:13px; color:#d0d0d0; line-height:1.5; margin-bottom:18px; }
+/* Ачивки */
+.achv-row { display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 20px; }
+.achv { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:10px; padding:8px 12px; font-size:12px; color:#b0b0b0; }
+.achv.on { background:rgba(255,201,60,.14); border-color:rgba(255,201,60,.45); color:#ffc93c; font-weight:bold; }
+.achv.dim { opacity:.45; }
+/* Ответ магазина на отзыв */
+.review-reply { margin-top:10px; background:rgba(126,240,168,.07); border:1px solid rgba(126,240,168,.25); border-radius:12px; padding:10px 14px; font-size:13px; color:#d0d0d0; }
+.review-reply .rt { color:#7ef0a8; font-weight:bold; margin-bottom:3px; }
+.reply-btn { background:rgba(91,200,255,.12); border:1px solid rgba(91,200,255,.35); color:#5bc8ff; padding:7px 12px; border-radius:9px; cursor:pointer; font-size:12px; font-weight:bold; margin-top:8px; }
+/* Журнал событий */
+.log-item { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 14px; font-size:13px; color:#d0d0d0; margin-bottom:8px; }
+.log-item .lt { color:#6e6e6e; font-size:11px; margin-right:8px; }
+/* Плавность — блок в профиле */
+.smooth-setting { background:rgba(24,24,24,.88); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:16px; margin-bottom:14px; }
+.smooth-setting .t { font-weight:bold; font-size:14px; margin-bottom:4px; }
+.smooth-setting .d { color:#8a8a8a; font-size:12px; margin-bottom:10px; }
+.smooth-row { display:flex; gap:8px; }
+.smooth-btn { flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:#d0d0d0; padding:10px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:bold; }
+.smooth-btn.selected { background:#e0e0e0; color:#0a0a0a; border-color:#e0e0e0; }
+#smooth-note { color:#8a8a8a; font-size:12px; margin-top:8px; }
+.profile-btn.danger { background:rgba(255,123,123,.1); border-color:rgba(255,123,123,.4); color:#ff7b7b; }
+/* Лента событий над каталогом */
+.ev-head { color:#c0c0c0; font-size:12px; font-weight:bold; letter-spacing:2px; margin:18px 0 10px; }
+.ev-item { background:rgba(24,24,24,.88); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:11px 14px; display:flex; align-items:center; gap:12px; cursor:pointer; margin-bottom:8px; }
+.ev-item:hover { background:rgba(255,255,255,.09); }
+.ev-hot { border-color:rgba(126,240,168,.65); background:rgba(126,240,168,.12); animation:evGlow 1.1s ease-in-out infinite alternate; }
+@keyframes evGlow { from { box-shadow:0 0 0 rgba(126,240,168,0); } to { box-shadow:0 0 16px rgba(126,240,168,.4); } }
+.ev-av { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#4a4a4a,#1a1a1a); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+.ev-mid { flex:1; min-width:0; }
+.ev-who { font-weight:bold; font-size:14px; }
+.ev-what { color:#9a9a9a; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ev-sum { color:#7ef0a8; font-weight:bold; font-size:14px; white-space:nowrap; }
+.ev-now { background:rgba(126,240,168,.22); color:#7ef0a8; font-size:10px; font-weight:bold; border-radius:6px; padding:2px 7px; vertical-align:middle; }
+/* Часы встреч и предупреждения */
+.schedule-line { background:rgba(91,200,255,.08); border:1px solid rgba(91,200,255,.3); border-radius:12px; padding:10px 14px; font-size:12px; color:#9fd6ff; line-height:1.55; margin-bottom:14px; }
+.time-warn { color:#ff7b7b; font-size:13px; text-align:center; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -491,14 +560,15 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <span id="info-datetime">—</span>
       <span class="dot-on">🟢 В сети: <b id="info-online">0</b></span>
       <span>👥 Всего: <b id="info-total">0</b></span>
+      <span>🤝 Сделок: <b id="info-done">0</b></span>
     </div>
     <div class="welcome">
       <span>🌙 Добро пожаловать, <b id="welcome-name">…</b></span>
-      <span class="right">Выберите идеальный вариант</span>
-    </div>
+      </div>
+    <div id="ev-block" style="margin-bottom:4px;"></div>
     <div class="catalog-head">
       <div class="over">КОЛЛЕКЦИЯ</div>
-      <div class="catalog-head-row"><h2>Каталог</h2><div class="pos-count" id="pos-count">0 поз.</div></div>
+      <div class="catalog-head-row"><h2>Каталог</h2><div style="display:flex; gap:8px; align-items:center;"><span class="owner-tag">🛠 v19</span><div class="pos-count" id="pos-count">0 поз.</div></div></div>
     </div>
     <div class="search">
       <span>🔍</span>
@@ -512,6 +582,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <button class="cat" onclick="showCategory('disposables', this)">⚡ Одноразки</button>
       <button class="cat" onclick="showCategory('consumables', this)">⚙️ Расходники</button>
       <button class="cat" onclick="showCategory('snus', this)">🌿 Снюс</button>
+      <button class="cat" onclick="showCategory('sets', this)">🎁 Сеты</button>
     </div>
     <div class="sort-row">
       <select class="sort-select" id="sort-select" onchange="renderCatalog()">
@@ -589,13 +660,27 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
         <div class="stat"><div class="l">Заказы</div><div class="v" id="stat-orders">0</div></div>
         <div class="stat"><div class="l">Сделки</div><div class="v" id="stat-deals">0</div></div>
       </div>
+      <div class="achv-row" id="achv-row" style="margin:14px 0 0;"></div>
     </div>
     <button class="profile-btn" onclick="openDM('@loonshop','client')">✉️ Написать в LoonShop</button>
+    <button class="profile-btn" onclick="openDM('@Loonshop_mngr','manager')">👨‍💼 Связь с менеджером</button>
     <button class="profile-btn" onclick="showTab('orders')">📦 Мои заказы</button>
     <button class="profile-btn" onclick="showTab('reviews')">⭐ Отзывы</button>
     <button class="profile-btn" onclick="showTab('chat')">💬 Общий чат</button>
     <button class="profile-btn" onclick="openRules()">📜 Правила магазина</button>
     <button class="profile-btn bazar" onclick="openBazar()">🛒 Наша барахолка</button>
+    <div class="smooth-setting">
+      <div class="t">✨ Плавность</div>
+      <div class="d">Анимации интерфейса. Авто — само подстроится под телефон.</div>
+      <div class="smooth-row">
+        <button class="smooth-btn" data-m="auto" onclick="setSmooth('auto')">Авто</button>
+        <button class="smooth-btn" data-m="lite" onclick="setSmooth('lite')">Вкл</button>
+        <button class="smooth-btn" data-m="off" onclick="setSmooth('off')">Выкл</button>
+      </div>
+      <div id="smooth-note"></div>
+    </div>
+    <button class="profile-btn" id="refresh-btn" onclick="refreshData()">🔄 Обновить данные</button>
+    <button class="profile-btn danger" onclick="logoutDevice()">🚪 Выйти на этом устройстве</button>
     <button class="profile-btn" id="owner-btn" style="display:none;" onclick="showTab('owner')">🔒 Панель владельца</button>
     <p class="hint" style="text-align:center;">Данные синхронизируются между устройствами через Firebase.</p>
   </div>
@@ -634,6 +719,13 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
     <div class="section-gap"></div>
 
+    <button class="clients-toggle-btn" onclick="toggleBlock('adm-log')">
+      <span>📜 Журнал событий</span><span class="cnt" id="adm-log-cnt">0</span>
+    </button>
+    <div class="hidden-block" id="adm-log"></div>
+
+    <div class="section-gap"></div>
+
     <button class="clients-toggle-btn" onclick="toggleBlock('adm-dm-list')">
       <span>💬 Диалоги с клиентами</span><span class="cnt" id="adm-dm-cnt">0</span>
     </button>
@@ -653,6 +745,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
             <option value="disposables">Одноразки</option>
             <option value="consumables">Расходники</option>
             <option value="snus">Снюс</option>
+          <option value="sets">Сеты</option>
           </select>
         </div>
         <div class="photo-row"><span class="nm">Цена (₽)</span><input class="photo-input" id="np-price" type="number" placeholder="1300" min="0"></div>
@@ -711,7 +804,8 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 <div class="modal" id="choose-window">
   <button class="close-btn" onclick="closeChoose()">✕</button>
   <h2 id="choose-title">Товар</h2>
-  <p class="color-label">Выберите цвет:</p>
+  <p class="color-label" id="choose-device" style="display:none; background:rgba(155,123,255,.12); border:1px solid rgba(155,123,255,.35); border-radius:10px; padding:10px 14px; color:#c9b8ff;"></p>
+  <p class="color-label" id="choose-color-label">Выберите цвет:</p>
   <div class="colors" id="choose-colors"></div>
   <p class="qty-label">Количество (шт.):</p>
   <div class="qty-controls">
@@ -736,6 +830,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <option value="disposables">Одноразки</option>
       <option value="consumables">Расходники</option>
       <option value="snus">Снюс</option>
+          <option value="sets">Сеты</option>
     </select>
   </div>
   <div class="photo-row"><span class="nm">Цена (₽)</span><input class="photo-input" id="ed-price" type="number" min="0"></div>
@@ -745,6 +840,8 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="photo-row"><span class="nm">Эмодзи</span><input class="photo-input" id="ed-emoji" placeholder="🟣"></div>
   <div class="photo-row"><span class="nm">Цвета</span><input class="photo-input" id="ed-colors" placeholder="Розовый,#ff9ecb,5; Синий,#5bc8ff,3"></div>
   <p class="owner-hint" style="margin-top:8px;">Цвета — формат <b>Название,#hex,количество</b> через точку с запятой. Если оставить пустым, будет общее количество из поля выше. При сохранении цветов старые остатки по цветам заменяются новыми.</p>
+  <div class="photo-row"><span class="nm">Вкусы сета</span><input class="photo-input" id="ed-flavors" placeholder="Хвоя №1 · Манго · 20мг|1; Хвоя №2 · Анис · 20мг|1"></div>
+  <p class="owner-hint" style="margin-top:8px;">Вкусы сета — формат <b>Название вкуса|количество</b> через точку с запятой (| — палочка). Меняешь цифру у вкуса — остаток обновляется. Работает только для сетов: каждый вкус — отдельная позиция со своим остатком.</p>
   <div class="modal-actions">
     <button class="btn-cancel" onclick="closeEdit()">Отмена</button>
     <button class="btn-ok" onclick="saveEdit()">Сохранить</button>
@@ -759,19 +856,29 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <h2 style="font-size:24px;">Откуда будете забирать?</h2>
   <p class="m-sub" id="pickup-sub">Выберите точку, дату и время, затем нажмите «Добавить».</p>
   <div class="pickup-places" id="pickup-places-modal">
-    <button class="place-btn" id="mplace-0" onclick="selectPickupModal(0)"><span>📍 ТЦ Космос</span><span class="check">✓</span></button>
-    <button class="place-btn" id="mplace-1" onclick="selectPickupModal(1)"><span>📍 Дом быта</span><span class="check">✓</span></button>
-    <button class="place-btn" id="mplace-2" onclick="selectPickupModal(2)"><span>📍 ДК Тольятти</span><span class="check">✓</span></button>
+    <button class="place-btn" id="mplace-0" onclick="selectPickupModal(0)"><span>📍 ТЦ Космос</span><span class="pmap" onclick="event.stopPropagation();openPlaceMap(0)">🗺 Карта</span><span class="check">✓</span></button>
+    <button class="place-btn" id="mplace-1" onclick="selectPickupModal(1)"><span>📍 Дом быта</span><span class="pmap" onclick="event.stopPropagation();openPlaceMap(1)">🗺 Карта</span><span class="check">✓</span></button>
+    <button class="place-btn" id="mplace-2" onclick="selectPickupModal(2)"><span>📍 ДК Тольятти</span><span class="pmap" onclick="event.stopPropagation();openPlaceMap(2)">🗺 Карта</span><span class="check">✓</span></button>
   </div>
+  <div class="place-info" id="place-info"></div>
   <div class="pickup-title">📅 ДАТА ВСТРЕЧИ</div>
   <input type="date" class="date-input" id="date-input-modal" onchange="updatePickupReady()" style="margin-bottom:18px;">
-  <div class="pickup-title">🕒 ВРЕМЯ ВСТРЕЧИ (с 10:00 до 20:00)</div>
+  <div class="pickup-title" id="time-title-modal">🕒 ВРЕМЯ ВСТРЕЧИ</div>
+  <div class="schedule-line">🗓 Встречи: Пн–Ср и Пт 16:00–20:00 · Чт 14:30–20:00 · Сб–Вс 10:00–20:00.<br>Заказ — минимум за 60 минут до встречи.</div>
   <input type="range" class="time-slider" id="time-slider-modal" min="600" max="1200" step="30" value="720" oninput="updatePickupTime()">
   <div class="time-label" id="time-label-modal">12:00</div>
+  <div class="time-warn" id="time-warn-modal" style="display:none;"></div>
   <div class="modal-actions">
     <button class="btn-cancel" onclick="cancelPickup()">Отмена</button>
     <button class="btn-ok" id="pickup-add-btn" onclick="confirmPickup(event)" disabled>Добавить</button>
   </div>
+</div>
+
+<!-- Окно события -->
+<div class="overlay" id="overlay-ev" onclick="overlayClose(event,'overlay-ev','ev-window')"></div>
+<div class="modal" id="ev-window">
+  <button class="close-btn" onclick="closeEventModal()">✕</button>
+  <div id="ev-body"></div>
 </div>
 
 <!-- Корзина -->
@@ -865,6 +972,36 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 var STORAGE_KEY = 'loonshop_v8';
 var BAZAR_URL = 'https://t.me/VapeTolyatti63';
 
+var NOTIFY_URL = 'https://loonshop.xylugan4uk123.workers.dev';
+var NOTIFY_KEY = 'loon-secret-2026';
+function notifyTg(text, to){
+  try{
+    var u = NOTIFY_URL + '?k=' + encodeURIComponent(NOTIFY_KEY) + '&text=' + encodeURIComponent(text);
+    if(to) u += '&to=' + encodeURIComponent(to);
+    fetch(u, {mode:'no-cors'});
+  }catch(e){}
+}
+function clientChatId(o){
+  var c = findClient(o.customer);
+  return (c && c.tgId) ? String(c.tgId) : null;
+}
+function orderItemsText(o){
+  var s='';
+  for(var i=0;i<o.items.length;i++){ s += '• '+o.items[i].name+' ('+o.items[i].color+') × '+o.items[i].qty+' — '+o.items[i].price+' \u20bd\n'; }
+  return s;
+}
+function newOrderTextToOwner(o){
+  var t = '\uD83C\uDF19 НОВЫЙ ЗАКАЗ в LoonShop';
+  t += '\nКлиент: ' + (me.name||'') + ' ' + (me.username||'');
+  t += '\n🆔 Заказ №' + (orders.indexOf(o)+1) + ' — назовите этот номер в чате для быстрого ответа';
+  if(me.tgId) t += '\n\uD83C\uDD94 ' + me.tgId + ' · dm:' + me.username + '\n\u21A9\uFE0F Ответьте на это сообщение — уйдёт клиенту';
+  t += '\nТовары:\n' + orderItemsText(o);
+  t += 'Итого: ' + o.sum + ' \u20BD\nОплата: наличные, расчёт ' + o.paid + ' \u20BD, сдача ' + o.change + ' \u20BD';
+  t += '\nТочка: \uD83D\uDCCD ' + o.place + '\nКогда: ' + fmtDate(o.date) + ' · ' + o.time;
+  return t;
+}
+
+
 // Секретный код владельца для входа с компьютера (поменяй на свой!)
 var OWNER_CODE = 'LOON-OWNER-2026';
 
@@ -901,22 +1038,78 @@ var defaultProducts = [
   { id:2, category:'pods', name:'Feelin', color:'Под-система, 800 mAh', price:600, emoji:'🔵', img:'',
     colors:[{name:'Розовый',hex:'#ff9ecb',stock:4},{name:'Красный',hex:'#ff5252',stock:6},{name:'Голубой',hex:'#5bc8ff',stock:2}] },
   { id:3, category:'liquids', name:'Пошлая Рабыня', color:'Жидкость 30ml', price:300, emoji:'🧪', img:'', stock:10 },
-  { id:4, category:'consumables', name:'Картридж XROS 0.6 Ω', color:'CORE 3.0, 3 ml', price:250, emoji:'⚙', img:'', stock:15 }
+  { id:4, category:'consumables', name:'Картридж XROS 0.6 Ω', color:'CORE 3.0, 3 ml', price:250, emoji:'⚙', img:'', stock:15 },
+  { id:5, category:'sets', name:'Feelin 2 + жидкость', color:'Сет: Feelin 2 фиолетовый + жидкость на выбор', price:900, emoji:'🎁', img:'',
+    colors:[
+    {name:'Жигуль №4 · Виноград, яблоко, алоэ · 20мг',hex:'#set',stock:1},
+    {name:'Жигуль №5 · Ананас, манго, апельсин · 20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №7 · Малина, мята, чёрная смородина, лёд · 12/20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №8 · Энергетик, киви, лимонад, зелёное яблоко, лёд · 12/20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №9 · Белый персик, сочный манго, мёд, лёд · 20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №11 · Чёрный чай, ваниль, черешня, лёд · 20мг',hex:'#set',stock:1},
+    {name:'INDONJI №12 · Вишня/барбарис · 25/40мг',hex:'#set',stock:1},
+    {name:'INDONJI №13 · Манго/виноград · 25мг',hex:'#set',stock:1},
+    {name:'INDONJI №14 · Персик/яблоко · 25мг',hex:'#set',stock:1},
+    {name:'INDONJI №15 · Черешня/яблоко · 25/40мг',hex:'#set',stock:1},
+    {name:'INDONJI №16 · Апельсин/спрайт · 25/40мг',hex:'#set',stock:1},
+    {name:'INDONJI №17 · Чёрная смородина/лимон · 25/40мг',hex:'#set',stock:1},
+    {name:'Line UP №18 · Морс из кисло-сладких ягод и ароматных трав · 40мг',hex:'#set',stock:1},
+    {name:'Line UP №19 · Прохладный тропический микс из ананаса, персика и манго · 40мг',hex:'#set',stock:1},
+    {name:'Line UP №20 · Охлаждающие виноград, личи и чёрная смородина · 40мг',hex:'#set',stock:1},
+    {name:'Хвоя №1 · Манго · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №2 · Анис · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №3 · Дыня · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №4 · Айва · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №5 · Хвоя · 20мг',hex:'#set',stock:1},
+    {name:'Twice on ice №7 · Красный апельсин и драгонфрукт со льдом · 20/40мг',hex:'#set',stock:1},
+    {name:'Twice on ice №8 · Киви, груша и мята со льдом · 40мг',hex:'#set',stock:1},
+    {name:'Twice on ice №9 · Вишня и апельсин со льдом · 40мг',hex:'#set',stock:1},
+    {name:'Twice on ice №11 · Гранат и личи со льдом · 40мг',hex:'#set',stock:1},
+    {name:'Indo drinks №12 · Морс клюква брусника · 20мг',hex:'#set',stock:1},
+    {name:'Indo drinks №13 · Ананас банан дыня · 20мг',hex:'#set',stock:1},
+    {name:'Edition exo №14 · Микс из личи и алоэ со льдом · 20мг',hex:'#set',stock:1},
+    {name:'TEA №15 · Клубника малина · 20мг',hex:'#set',stock:1},
+    {name:'Taboo №17 · Прохладный апельсин, маракуйя и гуава · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №20 · Виноград и чёрная смородина · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №23 · Малина и личи · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №25 · Маракуйя · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №26 · Ананас и арбуз · 20мг',hex:'#set',stock:1}
+    ] }
 ];
 
 var places = ['ТЦ Космос', 'Дом быта', 'ДК Тольятти'];
+
+/* ЗАМЕНИ ПОД СЕБЯ: адреса, места встречи и запросы карт для точек */
+var PLACE_INFO = [
+  { name:'ТЦ Космос',    addr:'ул. Карла Маркса, 57',  meet:'встреча на улице, около Груши',      map:'Тольятти, ул. Карла Маркса, 57' },
+  { name:'Дом быта',     addr:'ул. Ленинградская, 53', meet:'встреча около центрального входа',   map:'Тольятти, ул. Ленинградская, 53' },
+  { name:'ДК Тольятти',  addr:'бул. Ленина, 1',        meet:'встреча около центрального входа',   map:'Тольятти, бул. Ленина, 1' }
+];
+function openPlaceMap(i){
+  var q = encodeURIComponent(PLACE_INFO[i].map);
+  window.open('https://yandex.ru/maps/?text=' + q, '_blank');
+}
+function renderPlaceInfo(i){
+  var el = document.getElementById('place-info'); if(!el) return;
+  if(i === null || i === undefined){ el.style.display='none'; return; }
+  var p = PLACE_INFO[i];
+  el.innerHTML = '<b>' + p.name + '</b> · ' + p.addr + '<br>📍 ' + p.meet;
+  el.style.display = 'block';
+}
+
 
 var defaultClients = [];
 var defaultChatMsgs = [];
 
 var products, clients, chatMsgs, orders, reviews, dms, cart;
+var logs = [];
 var me = null;
 var firstSyncDone = false;
 
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms
+      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs
     }));
   } catch(e) { }
   // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
@@ -931,7 +1124,7 @@ function saveState() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           products: products, clients: clients, chatMsgs: chatMsgs,
-          orders: orders, reviews: reviews, dms: dms
+          orders: orders, reviews: reviews, dms: dms, logs: logs
         })
       });
     } catch(e) { }
@@ -950,12 +1143,13 @@ function loadState() {
     var raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       var d = JSON.parse(raw);
-      if (d.products) products = d.products;
+      if (d.products) { products = d.products; ensureSet(); }
       if (d.clients) clients = d.clients;
       if (d.chatMsgs) chatMsgs = d.chatMsgs;
       if (d.orders) orders = d.orders;
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
+      if (d.logs) logs = d.logs;
     }
   } catch(e) { }
 }
@@ -990,7 +1184,7 @@ function clientBadges(c) {
   return h;
 }
 function onlineBadge(c) {
-  return c.online ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
+  return isFresh(c) ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
 }
 function fmtDate(dateStr) {
   if (!dateStr) return '—';
@@ -1016,7 +1210,7 @@ function statusBadge(st) {
   return '<span class="status-badge '+cls+'">'+st+'</span>';
 }
 function catName(cat) {
-  var map = { pods:'Под-системы', liquids:'Жидкости', disposables:'Одноразки', consumables:'Расходники', snus:'Снюс', all:'Все' };
+  var map = { pods:'Под-системы', liquids:'Жидкости', disposables:'Одноразки', consumables:'Расходники', snus:'Снюс', sets:'Сеты', all:'Все' };
   return map[cat] || cat;
 }
 
@@ -1104,7 +1298,7 @@ function enterAs(name, username, tgId) {
 
   document.getElementById('login-screen').classList.remove('open');
   document.getElementById('app-root').style.display = 'block';
-  document.getElementById('welcome-name').textContent = username;
+  document.getElementById('welcome-name').textContent = name || username;
   renderAll();
 }
 
@@ -1130,7 +1324,8 @@ for (var i=0;i<45;i++) dots.push({
     if(d.y>cv.height){d.y=-10;d.x=Math.random()*cv.width;}
     if(d.x>cv.width)d.x=0; if(d.x<0)d.x=cv.width;
   }
-  requestAnimationFrame(drawDots);
+  if(particleOn) requestAnimationFrame(drawDots);
+  else window.__resumeDots = function(){ requestAnimationFrame(drawDots); };
 })();
 
 // ===== ВЕРХНЯЯ СТРОЧКА =====
@@ -1141,11 +1336,70 @@ function updateTopInfo() {
   var el = document.getElementById('info-datetime');
   if (el) el.textContent = n.getDate()+' '+months[n.getMonth()]+' '+n.getFullYear()+' · '+days[n.getDay()]+' · '+nowTime();
   var on = 0;
-  for (var i=0;i<clients.length;i++) if (clients[i].online && !clients[i].banned) on++;
+  for (var i=0;i<clients.length;i++) if (isFresh(clients[i]) && !clients[i].banned) on++;
   document.getElementById('info-online').textContent = on;
   document.getElementById('info-total').textContent = clients.length;
+  var dn=0;
+  for (var j=0;j<orders.length;j++) if (orders[j].status==='Выполнен') dn++;
+  document.getElementById('info-done').textContent = dn;
+}
+// ===== ЛЕНТА СОБЫТИЙ НАД КАТАЛОГОМ =====
+function renderEvents(){
+  var el=document.getElementById('ev-block'); if(!el) return;
+  var recent=[];
+  for(var i=orders.length-1;i>=0&&recent.length<10;i--){
+    if(orders[i].status!=='Отменён') recent.push({o:orders[i],idx:i});
+  }
+  if(recent.length===0){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='block';
+  var now=Date.now();
+  var html='<div class="ev-head">🔥 СОБЫТИЯ МАГАЗИНА</div>';
+  for(var k=0;k<recent.length;k++){
+    var o=recent[k].o;
+    var c=findClient(o.customer)||{};
+    var hot=o.created&&(now-o.created<10000);
+    var items='';
+    for(var j=0;j<o.items.length;j++){
+      items+=esc(o.items[j].name)+(o.items[j].qty>1?' ×'+o.items[j].qty:'');
+      if(j<o.items.length-1) items+=', ';
+    }
+    html+='<div class="ev-item'+(hot?' ev-hot':'')+'" onclick="showEventModal('+recent[k].idx+')">'+
+      '<div class="ev-av">'+(c.girl?'🌸':'🌙')+'</div>'+
+      '<div class="ev-mid">'+
+        '<div class="ev-who">'+esc(c.name||'Клиент')+(hot?' <span class="ev-now">🔥 СЕЙЧАС</span>':'')+'</div>'+
+        '<div class="ev-what">'+items+'</div>'+
+      '</div>'+
+      '<div class="ev-sum">'+o.sum+' ₽</div>'+
+    '</div>';
+  }
+  el.innerHTML=html;
+}
+function showEventModal(idx){
+  var o=orders[idx]; if(!o) return;
+  var c=findClient(o.customer)||{};
+  var rows='';
+  for(var j=0;j<o.items.length;j++){
+    var it=o.items[j];
+    rows+='<div class="od-row"><span>'+esc(it.name)+(it.color&&it.color!=='—'?' ('+esc(it.color)+')':'')+' × '+it.qty+'</span><span class="dim">'+(it.price*it.qty)+' ₽</span></div>';
+  }
+  document.getElementById('ev-body').innerHTML=
+    '<div class="pickup-title" style="margin-bottom:6px;">СОБЫТИЕ</div>'+
+    '<div class="member-row" style="margin-bottom:14px;">'+
+      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span></div>'+
+      '<div><div class="member-name" style="font-size:20px;">'+esc(c.name||'Клиент')+'</div></div>'+
+    '</div>'+
+    '<div class="pickup-title">ЧТО ЗАКАЗАЛИ</div>'+rows+
+    '<div class="cart-total-line"><span>Итого:</span><span class="sum">'+o.sum+' ₽</span></div>'+
+    '<div class="modal-actions"><button class="btn-cancel" onclick="closeEventModal()">Закрыть</button></div>';
+  document.getElementById('overlay-ev').className='overlay open';
+  document.getElementById('ev-window').style.display='block';
+}
+function closeEventModal(){
+  document.getElementById('overlay-ev').className='overlay';
+  document.getElementById('ev-window').style.display='none';
 }
 setInterval(updateTopInfo, 1000);
+setInterval(renderEvents, 1000);
 
 // ===== СКЛАД =====
 function getStock(p,colorName){
@@ -1202,6 +1456,7 @@ function showCategory(cat, btn){
 }
 
 function renderCatalog(){
+  ensureSet();
   catalogEl.innerHTML='';
   var query = document.getElementById('search-input').value.toLowerCase();
   var sort = document.getElementById('sort-select').value;
@@ -1260,11 +1515,29 @@ function editProduct(id){
   var colorsStr = '';
   if(p.colors){
     for(var i=0;i<p.colors.length;i++){
+      if(p.colors[i].hex==='#set') continue;
       colorsStr += p.colors[i].name+','+p.colors[i].hex+','+p.colors[i].stock;
-      if(i < p.colors.length-1) colorsStr += '; ';
+      if(i < p.colors.length-1 && !(i+1<p.colors.length && p.colors[i+1].hex==='#set' && colorsStr.slice(-2)=='; ')) colorsStr += '; ';
     }
+    if(colorsStr.slice(-2)=='; ') colorsStr = colorsStr.slice(0,-2);
   }
   document.getElementById('ed-colors').value = colorsStr;
+  var flavEl=document.getElementById('ed-flavors');
+  if(flavEl){
+    var flavStr='';
+    if(p.flavors && p.flavors.length>0){
+      for(var fi=0;fi<p.flavors.length;fi++){
+        flavStr += p.flavors[fi].name+'|'+p.flavors[fi].stock;
+        if(fi < p.flavors.length-1) flavStr += '; ';
+      }
+    } else if(p.colors && p.colors[0] && p.colors[0].hex==='#set'){
+      for(var fi=0;fi<p.colors.length;fi++){
+        flavStr += p.colors[fi].name+'|'+p.colors[fi].stock;
+        if(fi < p.colors.length-1) flavStr += '; ';
+      }
+    }
+    flavEl.value=flavStr;
+  }
   document.getElementById('overlay-edit').className='overlay open';
   document.getElementById('edit-window').style.display='block';
 }
@@ -1293,14 +1566,23 @@ function saveEdit(){
 
   var desc = document.getElementById('ed-desc').value.trim();
   var colorsRaw = document.getElementById('ed-colors').value.trim();
+  var flavorsRaw = document.getElementById('ed-flavors') ? document.getElementById('ed-flavors').value.trim() : '';
+  var wasSet = p.colors && p.colors[0] && p.colors[0].hex==='#set';
 
-  if(colorsRaw){
+  if(flavorsRaw){
+    var fl = parseFlavors(flavorsRaw);
+    if(fl.length>0){
+      p.colors = fl; if(desc) p.color = desc; delete p.stock;
+    }
+  } else if(colorsRaw){
     var colors = parseColors(colorsRaw);
     if(colors.length>0){
       p.colors = colors;
       if(desc) p.color = desc;
       delete p.stock; // наличие теперь считается по цветам
     }
+  } else if(wasSet){
+    if(desc) p.color = desc; // вкусы сета не трогаем — их правят в поле выше
   } else {
     var stock = parseInt(document.getElementById('ed-stock').value,10);
     if(isNaN(stock) || stock<0) stock = 0;
@@ -1316,22 +1598,88 @@ function saveEdit(){
   alert('Товар обновлён!');
 }
 
+// ===== СЕТЫ: ПОМОЩНИКИ =====
+function isSetProduct(p){
+  return p && p.colors && p.colors.length>0 && p.colors[0].hex==='#set';
+}
+function parseFlavors(raw){
+  var out=[];
+  var parts=raw.split(';');
+  for(var i=0;i<parts.length;i++){
+    var t=parts[i].trim(); if(!t) continue;
+    var pi=t.lastIndexOf('|');
+    if(pi<1) continue;
+    var nm=t.slice(0,pi).trim();
+    var st=parseInt(t.slice(pi+1).trim(),10);
+    if(isNaN(st)||st<0) st=0;
+    if(nm) out.push({name:nm, hex:'#set', stock:st});
+  }
+  return out;
+}
+var SET_PRODUCT = { id:5, category:'sets', name:'Feelin 2 + жидкость', color:'Сет: Feelin 2 фиолетовый + жидкость на выбор', price:900, emoji:'🎁', img:'',
+    colors:[
+    {name:'Жигуль №4 · Виноград, яблоко, алоэ · 20мг',hex:'#set',stock:1},
+    {name:'Жигуль №5 · Ананас, манго, апельсин · 20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №7 · Малина, мята, чёрная смородина, лёд · 12/20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №8 · Энергетик, киви, лимонад, зелёное яблоко, лёд · 12/20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №9 · Белый персик, сочный манго, мёд, лёд · 20мг',hex:'#set',stock:1},
+    {name:'Sun Strike №11 · Чёрный чай, ваниль, черешня, лёд · 20мг',hex:'#set',stock:1},
+    {name:'INDONJI №12 · Вишня/барбарис · 25/40мг',hex:'#set',stock:1},
+    {name:'INDONJI №13 · Манго/виноград · 25мг',hex:'#set',stock:1},
+    {name:'INDONJI №14 · Персик/яблоко · 25мг',hex:'#set',stock:1},
+    {name:'INDONJI №15 · Черешня/яблоко · 25/40мг',hex:'#set',stock:1},
+    {name:'INDONJI №16 · Апельсин/спрайт · 25/40мг',hex:'#set',stock:1},
+    {name:'INDONJI №17 · Чёрная смородина/лимон · 25/40мг',hex:'#set',stock:1},
+    {name:'Line UP №18 · Морс из кисло-сладких ягод и ароматных трав · 40мг',hex:'#set',stock:1},
+    {name:'Line UP №19 · Прохладный тропический микс из ананаса, персика и манго · 40мг',hex:'#set',stock:1},
+    {name:'Line UP №20 · Охлаждающие виноград, личи и чёрная смородина · 40мг',hex:'#set',stock:1},
+    {name:'Хвоя №1 · Манго · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №2 · Анис · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №3 · Дыня · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №4 · Айва · 20мг',hex:'#set',stock:1},
+    {name:'Хвоя №5 · Хвоя · 20мг',hex:'#set',stock:1},
+    {name:'Twice on ice №7 · Красный апельсин и драгонфрукт со льдом · 20/40мг',hex:'#set',stock:1},
+    {name:'Twice on ice №8 · Киви, груша и мята со льдом · 40мг',hex:'#set',stock:1},
+    {name:'Twice on ice №9 · Вишня и апельсин со льдом · 40мг',hex:'#set',stock:1},
+    {name:'Twice on ice №11 · Гранат и личи со льдом · 40мг',hex:'#set',stock:1},
+    {name:'Indo drinks №12 · Морс клюква брусника · 20мг',hex:'#set',stock:1},
+    {name:'Indo drinks №13 · Ананас банан дыня · 20мг',hex:'#set',stock:1},
+    {name:'Edition exo №14 · Микс из личи и алоэ со льдом · 20мг',hex:'#set',stock:1},
+    {name:'TEA №15 · Клубника малина · 20мг',hex:'#set',stock:1},
+    {name:'Taboo №17 · Прохладный апельсин, маракуйя и гуава · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №20 · Виноград и чёрная смородина · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №23 · Малина и личи · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №25 · Маракуйя · 20мг',hex:'#set',stock:1},
+    {name:'OVERMUCH №26 · Ананас и арбуз · 20мг',hex:'#set',stock:1}
+    ] };
+function ensureSet(){
+  try{ if(localStorage.getItem('ls_set_removed')==='1') return; }catch(e){}
+  for(var i=0;i<products.length;i++) if(products[i].id===5) return;
+  products.push(JSON.parse(JSON.stringify(SET_PRODUCT)));
+}
+
 // ===== ВЫБОР ЦВЕТА =====
-var chooseProduct=null, chooseColor=null, chooseQty=1;
+var chooseProduct=null, chooseColor=null, chooseFlavor=null, chooseQty=1;
 
 function openChoose(id){
   chooseProduct=findProduct(id);
   if(!chooseProduct||getTotalStock(chooseProduct)<=0) return;
-  chooseColor=null; chooseQty=1;
+  chooseColor=null; chooseFlavor=null; chooseQty=1;
   document.getElementById('choose-title').textContent=chooseProduct.name;
+  var isSet=isSetProduct(chooseProduct);
+  var devEl=document.getElementById('choose-device');
+  if(devEl){ devEl.style.display=isSet?'block':'none'; if(isSet) devEl.innerHTML='🎁 Устройство: <b>Feelin 2 · фиолетовый</b> — уже в сете. Осталось выбрать только вкус:'; }
+  var lblEl=document.getElementById('choose-color-label');
+  if(lblEl) lblEl.textContent=isSet?'Выберите вкус жидкости:':'Выберите цвет:';
   var box=document.getElementById('choose-colors');
   box.innerHTML='';
   if(chooseProduct.colors&&chooseProduct.colors.length>0){
     for(var i=0;i<chooseProduct.colors.length;i++){
       var c=chooseProduct.colors[i];
+      var dotHtml=(c.hex==='#set')?'<b style="margin-right:8px;">🎁</b>':'<span class="color-dot" style="background:'+c.hex+'"></span>';
       var btn=document.createElement('div');
       btn.className='color-option'; btn.id='color-'+i;
-      btn.innerHTML='<span><span class="color-dot" style="background:'+c.hex+'"></span>'+c.name+'</span>'+
+      btn.innerHTML='<span>'+dotHtml+c.name+'</span>'+
         '<span class="color-left">'+(c.stock>0?'Осталось: '+c.stock+' шт.':'Нет в наличии')+'</span>';
       if(c.stock<=0) btn.className='color-option empty';
       btn.setAttribute('onclick','selectColor('+i+')');
@@ -1358,11 +1706,12 @@ function selectColor(index){
   for(var i=0;i<chooseProduct.colors.length;i++){
     var el=document.getElementById('color-'+i);
     var cc=chooseProduct.colors[i];
-    el.innerHTML='<span><span class="color-dot" style="background:'+cc.hex+'"></span>'+cc.name+'</span>'+
+    var dotHtml2=(cc.hex==='#set')?'<b style="margin-right:8px;">🎁</b>':'<span class="color-dot" style="background:'+cc.hex+'"></span>';
+    el.innerHTML='<span>'+dotHtml2+cc.name+'</span>'+
       '<span class="color-left">'+(cc.stock>0?'Осталось: '+cc.stock+' шт.':'Нет в наличии')+'</span>';
     el.className=(i===index)?'color-option selected':'color-option';
   }
-  updateChooseView();
+    updateChooseView();
 }
 function chooseMinus(){ if(chooseQty>1) chooseQty--; updateChooseView(); }
 function choosePlus(){
@@ -1370,13 +1719,14 @@ function choosePlus(){
   if(chooseQty<maxStock) chooseQty++;
   updateChooseView();
 }
+
 function updateChooseView(){
   document.getElementById('choose-qty').textContent=chooseQty;
   var hint=document.getElementById('choose-stock-hint');
   var confirmBtn=document.getElementById('confirm-add-btn');
   var hasColors = chooseProduct.colors && chooseProduct.colors.length>0;
   if(hasColors && !chooseColor){
-    hint.textContent='Сначала выберите цвет';
+    hint.textContent=isSetProduct(chooseProduct)?'Сначала выберите вкус':'Сначала выберите цвет';
     confirmBtn.disabled=true;
     confirmBtn.textContent='Добавить в корзину';
   } else {
@@ -1392,7 +1742,7 @@ var pendingAdd=null, modalPlace=null, modalTime='12:00', modalDate='';
 function confirmAddToCart(){
   var hasColors = chooseProduct.colors && chooseProduct.colors.length>0;
   if(hasColors && !chooseColor){
-    alert('Сначала выберите цвет!'); return;
+    alert(isSetProduct(chooseProduct)?'Сначала выберите вкус жидкости!':'Сначала выберите цвет!'); return;
   }
   if(chooseQty>getStock(chooseProduct,chooseColor)){
     alert('Столько штук этого цвета нет на складе!'); return;
@@ -1402,22 +1752,96 @@ function confirmAddToCart(){
   document.getElementById('pickup-sub').textContent='Выберите точку для «'+chooseProduct.name+'», затем нажмите «Добавить».';
   for(var i=0;i<places.length;i++) document.getElementById('mplace-'+i).className='place-btn';
   document.getElementById('date-input-modal').value=todayISO();
+  document.getElementById('date-input-modal').min=todayISO();
   document.getElementById('time-slider-modal').value=720;
-  document.getElementById('time-label-modal').textContent='12:00';
+  applyTimeWindow();
   document.getElementById('pickup-add-btn').disabled=true;
+  renderPlaceInfo(null);
   closeChoose();
   document.getElementById('overlay-pickup').className='overlay open';
   document.getElementById('pickup-window').style.display='block';
 }
 function selectPickupModal(index){
   modalPlace=places[index];
+  renderPlaceInfo(index);
   for(var i=0;i<places.length;i++)
     document.getElementById('mplace-'+i).className=(i===index)?'place-btn selected':'place-btn';
   updatePickupReady();
 }
+// ===== ЧАСЫ ВСТРЕЧ ПО ДНЯМ НЕДЕЛИ =====
+var SCHEDULE={0:[600,1200],1:[960,1200],2:[960,1200],3:[960,1200],4:[870,1200],5:[960,1200],6:[600,1200]};
+var DAY_NAMES=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+var LEAD_MIN=30;
+function minsFromTime(t){
+  var p=String(t).split(':');
+  return parseInt(p[0],10)*60+parseInt(p[1],10);
+}
+function timeFromMins(m){
+  var h=Math.floor(m/60), mm=m%60;
+  return (h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;
+}
+function dayWindow(dateStr){
+  if(!dateStr) return null;
+  var p=dateStr.split('-');
+  var d=new Date(parseInt(p[0],10),parseInt(p[1],10)-1,parseInt(p[2],10));
+  return SCHEDULE[d.getDay()]||null;
+}
+function meetingCheck(dateStr,timeStr){
+  var w=dayWindow(dateStr);
+  if(!w) return {ok:false,msg:'Выберите дату встречи.'};
+  var p=dateStr.split('-');
+  var d=new Date(parseInt(p[0],10),parseInt(p[1],10)-1,parseInt(p[2],10));
+  var today=new Date(); today.setHours(0,0,0,0);
+  if(d.getTime()<today.getTime()) return {ok:false,msg:'Эта дата уже прошла — выберите другое число.'};
+  var n=new Date();
+  var nowMin=n.getHours()*60+n.getMinutes();
+  var isToday=d.getTime()===today.getTime();
+  if(timeStr===undefined){
+    if(isToday&&nowMin+LEAD_MIN>=w[1]) return {ok:false,msg:'На сегодня времени уже не осталось — выберите другое число.'};
+    return {ok:true};
+  }
+  var m=minsFromTime(timeStr);
+  if(m<w[0]) return {ok:false,msg:'В '+DAY_NAMES[d.getDay()]+' встречи идут с '+timeFromMins(w[0])+'.'};
+  if(m>w[1]) return {ok:false,msg:'В '+DAY_NAMES[d.getDay()]+' встречи идут до '+timeFromMins(w[1])+'.'};
+  if(isToday&&m<nowMin+LEAD_MIN) return {ok:false,msg:'Заказ нужен минимум за '+LEAD_MIN+' минут до встречи — выберите время позже.'};
+  return {ok:true};
+}
+function applyTimeWindow(){
+  var sl=document.getElementById('time-slider-modal'); if(!sl) return;
+  var warn=document.getElementById('time-warn-modal');
+  var w=dayWindow(modalDate);
+  if(!w) return;
+  var n=new Date();
+  var nowMin=n.getHours()*60+n.getMinutes();
+  var isToday=(modalDate===todayISO());
+  var minM=w[0];
+  if(isToday) minM=Math.max(minM,nowMin+LEAD_MIN);
+  minM=Math.ceil(minM/30)*30;
+  if(minM>w[1]){
+    sl.disabled=true;
+    if(warn){ warn.textContent='На этот день времени уже не осталось — выберите другое число.'; warn.style.display='block'; }
+    document.getElementById('pickup-add-btn').disabled=true;
+    return;
+  }
+  sl.disabled=false;
+  if(warn) warn.style.display='none';
+  sl.min=String(minM); sl.max=String(w[1]); sl.step='30';
+  if(parseInt(sl.value,10)<minM||parseInt(sl.value,10)>w[1]) sl.value=String(minM);
+  updatePickupTime();
+}
 function updatePickupReady(){
   modalDate=document.getElementById('date-input-modal').value;
-  document.getElementById('pickup-add-btn').disabled=!(modalPlace&&modalDate);
+  applyTimeWindow();
+  var warn=document.getElementById('time-warn-modal');
+  var ok=!!(modalPlace&&modalDate);
+  if(modalDate){
+    var chk=meetingCheck(modalDate);
+    if(!chk.ok){
+      if(warn){ warn.textContent=chk.msg; warn.style.display='block'; }
+      ok=false;
+    }
+  }
+  document.getElementById('pickup-add-btn').disabled=!ok;
 }
 function updatePickupTime(){
   var m=parseInt(document.getElementById('time-slider-modal').value,10);
@@ -1438,6 +1862,8 @@ function confirmPickup(event){
     alert('Такого количества уже нет на складе — попробуйте ещё раз.');
     cancelPickup(); return;
   }
+  var chk=meetingCheck(modalDate,modalTime);
+  if(!chk.ok){ alert(chk.msg); return; }
   var item=findCartItem(pendingAdd.id,pendingAdd.color);
   if(item) item.qty+=pendingAdd.qty;
   else cart.push({id:pendingAdd.id,color:pendingAdd.color,qty:pendingAdd.qty});
@@ -1510,7 +1936,7 @@ function openCart(){
       if(!p) continue;
       var c=findColor(p,item.color);
       var colorHex=c?c.hex:'#555';
-      var colorLine=item.color?'<span class="color-dot" style="background:'+colorHex+'"></span>'+item.color+' — ':'';
+      var colorLine=item.color?((colorHex==='#set'?'':'<span class="color-dot" style="background:'+colorHex+'"></span>')+item.color+' — '):'';
       var row=document.createElement('div');
       row.className='cart-item';
       var colorArg=item.color?"'"+item.color+"'":'null';
@@ -1564,6 +1990,8 @@ function removeItem(id,color){
 function confirmOrder(){
   if(cart.length===0){ alert('Корзина пуста!'); return; }
   if(!modalPlace||!modalDate){ alert('Выберите точку, дату и время — они спрашиваются при добавлении товара.'); return; }
+  var chkT=meetingCheck(modalDate,modalTime);
+  if(!chkT.ok){ alert('Время встречи устарело или вне расписания. '+chkT.msg+' Откройте корзину заново и выберите время.'); return; }
   var paid=parseFloat(document.getElementById('pay-amount').value);
   var sum=getCartSum();
   if(isNaN(paid)||paid<=0){ alert('Укажите сумму, которой расплатитесь наличными!'); return; }
@@ -1579,11 +2007,19 @@ function confirmOrder(){
     customer:me.username, items:items, count:getCartCount(), sum:sum,
     place:modalPlace, date:modalDate, time:modalTime,
     paid:Math.floor(paid), change:change,
+    created: Date.now(),
     payment:'Наличные', status:'Ожидает', reviewIdx:-1
   });
   alert('Заказ оформлен!\nМесто: '+modalPlace+'\nКогда: '+fmtDate(modalDate)+' · '+modalTime+'\nСумма: '+sum+' ₽ (наличные)\nСдача: '+change+' ₽');
   cart=[];
   document.getElementById('pay-amount').value='';
+  var lastOrder = orders[orders.length-1];
+  addLog('🛒 '+(me?me.name:'Клиент')+': новый заказ '+lastOrder.sum+' ₽ ('+lastOrder.place+')');
+  notifyTg(newOrderTextToOwner(lastOrder));
+  var ch = clientChatId(lastOrder);
+  if(ch){
+    notifyTg('\uD83C\uDF19 LoonShop\n\n\u2705 Заказ принят!\n\nТовары:\n' + orderItemsText(lastOrder) + 'Точка: \uD83D\uDCCD ' + lastOrder.place + '\nКогда: ' + fmtDate(lastOrder.date) + ' · ' + lastOrder.time + '\nИтого: ' + lastOrder.sum + ' \u20BD\nСдача: ' + lastOrder.change + ' \u20BD\n\nЕсли планы изменились — напишите нам.', ch);
+  }
   saveState();
   updateTotals(); renderCatalog(); renderOrders(); renderOwner(); updateReviewButton();
   closeCart();
@@ -1672,14 +2108,25 @@ function orderPassesFilter(o){
 
 function markAllDone(){
   var changed=0;
+  var toNotify=[];
   for(var i=0;i<orders.length;i++){
     if(orders[i].status==='Ожидает' && orderPassesFilter(orders[i])){
+      var ch = clientChatId(orders[i]);
+      if(ch) toNotify.push(orders[i]);
       orders[i].status='Выполнен';
       changed++;
     }
   }
   if(!changed){ alert('Под текущий фильтр не попало ни одного заказа со статусом «Ожидает»'); return; }
+  addLog('✅ Владелец: отмечено выполненными заказов: '+changed);
   saveState();
+  for(var n=0;n<toNotify.length;n++){
+    var oo = toNotify[n];
+    var ch2 = clientChatId(oo);
+    if(ch2){
+      notifyTg('\uD83C\uDF19 LoonShop\n\n\u2705 Заказ выполнен!\nЖдём вас: \uD83D\uDCCD ' + oo.place + '\n' + fmtDate(oo.date) + ' · ' + oo.time + '\nСдача: ' + oo.change + ' \u20BD\n\nСпасибо за покупку!', ch2);
+    }
+  }
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
   alert('Отмечено выполненными заказов: '+changed);
 }
@@ -1696,7 +2143,17 @@ function setOrderStatus(idx,status){
     }
   }
   o.status=status;
+  addLog((status==='Выполнен'?'✅':'✖')+' Владелец: заказ клиента '+o.customer+' — '+status);
   saveState();
+  var ch = clientChatId(o);
+  if(ch){
+    if(status==='Выполнен'){
+      notifyTg('\uD83C\uDF19 LoonShop\n\n\u2705 Заказ выполнен!\nЖдём вас: \uD83D\uDCCD ' + o.place + '\n' + fmtDate(o.date) + ' · ' + o.time + '\nСдача: ' + o.change + ' \u20BD\n\nСпасибо за покупку!', ch);
+    }
+    if(status==='Отменён'){
+      notifyTg('\uD83C\uDF19 LoonShop\n\n\u274C Заказ отменён.\nЕсли это недоразумение — напишите нам, разберёмся.', ch);
+    }
+  }
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
 }
 
@@ -1797,7 +2254,7 @@ function renderAdminDialogs(){
     row.className='dialog-row';
     row.setAttribute('onclick','openAdminDialog(\''+esc(u)+'\')');
     row.innerHTML=
-      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
       '<div style="flex:1; min-width:0;">'+
         '<div class="client-name" style="font-size:14px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="last">'+esc(lastText)+'</div>'+
@@ -1898,7 +2355,7 @@ function renderOwnerClients(){
 
     box.innerHTML=
       '<div class="client-row">'+
-        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
           '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+'</div>'+
           '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
@@ -1935,6 +2392,7 @@ function openClientProfile(idx){
   var c=clients[idx];
   if(!c) return;
   var st=clientStats(c.username);
+  var viewerAdm = me && isAdmin(me.username, me.tgId);
 
   var histHtml='';
   var has=false;
@@ -1959,7 +2417,7 @@ function openClientProfile(idx){
   var isAdm = isAdmin(c.username, c.tgId);
 
   var actionsHtml='';
-  if(!isAdm){
+  if(!isAdm && viewerAdm){
     actionsHtml=
     '<div class="modal-actions">'+
       '<button class="btn-neutral" onclick="openDM(\''+esc(c.username)+'\',\'shop\')">💬 Написать</button>'+
@@ -1971,24 +2429,26 @@ function openClientProfile(idx){
   document.getElementById('client-profile-body').innerHTML=
     '<div class="pickup-title" style="margin-bottom:6px;">ПРОФИЛЬ КЛИЕНТА</div>'+
     '<div class="member-row" style="margin-bottom:14px;">'+
-      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
       '<div>'+
         '<div class="member-name" style="font-size:20px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
-        '<div class="member-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
+        '<div class="member-handle">'+(viewerAdm?esc(c.username)+' · ':'')+onlineBadge(c)+'</div>'+
       '</div>'+
     '</div>'+
     '<div class="member-tags" style="margin-bottom:16px;">'+
       '<span class="tag" style="background:rgba(255,255,255,0.12); color:#fff; font-weight:bold;">№ '+(c.num||'—')+'</span>'+
-      '<span class="tag">ID: '+(c.tgId?c.tgId:'—')+'</span>'+
+      (viewerAdm?'<span class="tag">ID: '+(c.tgId?c.tgId:'—')+'</span>':'')+
       (c.verified?'<span class="tag" style="color:#7ef0a8;">✓ Верифицирован</span>':'<span class="tag">Не верифицирован</span>')+
     '</div>'+
+    (viewerAdm?
     '<div class="cp-stats">'+
       '<div class="cp-stat"><div class="l">Заказы</div><div class="v">'+st.orders+'</div></div>'+
       '<div class="cp-stat"><div class="l">Покупки</div><div class="v">'+st.spent+' ₽</div></div>'+
       '<div class="cp-stat"><div class="l">Сделки</div><div class="v">'+st.deals+'</div></div>'+
     '</div>'+
     '<div class="pickup-title" style="margin-top:18px;">ИСТОРИЯ ЗАКАЗОВ</div>'+
-    histHtml+
+    histHtml
+    :'<div class="schedule-line" style="margin-top:16px;">🔒 Детали покупок этого клиента скрыты — приватность</div>')+
     actionsHtml+
     '<div class="modal-actions" style="margin-top:0;">'+
       '<button class="btn-cancel" onclick="closeClientProfile()">Закрыть</button>'+
@@ -2071,6 +2531,7 @@ function deleteProduct(id){
   var np=[];
   for(var i=0;i<products.length;i++) if(products[i].id!==id) np.push(products[i]);
   products=np;
+  if(id===5) { try{ localStorage.setItem('ls_set_removed','1'); }catch(e){} }
   saveState();
   renderCatalog();
   renderOwnerPhotos();
@@ -2122,6 +2583,8 @@ function renderAll(){
   renderOwner();
   renderReviews();
   renderProfileLine();
+  renderAchievements();
+  renderLog();
   renderChat();
   renderAdminDialogs();
   updateReviewButton();
@@ -2217,6 +2680,7 @@ function submitReview(){
 
   reviews.push({clientIdx:cIdx, stars:pickedStars, text:text, date:dateStr, orderIdx:targetIdx, customer:me.username});
   orders[targetIdx].reviewIdx=reviews.length-1;
+  addLog('⭐ '+me.name+': отзыв '+pickedStars+'★');
   saveState();
   renderReviews(); renderOwner(); updateReviewButton();
   closeReview();
@@ -2244,19 +2708,32 @@ function renderReviews(){
       prodHtml='<div class="review-product"><div class="n">'+brief+'</div>'+
         '<span class="tag">📍 '+esc(o.place)+' · 📅 '+fmtDate(o.date)+' · 🕒 '+o.time+'</span></div>';
     }
+    var repHtml = r.reply ? '<div class="review-reply"><div class="rt">🌙 LoonShop</div>'+esc(r.reply)+'</div>' : '';
+    var admBtn = (me && isAdmin(me.username, me.tgId)) ? '<button class="reply-btn" onclick="shopReply('+i+')">'+(r.reply?'✏️ Изменить ответ':'💬 Ответить')+'</button>' : '';
     var box=document.createElement('div');
     box.className='review';
     box.innerHTML=
       '<div class="review-head">'+
         '<div class="client-avatar" style="width:44px; height:44px; font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span></div>'+
-        '<div><div class="review-name">'+esc(c.name)+' <span style="color:#8a8a8a; font-weight:normal;">'+esc(c.username)+'</span> '+clientBadges(c)+'</div>'+
+        '<div><div class="review-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="review-date">Дата покупки '+r.date+'</div></div>'+
         '<div class="review-stars">'+stars+'</div>'+
       '</div>'+
       prodHtml+
-      '<div class="review-text">'+esc(r.text)+'</div>';
+      '<div class="review-text">'+esc(r.text)+'</div>'+repHtml+admBtn;
     list.appendChild(box);
   }
+}
+
+function shopReply(i){
+  var r = reviews[i]; if(!r) return;
+  var cur = r.reply || '';
+  var t = prompt(cur ? 'Изменить ответ магазина:' : 'Ответ магазина на отзыв:', cur);
+  if (t === null) return;
+  t = t.trim();
+  if (!t){ delete r.reply; addLog('🌙 Владелец: убрал ответ на отзыв'); }
+  else { r.reply = t; addLog('🌙 Владелец: ответ на отзыв от '+(r.customer||'клиента')); }
+  saveState(); renderReviews();
 }
 
 // ===== ОБЩИЙ ЧАТ =====
@@ -2288,7 +2765,6 @@ function sendChat(side){
 function whoHtmlFor(m){
   if(m.shop) return '<div class="who"><b>🌙 LoonShop</b><span class="r-badge r-verified">✓ Владелец</span><span class="tm">'+m.time+'</span></div>';
   return '<div class="who"><b onclick="openChatProfile(\''+esc(m.username)+'\')" title="Открыть профиль">'+esc(m.name)+'</b>'+
-    '<span style="font-weight:normal; color:#8a8a8a;">'+esc(m.username)+'</span>'+
     clientBadges(m)+'<span class="tm">'+m.time+'</span></div>';
 }
 function openChatProfile(username){
@@ -2338,6 +2814,20 @@ function openDM(username, asSide){
     return;
   }
 
+  if (username==='@Loonshop_mngr' && me){
+    dmPeer='@Loonshop_mngr'; dmAsShop=false;
+    document.getElementById('dm-head').innerHTML=
+      '<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ С МЕНЕДЖЕРОМ</div>'+
+      '<h2 style="margin-top:0;">👨‍💼 Менеджер LoonShop</h2>'+
+      '<p class="m-sub">Напишите менеджеру — он получит сообщение и ответит вам здесь же.</p>';
+    document.getElementById('dm-input').value='';
+    document.getElementById('dm-hint-line').textContent='Ваше сообщение получит менеджер LoonShop.';
+    renderDM();
+    document.getElementById('overlay-dm').className='overlay open';
+    document.getElementById('dm-window').style.display='block';
+    return;
+  }
+
   dmPeer=username;
   dmAsShop=(asSide==='shop');
   var c=findClient(username);
@@ -2346,10 +2836,10 @@ function openDM(username, asSide){
   if(c){
     head='<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ'+(dmAsShop?' · ОТ ИМЕНИ МАГАЗИНА':' · С КЛИЕНТОМ')+'</div>'+
       '<div class="member-row" style="margin-bottom:10px;">'+
-        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
         '<div><div class="client-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="client-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
-        '<div style="margin-top:6px;"><button class="profile-link-btn" style="margin:0;" onclick="openChatProfile(\''+esc(c.username)+'\')">📋 Профиль и покупки</button></div></div></div>';
+        '(me&&isAdmin(me.username,me.tgId)?'<div style="margin-top:6px;"><button class="profile-link-btn" style="margin:0;" onclick="openChatProfile(\''+esc(c.username)+'\')">📋 Профиль и покупки</button></div>':'')</div></div>';
   } else {
     head='<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ</div>'+
       '<h2 style="margin-top:0;">🌙 LoonShop</h2><p class="m-sub">Личный чат с магазином. Здесь вам ответит владелец.</p>';
@@ -2409,6 +2899,7 @@ function sendDM(){
       return;
     }
     dms[key].push({from:'me', text:text, time:nowTime(), read:false});
+    if(dmPeer==='@Loonshop_mngr' && me) notifyTg('👨‍💼 Сообщение менеджеру от '+(me.name||me.username)+':\n'+text);
   }
   input.value='';
   saveState();
@@ -2444,12 +2935,13 @@ function syncPull(){
       var s = JSON.stringify(d);
       if (s === lastRemote) return;
       lastRemote = s;
-      if (d.products) products = d.products;
+      if (d.products) { products = d.products; ensureSet(); }
       if (d.clients) clients = d.clients;
       if (d.chatMsgs) chatMsgs = d.chatMsgs;
       if (d.orders) orders = d.orders;
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
+      if (d.logs) logs = d.logs;
       var myName = me ? me.username : null;
       me = null;
       if (myName) {
@@ -2469,7 +2961,114 @@ function syncPull(){
 }
 setInterval(syncPull, 3000);
 
+
+// ===== ЖУРНАЛ СОБЫТИЙ =====
+function addLog(txt){
+  var d = new Date();
+  var t = nowTime() + ' ' + d.getDate() + '.' + (d.getMonth()+1);
+  logs.unshift({ t:t, txt:txt });
+  if (logs.length > 50) logs.length = 50;
+  renderLog();
+}
+function renderLog(){
+  var el = document.getElementById('adm-log'); if(!el) return;
+  var cnt = document.getElementById('adm-log-cnt');
+  if (cnt) cnt.textContent = logs.length;
+  el.innerHTML = '';
+  if (!logs.length){ el.innerHTML = '<div class="empty-msg">Пока тихо — события появятся здесь.</div>'; return; }
+  for (var i=0;i<logs.length;i++){
+    var d = document.createElement('div');
+    d.className = 'log-item';
+    d.innerHTML = '<span class="lt">'+esc(logs[i].t)+'</span>'+esc(logs[i].txt);
+    el.appendChild(d);
+  }
+}
+
+// ===== АЧИВКИ КЛИЕНТА =====
+function renderAchievements(){
+  var el = document.getElementById('achv-row'); if(!el || !me) return;
+  var done = 0;
+  for (var i=0;i<orders.length;i++) if (orders[i].customer===me.username && orders[i].status==='Выполнен') done++;
+  var revs = 0;
+  for (var j=0;j<reviews.length;j++) if (reviews[j].customer===me.username) revs++;
+  var list = [
+    { ic:'🌱', n:'Первая покупка',   ok: done>=1  },
+    { ic:'⭐', n:'Пять сделок',      ok: done>=5  },
+    { ic:'👑', n:'Ветеран магазина', ok: done>=10 },
+    { ic:'💬', n:'Слово сказано',    ok: revs>=1  }
+  ];
+  var html = '';
+  for (var k=0;k<list.length;k++)
+    html += '<span class="achv '+(list[k].ok?'on':'dim')+'" title="'+(list[k].ok?'Получено':'Пока не получено')+'">'+list[k].ic+' '+list[k].n+'</span>';
+  el.innerHTML = html;
+}
+
+// ===== ПЛАВНОСТЬ =====
+var smoothMode = 'auto';
+var autoDowngraded = false;
+var particleOn = true;
+try { smoothMode = localStorage.getItem('ls_smooth') || 'auto'; } catch(e){}
+function applySmooth(){
+  document.body.classList.toggle('smooth-off', smoothMode==='off');
+  document.body.classList.toggle('smooth-lite', smoothMode==='lite');
+  particleOn = (smoothMode !== 'off');
+  var note = document.getElementById('smooth-note');
+  if (note) note.textContent =
+    smoothMode==='auto' ? (autoDowngraded ? 'Авто: телефон не справляется — включён облегчённый режим' : 'Авто: следим за плавностью')
+    : smoothMode==='lite' ? 'Вкл: анимации без размытий и слайда вкладок'
+    : 'Выкл: анимация отключена полностью';
+  var btns = document.querySelectorAll('.smooth-btn');
+  for (var i=0;i<btns.length;i++) btns[i].classList.toggle('selected', btns[i].getAttribute('data-m')===smoothMode);
+  if (particleOn && window.__resumeDots){ window.__resumeDots(); window.__resumeDots = null; }
+}
+function setSmooth(m){
+  smoothMode = m;
+  try { localStorage.setItem('ls_smooth', m); } catch(e){}
+  applySmooth();
+}
+(function fpsMon(){
+  var last = performance.now(), slow = 0;
+  function tick(t){
+    var d = t - last; last = t;
+    if (d > 40) slow++; else slow = Math.max(0, slow-1);
+    if (smoothMode==='auto' && !autoDowngraded && slow > 15){ autoDowngraded = true; applySmooth(); slow = 0; }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+// ===== ЖИВЫЕ СТАТУСЫ =====
+function isFresh(c){
+  return !!c.online && !!c.lastSeen && (Date.now() - c.lastSeen < 60000);
+}
+function beat(){
+  if (!me) return;
+  me.online = true; me.lastSeen = Date.now();
+  saveState();
+}
+setInterval(beat, 15000);
+window.addEventListener('beforeunload', function(){
+  if (me){ me.online = false; saveState(); }
+});
+
+// ===== ПРОФИЛЬ: ОБНОВИТЬ И ВЫЙТИ =====
+function refreshData(){
+  var b = document.getElementById('refresh-btn');
+  if (b) b.textContent = '🔄 Обновляю…';
+  syncPull();
+  setTimeout(function(){ if (b) b.textContent = '🔄 Обновить данные'; }, 1200);
+}
+function logoutDevice(){
+  if (!confirm('Выйти на этом устройстве?')) return;
+  if (me){ me.online = false; me.lastSeen = 0; saveState(); }
+  me = null;
+  document.getElementById('app-root').style.display = 'none';
+  document.getElementById('login-screen').classList.add('open');
+}
+
 // ===== ЗАПУСК =====
+applySmooth();
+renderLog();
 updateTopInfo();
 syncPull();
 </script>
