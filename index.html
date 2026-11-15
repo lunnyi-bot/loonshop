@@ -240,8 +240,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .on-dot { position:absolute; bottom:0; right:0; width:12px; height:12px; border-radius:50%;
   background:#7ef0a8; border:2px solid #0a0a0a; }
 .on-dot.off { background:#555; }
-.avatar-img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
-.photo-input[type=file] { padding:7px; }
 .client-name { font-weight:bold; font-size:15px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .client-handle { color:#8a8a8a; font-size:12px; margin-top:2px; }
 .perks { display:flex; gap:8px; flex-wrap:wrap; }
@@ -491,7 +489,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="tab-page visible" id="page-catalog">
     <div class="top-info">
       <span id="info-datetime">—</span>
-      <span id="info-sig"></span>
       <span class="dot-on">🟢 В сети: <b id="info-online">0</b></span>
       <span>👥 Всего: <b id="info-total">0</b></span>
     </div>
@@ -576,7 +573,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div class="member-card">
       <div class="over">MEMBER CARD</div>
       <div class="member-row">
-        <div class="member-avatar" id="profile-avatar"><span>🌙</span><span class="on-dot"></span></div>
+        <div class="member-avatar"><span>🌙</span><span class="on-dot"></span></div>
         <div>
           <div class="member-name" id="profile-name-line">—</div>
           <div class="member-handle" id="profile-handle-line">@—</div>
@@ -660,7 +657,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
         </div>
         <div class="photo-row"><span class="nm">Цена (₽)</span><input class="photo-input" id="np-price" type="number" placeholder="1300" min="0"></div>
         <div class="photo-row"><span class="nm">Фото (ссылка)</span><input class="photo-input" id="np-img" placeholder="https://... (.jpg/.png/.webp)"></div>
-        <div class="photo-row"><span class="nm">Или фото с телефона</span><input type="file" accept="image/*" class="photo-input" id="np-file" onchange="pickPhotoFile(this,'np-img')"></div>
         <div class="photo-row"><span class="nm">Эмодзи (если без фото)</span><input class="photo-input" id="np-emoji" placeholder="🟣"></div>
         <div class="photo-row"><span class="nm">Характеристики</span><input class="photo-input" id="np-desc" placeholder="Например: CORE 3.0, 3 ml"></div>
         <div class="photo-row"><span class="nm">Количество (шт.)</span><input class="photo-input" id="np-stock" type="number" placeholder="10" min="0"></div>
@@ -746,7 +742,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="photo-row"><span class="nm">Количество (шт.)</span><input class="photo-input" id="ed-stock" type="number" min="0"></div>
   <div class="photo-row"><span class="nm">Характеристики</span><input class="photo-input" id="ed-desc" placeholder="Например: CORE 3.0, 3 ml"></div>
   <div class="photo-row"><span class="nm">Фото (ссылка)</span><input class="photo-input" id="ed-img" placeholder="https://... или пусто"></div>
-  <div class="photo-row"><span class="nm">Или фото с телефона</span><input type="file" accept="image/*" class="photo-input" id="ed-file" onchange="pickPhotoFile(this,'ed-img')"></div>
   <div class="photo-row"><span class="nm">Эмодзи</span><input class="photo-input" id="ed-emoji" placeholder="🟣"></div>
   <div class="photo-row"><span class="nm">Цвета</span><input class="photo-input" id="ed-colors" placeholder="Розовый,#ff9ecb,5; Синий,#5bc8ff,3"></div>
   <p class="owner-hint" style="margin-top:8px;">Цвета — формат <b>Название,#hex,количество</b> через точку с запятой. Если оставить пустым, будет общее количество из поля выше. При сохранении цветов старые остатки по цветам заменяются новыми.</p>
@@ -883,61 +878,14 @@ function ownerLogin() {
   enterAs('Владелец', '@owner_browser', null);
 }
 
-// ===== УВЕДОМЛЕНИЯ ВЛАДЕЛЬЦУ =====
-// 1) Создай бота у @BotFather (команда /newbot), скопируй токен вида 123456789:AAH...
-// 2) Узнай свой числовой ID у @userinfobot
-// 3) Напиши своему боту /start — иначе он не сможет тебе писать
-var BOT_TOKEN = '';      // <-- сюда токен бота
-var OWNER_CHAT_ID = '8914120660';  // <-- сюда свой числовой ID
-
-function notifyOwner(text){
-  if(!BOT_TOKEN || !OWNER_CHAT_ID) return; // пока поля пустые — уведомления выключены
-  try {
-    fetch('https://api.telegram.org/bot'+BOT_TOKEN+'/sendMessage', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:OWNER_CHAT_ID, text:text})
-    });
-  } catch(e){}
-}
-
-// ===== ПРОВЕРКА ПОДПИСИ TELEGRAM (initData) =====
-function verifyInitData(initData){
-  if(!initData || !BOT_TOKEN) return Promise.resolve(false);
-  try {
-    var params = new URLSearchParams(initData);
-    var hash = params.get('hash');
-    if(!hash) return Promise.resolve(false);
-    var authDate = parseInt(params.get('auth_date')||'0',10);
-    if(authDate && (Date.now()/1000 - authDate) > 86400) return Promise.resolve(false);
-    params.delete('hash');
-    var keys=[];
-    params.forEach(function(v,k){ keys.push(k+'='+v); });
-    keys.sort();
-    var dataCheckString = keys.join('\n');
-    var enc = new TextEncoder();
-    return crypto.subtle.importKey('raw', enc.encode('WebAppData'), {name:'HMAC', hash:'SHA-256'}, false, ['sign'])
-      .then(function(k1){ return crypto.subtle.sign('HMAC', k1, enc.encode(BOT_TOKEN)); })
-      .then(function(secretBytes){ return crypto.subtle.importKey('raw', secretBytes, {name:'HMAC', hash:'SHA-256'}, false, ['sign']); })
-      .then(function(k2){ return crypto.subtle.sign('HMAC', k2, enc.encode(dataCheckString)); })
-      .then(function(sig){
-        var hex = Array.prototype.map.call(new Uint8Array(sig), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
-        return hex === hash;
-      });
-  } catch(e) { return Promise.resolve(false); }
-}
-
 // Адрес общей базы Firebase (Realtime Database)
 var DB_URL = 'https://loonshop63-default-rtdb.europe-west1.firebasedatabase.app';
 
 // Админы по ID Telegram (ID не меняется никогда — надёжнее юзернейма)
 var ADMIN_IDS = [8914120660, 5009894330];
-function isAdmin(username, tgId, sigOk) {
+function isAdmin(username, tgId) {
   if (username === '@owner_browser') return true;
-  if (tgId && ADMIN_IDS.indexOf(tgId) !== -1) {
-    if (BOT_TOKEN && sigOk !== true) return false;
-    return true;
-  }
+  if (tgId && ADMIN_IDS.indexOf(tgId) !== -1) return true;
   if (username) {
     for (var i = 0; i < ADMIN_IDS.length; i++) {
       if (username === '@id' + ADMIN_IDS[i]) return true;
@@ -1041,10 +989,6 @@ function clientBadges(c) {
   if (c.mutedUntil && Date.now() < c.mutedUntil) h += '<span class="r-badge r-muted">🔇 мут до ' + fmtTime(c.mutedUntil) + '</span>';
   return h;
 }
-function avatarHtml(c){
-  if(c && c.avatar) return '<img class="avatar-img" src="'+esc(c.avatar)+'" alt="">';
-  return (c && c.girl) ? '🌸' : '🌙';
-}
 function onlineBadge(c) {
   return c.online ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
 }
@@ -1122,9 +1066,7 @@ function doLogin() {
     name = tgUser.first_name || tgUser.username || 'Клиент';
     username = '@' + (tgUser.username || ('id' + tgUser.id));
     tgId = tgUser.id;
-    verifyInitData(Tg.initData || '').then(function(ok){
-      enterAs(name, username, tgId, tgUser.photo_url || '', ok);
-    });
+    enterAs(name, username, tgId);
     return;
   }
 
@@ -1136,19 +1078,17 @@ function doLogin() {
   enterAs(name, username, null);
 }
 
-function enterAs(name, username, tgId, avatar, sigOk) {
+function enterAs(name, username, tgId) {
   var c = findClient(username);
   if (!c) {
     c = { name:name, username:username, tgId:tgId||null, num:nextClientNum(),
           verified:false, vip:false, girl:false, mod:false,
-          online:true, banned:false, mutedUntil:0, admin:isAdmin(username, tgId, sigOk) };
+          online:true, banned:false, mutedUntil:0, admin:isAdmin(username, tgId) };
     clients.push(c);
   }
   if (tgId && !c.tgId) c.tgId = tgId;
   if (!c.num) c.num = nextClientNum();
-  c.admin = isAdmin(c.username, c.tgId, sigOk);
-  if (avatar) c.avatar = avatar;
-  c.sigVerified = !!sigOk;
+  c.admin = isAdmin(c.username, c.tgId);
   c.name = name;
 
   if (c.banned) {
@@ -1200,8 +1140,6 @@ function updateTopInfo() {
   var days=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
   var el = document.getElementById('info-datetime');
   if (el) el.textContent = n.getDate()+' '+months[n.getMonth()]+' '+n.getFullYear()+' · '+days[n.getDay()]+' · '+nowTime();
-  var sigEl = document.getElementById('info-sig');
-  if (sigEl) sigEl.textContent = BOT_TOKEN ? (me && me.sigVerified ? '🛡 Подпись проверена' : '⚠️ Подпись не проверена') : '';
   var on = 0;
   for (var i=0;i<clients.length;i++) if (clients[i].online && !clients[i].banned) on++;
   document.getElementById('info-online').textContent = on;
@@ -1287,7 +1225,7 @@ function renderCatalog(){
     var descHtml = (p2.color && p2.color!=='—') ? '<div class="pcard-desc">'+esc(p2.color)+'</div>' : '';
     var card=document.createElement('div');
     card.className='pcard';
-    var editBtn = isAdmin(me && me.username, me && me.tgId, me && me.sigVerified)
+    var editBtn = isAdmin(me && me.username, me && me.tgId)
       ? '<button class="edit-icon" title="Редактировать" onclick="editProduct('+p2.id+')">✏️</button>'
       : '';
     card.innerHTML =
@@ -1308,7 +1246,7 @@ function renderCatalog(){
 var editId = null;
 
 function editProduct(id){
-  if(!isAdmin(me && me.username, me && me.tgId, me && me.sigVerified)) return;
+  if(!isAdmin(me && me.username, me && me.tgId)) return;
   var p = findProduct(id);
   if(!p) return;
   editId = id;
@@ -1338,7 +1276,7 @@ function closeEdit(){
 }
 
 function saveEdit(){
-  if(!isAdmin(me && me.username, me && me.tgId, me && me.sigVerified) || editId===null) return;
+  if(!isAdmin(me && me.username, me && me.tgId) || editId===null) return;
   var p = findProduct(editId);
   if(!p){ closeEdit(); return; }
 
@@ -1643,9 +1581,6 @@ function confirmOrder(){
     paid:Math.floor(paid), change:change,
     payment:'Наличные', status:'Ожидает', reviewIdx:-1
   });
-  var notif = '🔔 Новый заказ в LoonShop!\nКлиент: '+me.username+'\nСумма: '+sum+' ₽ (отдаст: '+Math.floor(paid)+' ₽, сдача: '+change+' ₽)\n📍 '+modalPlace+'\n📅 '+fmtDate(modalDate)+' · '+modalTime;
-  for(var n=0;n<items.length;n++) notif += '\n• '+items[n].name+(items[n].color!=='—'?' ('+items[n].color+')':'')+' ×'+items[n].qty;
-  notifyOwner(notif);
   alert('Заказ оформлен!\nМесто: '+modalPlace+'\nКогда: '+fmtDate(modalDate)+' · '+modalTime+'\nСумма: '+sum+' ₽ (наличные)\nСдача: '+change+' ₽');
   cart=[];
   document.getElementById('pay-amount').value='';
@@ -1862,7 +1797,7 @@ function renderAdminDialogs(){
     row.className='dialog-row';
     row.setAttribute('onclick','openAdminDialog(\''+esc(u)+'\')');
     row.innerHTML=
-      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;">'+avatarHtml(c)+'<span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
       '<div style="flex:1; min-width:0;">'+
         '<div class="client-name" style="font-size:14px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="last">'+esc(lastText)+'</div>'+
@@ -1899,7 +1834,7 @@ function togglePerk(clientIdx,perk){
 function banClient(username){
   var c=findClient(username);
   if(!c) return;
-  if(isAdmin(c.username, c.tgId, c.sigVerified)){ alert('Нельзя забанить администратора :)'); return; }
+  if(isAdmin(c.username, c.tgId)){ alert('Нельзя забанить администратора :)'); return; }
   if(c.banned){
     c.banned=false;
     alert('Разбанен: '+c.name);
@@ -1936,7 +1871,7 @@ function unmuteClient(username){
 function deleteClient(username){
   var c=findClient(username);
   if(!c) return;
-  if(isAdmin(c.username, c.tgId, c.sigVerified)){ alert('Нельзя удалить администратора :)'); return; }
+  if(isAdmin(c.username, c.tgId)){ alert('Нельзя удалить администратора :)'); return; }
   if(!confirm('Удалить клиента '+c.name+' полностью? Историю диалогов тоже удалим.')) return;
   var nc=[];
   for(var i=0;i<clients.length;i++) if(clients[i].username!==username) nc.push(clients[i]);
@@ -1963,7 +1898,7 @@ function renderOwnerClients(){
 
     box.innerHTML=
       '<div class="client-row">'+
-        '<div class="client-avatar">'+avatarHtml(c)+'<span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
           '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+'</div>'+
           '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
@@ -2036,7 +1971,7 @@ function openClientProfile(idx){
   document.getElementById('client-profile-body').innerHTML=
     '<div class="pickup-title" style="margin-bottom:6px;">ПРОФИЛЬ КЛИЕНТА</div>'+
     '<div class="member-row" style="margin-bottom:14px;">'+
-      '<div class="member-avatar">'+avatarHtml(c)+'<span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
       '<div>'+
         '<div class="member-name" style="font-size:20px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="member-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
@@ -2171,31 +2106,6 @@ function savePhoto(id){
   renderOwnerPhotos();
   alert('Фото сохранено!');
 }
-function pickPhotoFile(input, targetId){
-  var file = input.files && input.files[0];
-  if(!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var img = new Image();
-    img.onload = function(){
-      var max = 700;
-      var w = img.width, h = img.height;
-      if(w > max || h > max){
-        if(w >= h){ h = Math.round(h*max/w); w = max; }
-        else { w = Math.round(w*max/h); h = max; }
-      }
-      var cv = document.createElement('canvas');
-      cv.width = w; cv.height = h;
-      cv.getContext('2d').drawImage(img, 0, 0, w, h);
-      var dataUrl = cv.toDataURL('image/jpeg', 0.8);
-      document.getElementById(targetId).value = dataUrl;
-      alert('Фото загружено! Теперь сохрани товар.');
-    };
-    img.onerror = function(){ alert('Не удалось прочитать файл'); };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
 
 // ===== СВОЙ ПРОФИЛЬ =====
 function renderProfileLine(){
@@ -2204,9 +2114,7 @@ function renderProfileLine(){
   document.getElementById('profile-handle-line').textContent=me.username;
   document.getElementById('profile-num-tag').textContent='№ '+(me.num||'—');
   document.getElementById('profile-id-tag').textContent='ID: '+(me.tgId?me.tgId:'—');
-  document.getElementById('owner-btn').style.display = (me.admin || isAdmin(me.username, me.tgId, me.sigVerified)) ? 'block' : 'none';
-  var pa = document.getElementById('profile-avatar');
-  if (pa) pa.innerHTML = avatarHtml(me) + '<span class="on-dot"></span>';
+  document.getElementById('owner-btn').style.display = (me.admin || isAdmin(me.username, me.tgId)) ? 'block' : 'none';
 }
 function renderAll(){
   renderCatalog();
@@ -2340,7 +2248,7 @@ function renderReviews(){
     box.className='review';
     box.innerHTML=
       '<div class="review-head">'+
-        '<div class="client-avatar" style="width:44px; height:44px; font-size:18px;">'+avatarHtml(c)+'</span></div>'+
+        '<div class="client-avatar" style="width:44px; height:44px; font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span></div>'+
         '<div><div class="review-name">'+esc(c.name)+' <span style="color:#8a8a8a; font-weight:normal;">'+esc(c.username)+'</span> '+clientBadges(c)+'</div>'+
         '<div class="review-date">Дата покупки '+r.date+'</div></div>'+
         '<div class="review-stars">'+stars+'</div>'+
@@ -2364,7 +2272,7 @@ function sendChat(side){
   if(!text) return;
 
   if(side==='owner'){
-    if(!isAdmin(me.username, me.tgId, me.sigVerified)) return;
+    if(!isAdmin(me.username, me.tgId)) return;
     chatMsgs.push({name:'LoonShop',username:'@loonshop',shop:true,verified:true,vip:false,girl:false,mod:false,online:true,text:text,time:nowTime()});
   } else {
     if(isMuted(me)){
@@ -2438,7 +2346,7 @@ function openDM(username, asSide){
   if(c){
     head='<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ'+(dmAsShop?' · ОТ ИМЕНИ МАГАЗИНА':' · С КЛИЕНТОМ')+'</div>'+
       '<div class="member-row" style="margin-bottom:10px;">'+
-        '<div class="client-avatar">'+avatarHtml(c)+'<span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
         '<div><div class="client-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="client-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
         '<div style="margin-top:6px;"><button class="profile-link-btn" style="margin:0;" onclick="openChatProfile(\''+esc(c.username)+'\')">📋 Профиль и покупки</button></div></div></div>';
@@ -2493,7 +2401,7 @@ function sendDM(){
   if(!dms[key]) dms[key]=[];
 
   if(dmAsShop){
-    if(!isAdmin(me.username, me.tgId, me.sigVerified)) return;
+    if(!isAdmin(me.username, me.tgId)) return;
     dms[key].push({from:'shop', text:text, time:nowTime(), read:true});
   } else {
     if(me && isMuted(me)){
@@ -2501,7 +2409,6 @@ function sendDM(){
       return;
     }
     dms[key].push({from:'me', text:text, time:nowTime(), read:false});
-    notifyOwner('💬 Новое сообщение в личку\nКлиент: '+me.username+'\n'+text);
   }
   input.value='';
   saveState();
