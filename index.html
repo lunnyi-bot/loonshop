@@ -424,49 +424,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
 @media (max-width:700px) { .brand { font-size:16px; } }
 
-
-/* ===== ПЛАВНЫЕ ВКЛАДКИ ===== */
-.tab-page.visible { animation: tabIn 0.38s ease both; }
-@keyframes tabIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.dock-btn .ic { transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); }
-.dock-btn.active .ic { transform: scale(1.15); }
-.dock-btn:active .ic { transform: scale(0.82); }
-
-/* ===== ПЛАВНОСТЬ ===== */
-.smooth-block { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
-.smooth-title { font-weight: bold; font-size: 14px; margin-bottom: 10px; }
-.fx-row { display: flex; gap: 8px; }
-.fx-btn { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
-  color: #b0b0b0; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold; }
-.fx-btn:hover { background: rgba(255,255,255,0.12); }
-.fx-btn.active { background: #e0e0e0; color: #0a0a0a; border-color: #e0e0e0; }
-.fx-note { color: #8a8a8a; font-size: 12px; margin-top: 10px; line-height: 1.45; }
-.profile-btn.exit { background: rgba(255,123,123,0.1); border-color: rgba(255,123,123,0.4); color: #ff7b7b; }
-.profile-btn.exit:hover { background: rgba(255,123,123,0.2); }
-
-/* Облегчённый режим: без размытий и слайда вкладок */
-body.fx-lite .topbar, body.fx-lite .dock, body.fx-lite .modal, body.fx-lite .overlay { backdrop-filter: none; }
-body.fx-lite .tab-page.visible { animation: none; }
-body.fx-lite .moon-glow { animation: none; }
-
-/* Полное отключение анимации */
-body.fx-off * { transition: none !important; animation: none !important; }
-body.fx-off .moon-glow { display: none; }
-body.fx-off #particles { display: none; }
-
-/* ===== ТОЧКИ: маршрут и регламент ===== */
-.route-mini { font-size: 15px; cursor: pointer; padding: 2px 6px; border-radius: 8px;
-  background: rgba(91,200,255,0.1); border: 1px solid rgba(91,200,255,0.3); }
-.route-mini:hover { background: rgba(91,200,255,0.22); }
-.place-rule { background: rgba(91,200,255,0.06); border: 1px solid rgba(91,200,255,0.25);
-  border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #d0d0d0; line-height: 1.5; margin-top: 10px; }
-.place-rule a { color: #5bc8ff; font-weight: bold; text-decoration: none; }
-.place-rule .rule-line { margin-bottom: 6px; }
-
 /* ===== МОБИЛЬНЫЕ КАРТОЧКИ ===== */
 @media (max-width: 700px){
   .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -480,6 +437,43 @@ body.fx-off #particles { display: none; }
   .pcard-stock { font-size: 10px; margin-bottom: 8px; }
   .pcard .btn { padding: 9px 6px; font-size: 12px; border-radius: 10px; }
 }
+/* ===== ПЛАВНОСТЬ ВКЛАДОК ===== */
+@keyframes tabIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+.tab-page.visible { animation:tabIn 0.38s ease-out; }
+@keyframes tabFade { from { opacity:0; } to { opacity:1; } }
+body.sm-light .tab-page.visible { animation:tabFade 0.2s ease-out; }
+@keyframes dockPop { 0% { transform:scale(0.8); } 55% { transform:scale(1.15); } 100% { transform:scale(1); } }
+.dock-btn.active .ic { animation:dockPop 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+.dock-btn:active .ic { transform:scale(0.82); }
+
+/* ===== ПЛАВНОСТЬ: РЕЖИМЫ ===== */
+body.sm-light .topbar, body.sm-light .dock, body.sm-light .overlay { backdrop-filter:none; }
+body.sm-light #glow-1, body.sm-light #glow-2 { animation:none; }
+body.sm-off .moon-glow { display:none; }
+body.sm-off #particles { display:none; }
+body.sm-off * { transition:none !important; animation:none !important; }
+
+/* ===== ПУНКТЫ ВСТРЕЧИ ===== */
+.pmap { display:inline-block; margin-left:10px; padding:2px 8px; border:1px solid rgba(91,200,255,0.45);
+  border-radius:8px; color:#5bc8ff; font-size:12px; cursor:pointer; }
+.pmap:hover { background:rgba(91,200,255,0.18); }
+.place-info { background:rgba(91,200,255,0.07); border:1px solid rgba(91,200,255,0.3); border-radius:12px;
+  padding:12px 14px; font-size:13px; line-height:1.5; color:#d0d0d0; margin-bottom:18px; }
+.place-info b { color:#fff; }
+
+/* ===== НАСТРОЙКИ ПРОФИЛЯ ===== */
+.smooth-box { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+  padding:14px 16px; margin-bottom:12px; }
+.smooth-title { font-weight:bold; font-size:14px; margin-bottom:10px; }
+.smooth-row { display:flex; gap:8px; }
+.smooth-btn { flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14);
+  color:#b0b0b0; padding:11px 8px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:bold; }
+.smooth-btn:hover { background:rgba(255,255,255,0.12); }
+.smooth-btn.on { background:#e0e0e0; color:#0a0a0a; }
+.smooth-note { color:#6e6e6e; font-size:11px; margin-top:8px; }
+.profile-btn.danger { background:rgba(255,123,123,0.1); border-color:rgba(255,123,123,0.4); color:#ff7b7b; }
+.profile-btn.danger:hover { background:rgba(255,123,123,0.2); }
+
 </style>
 </head>
 <body>
@@ -551,7 +545,7 @@ body.fx-off #particles { display: none; }
     </div>
     <div class="welcome">
       <span>🌙 Добро пожаловать, <b id="welcome-name">…</b></span>
-      </div>
+    </div>
     <div class="catalog-head">
       <div class="over">КОЛЛЕКЦИЯ</div>
       <div class="catalog-head-row"><h2>Каталог</h2><div class="pos-count" id="pos-count">0 поз.</div></div>
@@ -653,17 +647,17 @@ body.fx-off #particles { display: none; }
     <button class="profile-btn" onclick="openRules()">📜 Правила магазина</button>
     <button class="profile-btn bazar" onclick="openBazar()">🛒 Наша барахолка</button>
     <button class="profile-btn" id="owner-btn" style="display:none;" onclick="showTab('owner')">🔒 Панель владельца</button>
-    <div class="smooth-block">
+    <div class="smooth-box">
       <div class="smooth-title">✨ Плавность</div>
-      <div class="fx-row">
-        <button class="fx-btn" id="fx-auto" onclick="setFx('auto')">Авто</button>
-        <button class="fx-btn" id="fx-on" onclick="setFx('on')">Вкл</button>
-        <button class="fx-btn" id="fx-off" onclick="setFx('off')">Выкл</button>
+      <div class="smooth-row">
+        <button class="smooth-btn" id="sm-auto" onclick="setSmooth('auto')">Авто</button>
+        <button class="smooth-btn" id="sm-light" onclick="setSmooth('light')">Вкл</button>
+        <button class="smooth-btn" id="sm-off" onclick="setSmooth('off')">Выкл</button>
       </div>
-      <div class="fx-note" id="fx-note">Авто: анимации включены, при тормозах облегчённый режим включится сам.</div>
+      <div class="smooth-note" id="smooth-note">Авто: включено, ослабится само, если начнёт тормозить</div>
     </div>
     <button class="profile-btn" id="refresh-btn" onclick="refreshData()">🔄 Обновить данные</button>
-    <button class="profile-btn exit" onclick="logoutDevice()">🚪 Выйти на этом устройстве</button>
+    <button class="profile-btn danger" onclick="logoutDevice()">🚪 Выйти на этом устройстве</button>
     <p class="hint" style="text-align:center;">Данные синхронизируются между устройствами через Firebase.</p>
   </div>
 
@@ -826,11 +820,11 @@ body.fx-off #particles { display: none; }
   <h2 style="font-size:24px;">Откуда будете забирать?</h2>
   <p class="m-sub" id="pickup-sub">Выберите точку, дату и время, затем нажмите «Добавить».</p>
   <div class="pickup-places" id="pickup-places-modal">
-    <button class="place-btn" id="mplace-0" onclick="selectPickupModal(0)"><span>📍 ТЦ Космос</span><span class="route-mini" onclick="event.stopPropagation(); openRoute(0)">🗺</span><span class="check">✓</span></button>
-    <button class="place-btn" id="mplace-1" onclick="selectPickupModal(1)"><span>📍 Дом быта</span><span class="route-mini" onclick="event.stopPropagation(); openRoute(1)">🗺</span><span class="check">✓</span></button>
-    <button class="place-btn" id="mplace-2" onclick="selectPickupModal(2)"><span>📍 ДК Тольятти</span><span class="route-mini" onclick="event.stopPropagation(); openRoute(2)">🗺</span><span class="check">✓</span></button>
+    <button class="place-btn" id="mplace-0" onclick="selectPickupModal(0)"><span>📍 ТЦ Космос</span><span class="pmap" onclick="event.stopPropagation();openPlaceMap(0)">🗺 Карта</span><span class="check">✓</span></button>
+    <button class="place-btn" id="mplace-1" onclick="selectPickupModal(1)"><span>📍 Дом быта</span><span class="pmap" onclick="event.stopPropagation();openPlaceMap(1)">🗺 Карта</span><span class="check">✓</span></button>
+    <button class="place-btn" id="mplace-2" onclick="selectPickupModal(2)"><span>📍 ДК Тольятти</span><span class="pmap" onclick="event.stopPropagation();openPlaceMap(2)">🗺 Карта</span><span class="check">✓</span></button>
   </div>
-  <div class="place-rule" id="place-rule-box">Выберите точку — покажу маршрут и условия встречи.</div>
+  <div class="place-info" id="place-info" style="display:none;"></div>
   <div class="pickup-title">📅 ДАТА ВСТРЕЧИ</div>
   <input type="date" class="date-input" id="date-input-modal" onchange="updatePickupReady()" style="margin-bottom:18px;">
   <div class="pickup-title">🕒 ВРЕМЯ ВСТРЕЧИ (с 10:00 до 20:00)</div>
@@ -1003,23 +997,12 @@ var defaultProducts = [
 
 var places = ['ТЦ Космос', 'Дом быта', 'ДК Тольятти'];
 
-// ЗАМЕНИ ПОД СЕБЯ: запрос карты и регламент каждой точки
+// ЗАМЕНИ ПОД СЕБЯ: адреса и места встречи. q — запрос для Яндекс.Карт.
 var PLACE_INFO = [
-  { map: 'Тольятти, ТЦ Космос',   rule: 'ЗАМЕНИ ПОД СЕБЯ: встречи у главного входа, ежедневно 10:00–20:00. Приди к точке и напиши мне в Telegram — подойду.' },
-  { map: 'Тольятти, Дом быта',    rule: 'ЗАМЕНИ ПОД СЕБЯ: встречи во дворе со стороны парковки, ежедневно 11:00–19:00. Приди к точке и напиши мне в Telegram — подойду.' },
-  { map: 'Тольятти, ДК Тольятти', rule: 'ЗАМЕНИ ПОД СЕБЯ: встречи у центрального входа в ДК, ежедневно 10:00–20:00. Приди к точке и напиши мне в Telegram — подойду.' }
+  { name:'ТЦ Космос',  addr:'ул. Карла Маркса, 57',  meet:'на улице, около Груши',        q:'Тольятти, улица Карла Маркса, 57' },
+  { name:'Дом быта',   addr:'ул. Ленинградская, 53', meet:'около центрального входа',     q:'Тольятти, улица Ленинградская, 53' },
+  { name:'ДК Тольятти', addr:'бул. Ленина, 1',       meet:'около центрального входа',     q:'Тольятти, бульвар Ленина, 1' }
 ];
-function openRoute(i){
-  var q = encodeURIComponent(PLACE_INFO[i].map);
-  window.open('https://yandex.ru/maps/?text=' + q, '_blank');
-}
-function showPlaceRule(i){
-  var box = document.getElementById('place-rule-box');
-  if (!box) return;
-  box.innerHTML = '<div class="rule-line">🗺 Маршрут: <a href="https://yandex.ru/maps/?text=' +
-    encodeURIComponent(PLACE_INFO[i].map) + '" target="_blank">построить до точки</a></div>' +
-    '<div>' + PLACE_INFO[i].rule + '</div>';
-}
 
 var defaultClients = [];
 var defaultChatMsgs = [];
@@ -1105,7 +1088,7 @@ function clientBadges(c) {
   return h;
 }
 function onlineBadge(c) {
-  return c.online ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
+  return (c.online&&isFresh(c)) ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
 }
 function fmtDate(dateStr) {
   if (!dateStr) return '—';
@@ -1193,6 +1176,39 @@ function doLogin() {
   enterAs(name, username, null);
 }
 
+// ===== ПУЛЬС ПРИСУТСТВИЯ =====
+function isFresh(c){
+  if(!c) return false;
+  if(!c.lastSeen) return !!c.online;
+  return (Date.now()-c.lastSeen) < 65000;
+}
+function pingOnline(on){
+  if(!DB_URL || !me || !firstSyncDone) return;
+  var idx=-1;
+  for(var i=0;i<clients.length;i++){ if(clients[i].username===me.username){ idx=i; break; } }
+  if(idx<0) return;
+  try{
+    fetch(DB_URL + '/clients/' + idx + '.json', {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ online: on?true:false, lastSeen: on?Date.now():0 })
+    });
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden){ if(me){ me.online=false; me.lastSeen=0; pingOnline(false); } }
+  else { if(me){ me.online=true; me.lastSeen=Date.now(); pingOnline(true); } }
+});
+window.addEventListener('beforeunload', function(){
+  if(me && DB_URL && firstSyncDone){
+    try{
+      fetch(DB_URL + '/clients/' + String(clients.indexOf(me)) + '.json', {
+        method:'PATCH', body:'{"online":false,"lastSeen":0}', keepalive:true
+      });
+    }catch(e){}
+  }
+});
+
 function enterAs(name, username, tgId) {
   var c = findClient(username);
   if (!c) {
@@ -1214,14 +1230,20 @@ function enterAs(name, username, tgId) {
     return;
   }
   c.online = true;
-  c.lastSeen = Date.now();
   me = c;
   saveState();
 
   document.getElementById('login-screen').classList.remove('open');
   document.getElementById('app-root').style.display = 'block';
-  document.getElementById('welcome-name').textContent = me.name || username;
+    document.getElementById('welcome-name').textContent = name;
   renderAll();
+
+  // ПУЛЬС ПРИСУТСТВИЯ: каждые 15 секунд подтверждаем, что магазин открыт
+  if (window.__hbTimer) clearInterval(window.__hbTimer);
+  window.__hbTimer = setInterval(function(){
+    if(me && !document.hidden){ me.online=true; me.lastSeen=Date.now(); pingOnline(true); }
+  }, 15000);
+  pingOnline(true);
 }
 
 // ===== ЧАСТИЦЫ =====
@@ -1236,7 +1258,9 @@ for (var i=0;i<45;i++) dots.push({
   speed:Math.random()*0.4+0.1, drift:Math.random()*0.4-0.2, opacity:Math.random()*0.5+0.15
 });
 (function drawDots(){
-  if (document.body.classList.contains('fx-off')) { requestAnimationFrame(drawDots); return; }
+  var tNow=(performance.now?performance.now():Date.now());
+  if(window.__fd){ var dt=tNow-window.__lf; if(dt>0&&dt<1000){ window.__fd.push(dt); if(window.__fd.length>40) window.__fd.shift(); } }
+  window.__lf=tNow;
   ctx.clearRect(0,0,cv.width,cv.height);
   ctx.fillStyle = '#e0e0e0';
   for (var i=0;i<dots.length;i++){
@@ -1247,11 +1271,8 @@ for (var i=0;i<45;i++) dots.push({
     if(d.y>cv.height){d.y=-10;d.x=Math.random()*cv.width;}
     if(d.x>cv.width)d.x=0; if(d.x<0)d.x=cv.width;
   }
-  requestAnimationFrame(drawDots);
+    if(typeof smoothMode==='undefined' || smoothMode!=='off') requestAnimationFrame(drawDots);
 })();
-
-// Статус «в сети» живой, только если пульс был недавно (60 секунд)
-function isFresh(c){ if(!c.lastSeen) return false; return (Date.now() - c.lastSeen) < 60000; }
 
 // ===== ВЕРХНЯЯ СТРОЧКА =====
 function updateTopInfo() {
@@ -1533,8 +1554,20 @@ function selectPickupModal(index){
   modalPlace=places[index];
   for(var i=0;i<places.length;i++)
     document.getElementById('mplace-'+i).className=(i===index)?'place-btn selected':'place-btn';
-  showPlaceRule(index);
+  renderPlaceInfo(index);
   updatePickupReady();
+}
+function renderPlaceInfo(index){
+  var box=document.getElementById('place-info');
+  var p=PLACE_INFO[index];
+  if(!box||!p) return;
+  box.style.display='block';
+  box.innerHTML='<b>📍 '+p.name+'</b> — '+p.addr+'<br>🤝 Встреча: '+p.meet;
+}
+function openPlaceMap(index){
+  var p=PLACE_INFO[index];
+  if(!p) return;
+  window.open('https://yandex.ru/maps/?text='+encodeURIComponent(p.q),'_blank');
 }
 function updatePickupReady(){
   modalDate=document.getElementById('date-input-modal').value;
@@ -1943,7 +1976,7 @@ function renderAdminDialogs(){
     row.className='dialog-row';
     row.setAttribute('onclick','openAdminDialog(\''+esc(u)+'\')');
     row.innerHTML=
-      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online&&isFresh(c)?'':' off')+'"></span></div>'+
       '<div style="flex:1; min-width:0;">'+
         '<div class="client-name" style="font-size:14px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="last">'+esc(lastText)+'</div>'+
@@ -2044,7 +2077,7 @@ function renderOwnerClients(){
 
     box.innerHTML=
       '<div class="client-row">'+
-        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online&&isFresh(c)?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
           '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+'</div>'+
           '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
@@ -2117,7 +2150,7 @@ function openClientProfile(idx){
   document.getElementById('client-profile-body').innerHTML=
     '<div class="pickup-title" style="margin-bottom:6px;">ПРОФИЛЬ КЛИЕНТА</div>'+
     '<div class="member-row" style="margin-bottom:14px;">'+
-      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online&&isFresh(c)?'':' off')+'"></span></div>'+
       '<div>'+
         '<div class="member-name" style="font-size:20px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="member-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
@@ -2433,7 +2466,7 @@ function sendChat(side){
 }
 function whoHtmlFor(m){
   if(m.shop) return '<div class="who"><b>🌙 LoonShop</b><span class="r-badge r-verified">✓ Владелец</span><span class="tm">'+m.time+'</span></div>';
-  return '<div class="who"><b onclick="openChatProfile(\''+esc(m.username)+'\')" title="Открыть профиль — там виден юзернейм">'+esc(m.name)+'</b>'+
+  return '<div class="who"><b onclick="openChatProfile(\''+esc(m.username)+'\')" title="Открыть профиль">'+esc(m.name)+'</b>'+
     clientBadges(m)+'<span class="tm">'+m.time+'</span></div>';
 }
 function openChatProfile(username){
@@ -2491,7 +2524,7 @@ function openDM(username, asSide){
   if(c){
     head='<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ'+(dmAsShop?' · ОТ ИМЕНИ МАГАЗИНА':' · С КЛИЕНТОМ')+'</div>'+
       '<div class="member-row" style="margin-bottom:10px;">'+
-        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online&&isFresh(c)?'':' off')+'"></span></div>'+
         '<div><div class="client-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="client-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
         '<div style="margin-top:6px;"><button class="profile-link-btn" style="margin:0;" onclick="openChatProfile(\''+esc(c.username)+'\')">📋 Профиль и покупки</button></div></div></div>';
@@ -2591,10 +2624,6 @@ function syncPull(){
       lastRemote = s;
       if (d.products) products = d.products;
       if (d.clients) clients = d.clients;
-      var nowMs = Date.now();
-      for (var ci = 0; ci < clients.length; ci++) {
-        if (clients[ci].online && !isFresh(clients[ci]) && (!me || clients[ci].username !== me.username)) clients[ci].online = false;
-      }
       if (d.chatMsgs) chatMsgs = d.chatMsgs;
       if (d.orders) orders = d.orders;
       if (d.reviews) reviews = d.reviews;
@@ -2618,93 +2647,58 @@ function syncPull(){
 }
 setInterval(syncPull, 3000);
 
-// Живой статус: пульс каждые 15 секунд — я ещё здесь
-setInterval(function(){ if(!me) return; me.lastSeen = Date.now(); me.online = true; saveState(); }, 15000);
-// Ушёл со страницы — гасим статус сразу
-window.addEventListener('beforeunload', function(){ if(me){ me.online = false; me.lastSeen = 0; saveState(); } });
-
-
-// ===== ПЛАВНОСТЬ (авто/вкл/выкл) =====
-var FX_KEY = 'loonshop_fx';
-var fxMode = 'auto';
-var fxAutoDropped = false;
-
-function applyFx(){
-  var b = document.body;
-  b.classList.remove('fx-lite', 'fx-off');
-  if (fxMode === 'on') b.classList.add('fx-lite');
-  if (fxMode === 'off') b.classList.add('fx-off');
-  if (fxMode === 'auto' && fxAutoDropped) b.classList.add('fx-lite');
-  var ids = ['fx-auto', 'fx-on', 'fx-off'], modes = ['auto', 'on', 'off'];
-  for (var i = 0; i < ids.length; i++) {
-    var el = document.getElementById(ids[i]);
-    if (el) el.className = 'fx-btn' + (modes[i] === fxMode ? ' active' : '');
-  }
-  var note = document.getElementById('fx-note');
-  if (note) {
-    if (fxMode === 'auto') note.textContent = fxAutoDropped
-      ? 'Авто: телефон тормозил — облегчённый режим включён автоматически.'
-      : 'Авто: анимации включены, при тормозах облегчённый режим включится сам.';
-    else if (fxMode === 'on') note.textContent = 'Вкл: анимации без размытия фона и слайда вкладок.';
-    else note.textContent = 'Выкл: вся анимация отключена.';
+// ===== ПЛАВНОСТЬ =====
+var smoothMode = 'auto';
+var autoLatched = false, autoApplied = false;
+function applySmooth(mode){
+  smoothMode = mode;
+  try{ localStorage.setItem('loonshop_smooth', mode); }catch(e){}
+  document.body.classList.remove('sm-light','sm-off');
+  if(mode==='light') document.body.classList.add('sm-light');
+  if(mode==='off') document.body.classList.add('sm-off');
+  var b1=document.getElementById('sm-auto'), b2=document.getElementById('sm-light'), b3=document.getElementById('sm-off');
+  if(b1) b1.className='smooth-btn'+(mode==='auto'?' on':'');
+  if(b2) b2.className='smooth-btn'+(mode==='light'?' on':'');
+  if(b3) b3.className='smooth-btn'+(mode==='off'?' on':'');
+  var note=document.getElementById('smooth-note');
+  if(note){
+    if(mode==='auto') note.textContent = autoApplied ? 'Авто: тормозило — сам включил облегчённый режим' : 'Авто: включено, ослабится само, если начнёт тормозить';
+    else if(mode==='light') note.textContent = 'Вкл: анимации работают, без размытий и слайда вкладок';
+    else note.textContent = 'Выкл: все анимации отключены';
   }
 }
-function setFx(mode){
-  fxMode = mode;
-  try { localStorage.setItem(FX_KEY, mode); } catch(e) {}
-  if (mode !== 'auto') fxAutoDropped = false;
-  applyFx();
-}
-(function initFx(){
-  try { fxMode = localStorage.getItem(FX_KEY) || 'auto'; } catch(e) { fxMode = 'auto'; }
-  if (['auto','on','off'].indexOf(fxMode) === -1) fxMode = 'auto';
-  applyFx();
-})();
-
-// Монитор кадров: если кадры систематически дольше 40 мс — авто ослабляет режим сам
-(function fxMonitor(){
-  var times = [], last = 0;
-  function tick(t){
-    if (last) {
-      times.push(t - last);
-      if (times.length > 30) times.shift();
-      var avg = 0;
-      for (var i = 0; i < times.length; i++) avg += times[i];
-      avg /= times.length;
-      if (fxMode === 'auto' && !fxAutoDropped && avg > 40) {
-        fxAutoDropped = true;
-        applyFx();
-      }
-    }
-    last = t;
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
+function setSmooth(mode){ autoLatched=false; autoApplied=false; applySmooth(mode); }
+setInterval(function(){
+  if(smoothMode!=='auto' || !window.__fd || window.__fd.length<15) return;
+  var s=0; for(var i=0;i<window.__fd.length;i++) s+=window.__fd[i];
+  var avg=s/window.__fd.length;
+  if(avg>40 && !autoLatched){ autoLatched=true; autoApplied=true; applySmooth('light'); }
+  else if(avg<25 && autoApplied){ autoApplied=false; applySmooth('auto'); }
+}, 5000);
+(function initSmooth(){
+  var m='auto';
+  try{ m = localStorage.getItem('loonshop_smooth') || 'auto'; }catch(e){}
+  applySmooth(m);
 })();
 
 // ===== ОБНОВИТЬ ДАННЫЕ =====
 function refreshData(){
-  var btn = document.getElementById('refresh-btn');
-  if (btn) { btn.textContent = '🔄 Обновляю…'; }
-  syncing = false;
-  try { lastRemote = ''; } catch(e) {}
-  setTimeout(function(){
-    syncPull();
-    setTimeout(function(){
-      renderAll();
-      if (btn) btn.textContent = '🔄 Обновить данные';
-    }, 800);
-  }, 100);
+  var b=document.getElementById('refresh-btn');
+  if(b){ b.textContent='🔄 Обновляю…'; setTimeout(function(){ b.textContent='🔄 Обновить данные'; }, 900); }
+  lastRemote=null; syncPull();
 }
 
-// ===== ВЫЙТИ НА ЭТОМ УСТРОЙСТВЕ =====
+// ===== ВЫХОД НА ЭТОМ УСТРОЙСТВЕ =====
 function logoutDevice(){
-  if (!confirm('Выйти из аккаунта на этом устройстве?')) return;
-  if (me) { me.online = false; me.lastSeen = 0; saveState(); }
-  me = null;
-  cart = [];
-  document.getElementById('app-root').style.display = 'none';
+  if(!confirm('Выйти на этом устройстве?')) return;
+  if(window.__hbTimer){ clearInterval(window.__hbTimer); window.__hbTimer=null; }
+  if(me){ me.online=false; me.lastSeen=0; pingOnline(false); }
+  me=null; cart=[];
+  saveState();
+  document.getElementById('app-root').style.display='none';
   document.getElementById('login-screen').classList.add('open');
+  var h=document.getElementById('login-hint');
+  if(h) h.textContent='Ожидание входа…';
 }
 
 // ===== ЗАПУСК =====
