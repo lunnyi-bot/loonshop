@@ -437,6 +437,26 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   .pcard-stock { font-size: 10px; margin-bottom: 8px; }
   .pcard .btn { padding: 9px 6px; font-size: 12px; border-radius: 10px; }
 }
+
+/* ===== ПЛАВНОСТЬ (режимы анимаций) ===== */
+body.fx-lite .topbar, body.fx-lite .dock, body.fx-lite .overlay { backdrop-filter:none !important; }
+body.fx-lite .moon-glow { filter:none !important; animation:none !important; opacity:0.12 !important; }
+body.fx-off *, body.fx-off *::before, body.fx-off *::after { transition:none !important; animation:none !important; }
+body.fx-off .topbar, body.fx-off .dock, body.fx-off .overlay { backdrop-filter:none !important; }
+body.fx-off .moon-glow, body.fx-off #particles { display:none !important; }
+body.fx-off .pcard:hover, body.fx-off .cat:hover { transform:none !important; }
+
+.fx-block { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+  padding:14px; margin-bottom:12px; }
+.fx-block .fx-title { color:#8a8a8a; font-size:13px; margin-bottom:10px; font-weight:bold; }
+.fx-row { display:flex; gap:8px; }
+.fx-opt { flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#b0b0b0;
+  padding:10px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:bold; }
+.fx-opt:hover { background:rgba(255,255,255,0.12); }
+.fx-opt.on { background:#e0e0e0; color:#0a0a0a; border-color:#e0e0e0; }
+.fx-sub { color:#6e6e6e; font-size:11px; margin-top:8px; line-height:1.4; }
+.profile-btn.danger { background:rgba(255,123,123,0.1); border-color:rgba(255,123,123,0.4); color:#ff7b7b; }
+.profile-btn.danger:hover { background:rgba(255,123,123,0.2); }
 </style>
 </head>
 <body>
@@ -508,7 +528,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     </div>
     <div class="welcome">
       <span>🌙 Добро пожаловать, <b id="welcome-name">…</b></span>
-      <span class="right">Выберите идеальный вариант</span>
+      
     </div>
     <div class="catalog-head">
       <div class="over">КОЛЛЕКЦИЯ</div>
@@ -587,7 +607,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div class="member-card">
       <div class="over">MEMBER CARD</div>
       <div class="member-row">
-        <div class="member-avatar"><span>🌙</span><span class="on-dot"></span></div>
+        <div class="member-avatar"><span>🌙</span><span class="on-dot" id="self-dot"></span></div>
         <div>
           <div class="member-name" id="profile-name-line">—</div>
           <div class="member-handle" id="profile-handle-line">@—</div>
@@ -611,6 +631,18 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <button class="profile-btn" onclick="openRules()">📜 Правила магазина</button>
     <button class="profile-btn bazar" onclick="openBazar()">🛒 Наша барахолка</button>
     <button class="profile-btn" id="owner-btn" style="display:none;" onclick="showTab('owner')">🔒 Панель владельца</button>
+
+    <div class="fx-block">
+      <div class="fx-title">✨ Плавность</div>
+      <div class="fx-row">
+        <button class="fx-opt" id="fx-auto" onclick="setFxMode('auto')">Авто</button>
+        <button class="fx-opt" id="fx-on" onclick="setFxMode('on')">Вкл</button>
+        <button class="fx-opt" id="fx-off" onclick="setFxMode('off')">Выкл</button>
+      </div>
+      <div class="fx-sub" id="fx-sub">Авто: анимации работают, а если телефон не справляется — плавный режим ослабляется сам.</div>
+    </div>
+    <button class="profile-btn" id="refresh-btn" onclick="refreshData()">🔄 Обновить данные</button>
+    <button class="profile-btn danger" onclick="logoutDevice()">🚪 Выйти на этом устройстве</button>
     <p class="hint" style="text-align:center;">Данные синхронизируются между устройствами через Firebase.</p>
   </div>
 
@@ -1142,12 +1174,13 @@ function enterAs(name, username, tgId) {
     return;
   }
   c.online = true;
+  c.seenAt = Date.now();
   me = c;
   saveState();
 
   document.getElementById('login-screen').classList.remove('open');
   document.getElementById('app-root').style.display = 'block';
-  document.getElementById('welcome-name').textContent = username;
+  document.getElementById('welcome-name').textContent = me.name;
   renderAll();
 }
 
@@ -1163,6 +1196,7 @@ for (var i=0;i<45;i++) dots.push({
   speed:Math.random()*0.4+0.1, drift:Math.random()*0.4-0.2, opacity:Math.random()*0.5+0.15
 });
 (function drawDots(){
+  if (fxStopped) { fxLastT = 0; requestAnimationFrame(drawDots); return; }
   ctx.clearRect(0,0,cv.width,cv.height);
   ctx.fillStyle = '#e0e0e0';
   for (var i=0;i<dots.length;i++){
@@ -1173,6 +1207,7 @@ for (var i=0;i<45;i++) dots.push({
     if(d.y>cv.height){d.y=-10;d.x=Math.random()*cv.width;}
     if(d.x>cv.width)d.x=0; if(d.x<0)d.x=cv.width;
   }
+  fxMonitor(performance.now());
   requestAnimationFrame(drawDots);
 })();
 
@@ -1184,7 +1219,7 @@ function updateTopInfo() {
   var el = document.getElementById('info-datetime');
   if (el) el.textContent = n.getDate()+' '+months[n.getMonth()]+' '+n.getFullYear()+' · '+days[n.getDay()]+' · '+nowTime();
   var on = 0;
-  for (var i=0;i<clients.length;i++) if (clients[i].online && !clients[i].banned) on++;
+  for (var i=0;i<clients.length;i++) if (isOnline(clients[i])) on++;
   document.getElementById('info-online').textContent = on;
   document.getElementById('info-total').textContent = clients.length;
 }
@@ -1865,7 +1900,7 @@ function renderAdminDialogs(){
     row.className='dialog-row';
     row.setAttribute('onclick','openAdminDialog(\''+esc(u)+'\')');
     row.innerHTML=
-      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="client-avatar" style="width:40px;height:40px;font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isOnline(c)?'':' off')+'"></span></div>'+
       '<div style="flex:1; min-width:0;">'+
         '<div class="client-name" style="font-size:14px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="last">'+esc(lastText)+'</div>'+
@@ -1966,7 +2001,7 @@ function renderOwnerClients(){
 
     box.innerHTML=
       '<div class="client-row">'+
-        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isOnline(c)?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
           '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+'</div>'+
           '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
@@ -2039,7 +2074,7 @@ function openClientProfile(idx){
   document.getElementById('client-profile-body').innerHTML=
     '<div class="pickup-title" style="margin-bottom:6px;">ПРОФИЛЬ КЛИЕНТА</div>'+
     '<div class="member-row" style="margin-bottom:14px;">'+
-      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+      '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isOnline(c)?'':' off')+'"></span></div>'+
       '<div>'+
         '<div class="member-name" style="font-size:20px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="member-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
@@ -2183,6 +2218,8 @@ function renderProfileLine(){
   document.getElementById('profile-num-tag').textContent='№ '+(me.num||'—');
   document.getElementById('profile-id-tag').textContent='ID: '+(me.tgId?me.tgId:'—');
   document.getElementById('owner-btn').style.display = (me.admin || isAdmin(me.username, me.tgId)) ? 'block' : 'none';
+  var sd = document.getElementById('self-dot');
+  if (sd) sd.className = 'on-dot' + (isOnline(me) ? '' : ' off');
 }
 function renderAll(){
   renderCatalog();
@@ -2355,8 +2392,7 @@ function sendChat(side){
 }
 function whoHtmlFor(m){
   if(m.shop) return '<div class="who"><b>🌙 LoonShop</b><span class="r-badge r-verified">✓ Владелец</span><span class="tm">'+m.time+'</span></div>';
-  return '<div class="who"><b onclick="openChatProfile(\''+esc(m.username)+'\')" title="Открыть профиль">'+esc(m.name)+'</b>'+
-    '<span style="font-weight:normal; color:#8a8a8a;">'+esc(m.username)+'</span>'+
+  return '<div class="who"><b onclick="openChatProfile(\''+esc(m.username)+'\')" title="Открыть профиль — там виден юзернейм">'+esc(m.name)+'</b>'+
     clientBadges(m)+'<span class="tm">'+m.time+'</span></div>';
 }
 function openChatProfile(username){
@@ -2414,7 +2450,7 @@ function openDM(username, asSide){
   if(c){
     head='<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ'+(dmAsShop?' · ОТ ИМЕНИ МАГАЗИНА':' · С КЛИЕНТОМ')+'</div>'+
       '<div class="member-row" style="margin-bottom:10px;">'+
-        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(c.online?'':' off')+'"></span></div>'+
+        '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isOnline(c)?'':' off')+'"></span></div>'+
         '<div><div class="client-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
         '<div class="client-handle">'+esc(c.username)+' · '+onlineBadge(c)+'</div>'+
         '<div style="margin-top:6px;"><button class="profile-link-btn" style="margin:0;" onclick="openChatProfile(\''+esc(c.username)+'\')">📋 Профиль и покупки</button></div></div></div>';
@@ -2537,7 +2573,103 @@ function syncPull(){
 }
 setInterval(syncPull, 3000);
 
+
+// ===== ПЛАВНОСТЬ =====
+var FX_KEY = 'loonshop_fx';
+var fxMode = 'auto';
+try { fxMode = localStorage.getItem(FX_KEY) || 'auto'; } catch(e) {}
+var fxStopped = false, fxAutoSlow = false, fxSlowFrames = 0, fxLastT = 0;
+
+function applyFx(mode){
+  var b = document.body;
+  b.classList.remove('fx-lite','fx-off');
+  if (mode === 'off') { b.classList.add('fx-off'); fxStopped = true; }
+  else if (mode === 'on') { b.classList.add('fx-lite'); fxStopped = false; }
+  else fxStopped = false;
+  var subs = {
+    auto: 'Авто: анимации работают, а если телефон не справляется — плавный режим ослабляется сам.',
+    on: 'Вкл: анимации включены, но без размытия фона и слайда вкладок — легко для слабых телефонов.',
+    off: 'Выкл: вся анимация отключена целиком — даже если телефон справляется.'
+  };
+  var sub = document.getElementById('fx-sub');
+  if (sub) sub.textContent = subs[mode] || subs.auto;
+  var ids = ['fx-auto','fx-on','fx-off'], keys = ['auto','on','off'];
+  for (var i=0;i<ids.length;i++){
+    var el = document.getElementById(ids[i]);
+    if (el) el.className = 'fx-opt' + (keys[i] === mode ? ' on' : '');
+  }
+}
+function setFxMode(mode){
+  try { localStorage.setItem(FX_KEY, mode); } catch(e) {}
+  fxMode = mode;
+  fxAutoSlow = false;
+  applyFx(mode);
+}
+function fxMonitor(t){
+  if (fxLastT){
+    var dt = t - fxLastT;
+    if (dt > 40) fxSlowFrames++; else fxSlowFrames = Math.max(0, fxSlowFrames - 1);
+    if (!fxAutoSlow && fxMode === 'auto' && fxSlowFrames >= 30){
+      fxAutoSlow = true;
+      applyFx('on');
+    }
+  }
+  fxLastT = t;
+}
+
+
+// ===== ОБНОВИТЬ ДАННЫЕ =====
+function refreshData(){
+  var btn = document.getElementById('refresh-btn');
+  var old = btn ? btn.textContent : '';
+  lastRemote = null;
+  syncPull();
+  if (btn){
+    btn.textContent = '⏳ Обновляю…';
+    setTimeout(function(){ btn.textContent = '🔄 Обновить данные'; }, 1500);
+  }
+}
+
+// ===== ВЫЙТИ НА ЭТОМ УСТРОЙСТВЕ =====
+function logoutDevice(){
+  if (!confirm('Выйти из магазина на этом устройстве?')) return;
+  if (me) me.online = false;
+  me = null;
+  saveState();
+  document.getElementById('app-root').style.display = 'none';
+  document.getElementById('login-screen').classList.add('open');
+  var hint = document.getElementById('login-hint');
+  if (hint) hint.textContent = 'Вы вышли. Для входа нажмите «Войти через Telegram».';
+}
+
+// ===== ПУЛЬС ОНЛАЙН =====
+function isOnline(c){
+  if (!c || c.banned || !c.online) return false;
+  if (c.seenAt === undefined || c.seenAt === null) return c.online;
+  return (Date.now() - c.seenAt) < 70000;
+}
+setInterval(function(){
+  if (me){
+    me.seenAt = Date.now();
+    me.online = true;
+    saveState();
+    updateTopInfo();
+  }
+}, 15000);
+document.addEventListener('visibilitychange', function(){
+  if (!me) return;
+  if (document.visibilityState === 'hidden'){
+    me.seenAt = Date.now() - 70000;
+  } else {
+    me.seenAt = Date.now();
+    me.online = true;
+  }
+  saveState();
+  updateTopInfo();
+});
+
 // ===== ЗАПУСК =====
+applyFx(fxMode);
 updateTopInfo();
 syncPull();
 </script>
