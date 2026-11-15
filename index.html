@@ -865,6 +865,10 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 var STORAGE_KEY = 'loonshop_v8';
 var BAZAR_URL = 'https://t.me/VapeTolyatti63';
 
+// Посредник для уведомлений в Telegram (Cloudflare Worker)
+var NOTIFY_URL = 'https://loonshop.xylugan4uk123.workers.dev';
+var NOTIFY_KEY = 'loon-secret-2026';
+
 // Секретный код владельца для входа с компьютера (поменяй на свой!)
 var OWNER_CODE = 'LOON-OWNER-2026';
 
@@ -1560,6 +1564,26 @@ function removeItem(id,color){
   saveState(); updateTotals(); updateChange(); renderCatalog(); openCart();
 }
 
+// ===== УВЕДОМЛЕНИЕ О ЗАКАЗЕ ЧЕРЕЗ ПОСРЕДНИКА =====
+function notifyOrder(o, items, sum, change){
+  try {
+    var lines = [];
+    for (var i = 0; i < items.length; i++) {
+      lines.push('• ' + items[i].name + (items[i].color !== '—' ? ' (' + items[i].color + ')' : '') + ' × ' + items[i].qty + ' — ' + (items[i].price * items[i].qty) + ' ₽');
+    }
+    var msg =
+      '🌙 НОВЫЙ ЗАКАЗ в LoonShop\n' +
+      'Клиент: ' + (me ? (me.name + ' ' + me.username) : '—') + '\n' +
+      'Товары:\n' + lines.join('\n') + '\n' +
+      'Итого: ' + sum + ' ₽\n' +
+      'Оплата: наличные, расчёт ' + Math.floor(o.paid) + ' ₽, сдача ' + change + ' ₽\n' +
+      'Точка: ' + o.place + '\n' +
+      'Когда: ' + fmtDate(o.date) + ' · ' + o.time;
+    var url = NOTIFY_URL + '?k=' + NOTIFY_KEY + '&text=' + encodeURIComponent(msg);
+    fetch(url).catch(function(){ });
+  } catch(e) { }
+}
+
 // ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
 function confirmOrder(){
   if(cart.length===0){ alert('Корзина пуста!'); return; }
@@ -1581,6 +1605,7 @@ function confirmOrder(){
     paid:Math.floor(paid), change:change,
     payment:'Наличные', status:'Ожидает', reviewIdx:-1
   });
+  notifyOrder(orders[orders.length-1], items, sum, change);
   alert('Заказ оформлен!\nМесто: '+modalPlace+'\nКогда: '+fmtDate(modalDate)+' · '+modalTime+'\nСумма: '+sum+' ₽ (наличные)\nСдача: '+change+' ₽');
   cart=[];
   document.getElementById('pay-amount').value='';
