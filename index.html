@@ -865,10 +865,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 var STORAGE_KEY = 'loonshop_v8';
 var BAZAR_URL = 'https://t.me/VapeTolyatti63';
 
-// Посредник для уведомлений в Telegram (Cloudflare Worker)
-var NOTIFY_URL = 'https://loonshop.xylugan4uk123.workers.dev';
-var NOTIFY_KEY = 'loon-secret-2026';
-
 // Секретный код владельца для входа с компьютера (поменяй на свой!)
 var OWNER_CODE = 'LOON-OWNER-2026';
 
@@ -884,6 +880,46 @@ function ownerLogin() {
 
 // Адрес общей базы Firebase (Realtime Database)
 var DB_URL = 'https://loonshop63-default-rtdb.europe-west1.firebasedatabase.app';
+
+// ===== УВЕДОМЛЕНИЯ ЧЕРЕЗ CLOUDFLARE WORKER =====
+var NOTIFY_URL = 'https://loonshop.xylugan4uk123.workers.dev';
+var NOTIFY_KEY = 'loon-secret-2026';
+
+function sendNotify(chatId, text) {
+  try {
+    var u = NOTIFY_URL + '?k=' + encodeURIComponent(NOTIFY_KEY) +
+            '&text=' + encodeURIComponent(text);
+    if (chatId) u += '&to=' + encodeURIComponent(chatId);
+    fetch(u, { method: 'GET' }).catch(function(){});
+  } catch(e) { }
+}
+
+function orderBrief(o) {
+  var itemsBrief = '';
+  for (var i = 0; i < o.items.length; i++) {
+    var it = o.items[i];
+    itemsBrief += '\u2022 ' + it.name + (it.color !== '\u2014' ? ' (' + it.color + ')' : '') +
+      ' x' + it.qty + ' \u2014 ' + (it.price * it.qty) + ' \u20BD\n';
+  }
+  return itemsBrief;
+}
+
+function notifyOrderStatus(o) {
+  var c = findClient(o.customer);
+  if (!c || !c.tgId) return;
+  var msg = '';
+  if (o.status === 'Выполнен') {
+    msg = '\u2705 LoonShop: заказ выполнен!\n' +
+      'Ждём вас: \u{1F4CD} ' + o.place + ' \u00B7 ' + fmtDate(o.date) + ' \u00B7 ' + o.time + '\n' +
+      'Сумма: ' + o.sum + ' \u20BD, сдача: ' + o.change + ' \u20BD\n' +
+      'Не забудьте проверить товар при получении.';
+  } else if (o.status === 'Отменён') {
+    msg = '\u274C LoonShop: заказ отменён.\n' +
+      'Товары вернулись в наличие. Если это недоразумение \u2014 напишите нам: «Написать в LoonShop» в профиле.';
+  }
+  if (msg) sendNotify(c.tgId, msg);
+}
+
 
 // Админы по ID Telegram (ID не меняется никогда — надёжнее юзернейма)
 var ADMIN_IDS = [8914120660, 5009894330];
@@ -1564,26 +1600,6 @@ function removeItem(id,color){
   saveState(); updateTotals(); updateChange(); renderCatalog(); openCart();
 }
 
-// ===== УВЕДОМЛЕНИЕ О ЗАКАЗЕ ЧЕРЕЗ ПОСРЕДНИКА =====
-function notifyOrder(o, items, sum, change){
-  try {
-    var lines = [];
-    for (var i = 0; i < items.length; i++) {
-      lines.push('• ' + items[i].name + (items[i].color !== '—' ? ' (' + items[i].color + ')' : '') + ' × ' + items[i].qty + ' — ' + (items[i].price * items[i].qty) + ' ₽');
-    }
-    var msg =
-      '🌙 НОВЫЙ ЗАКАЗ в LoonShop\n' +
-      'Клиент: ' + (me ? (me.name + ' ' + me.username) : '—') + '\n' +
-      'Товары:\n' + lines.join('\n') + '\n' +
-      'Итого: ' + sum + ' ₽\n' +
-      'Оплата: наличные, расчёт ' + Math.floor(o.paid) + ' ₽, сдача ' + change + ' ₽\n' +
-      'Точка: ' + o.place + '\n' +
-      'Когда: ' + fmtDate(o.date) + ' · ' + o.time;
-    var url = NOTIFY_URL + '?k=' + NOTIFY_KEY + '&text=' + encodeURIComponent(msg);
-    fetch(url).catch(function(){ });
-  } catch(e) { }
-}
-
 // ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
 function confirmOrder(){
   if(cart.length===0){ alert('Корзина пуста!'); return; }
@@ -1603,9 +1619,24 @@ function confirmOrder(){
     customer:me.username, items:items, count:getCartCount(), sum:sum,
     place:modalPlace, date:modalDate, time:modalTime,
     paid:Math.floor(paid), change:change,
-    payment:'Наличные', status:'Ожидает', reviewIdx:-1
+    payment:'Наличные', status:'Ожидает', reviewIdx:-1,
+    tgId: me.tgId || null
   });
-  notifyOrder(orders[orders.length-1], items, sum, change);
+  var orderNum = orders.length;
+  var newOrder = orders[orderNum-1];
+  var ownerMsg = '\u{1F319} НОВЫЙ ЗАКАЗ в LoonShop\n' +
+    'Клиент: ' + me.name + ' ' + me.username + '\n' + orderBrief(newOrder) +
+    'Итого: ' + sum + ' \u20BD\n' +
+    'Оплата: наличные, отдаст ' + Math.floor(paid) + ' \u20BD, сдача ' + change + ' \u20BD\n' +
+    '\u{1F4CD} ' + modalPlace + ' \u00B7 ' + fmtDate(modalDate) + ' \u00B7 ' + modalTime;
+  sendNotify(null, ownerMsg);
+  if (me.tgId) {
+    sendNotify(me.tgId, '\u{1F319} LoonShop: заказ \u2116' + orderNum + ' принят!\n' +
+      orderBrief(newOrder) +
+      'Итого: ' + sum + ' \u20BD\n' +
+      '\u{1F4CD} ' + modalPlace + ' \u00B7 ' + fmtDate(modalDate) + ' \u00B7 ' + modalTime + '\n' +
+      'Как только статус изменится \u2014 пришлём уведомление сюда.');
+  }
   alert('Заказ оформлен!\nМесто: '+modalPlace+'\nКогда: '+fmtDate(modalDate)+' · '+modalTime+'\nСумма: '+sum+' ₽ (наличные)\nСдача: '+change+' ₽');
   cart=[];
   document.getElementById('pay-amount').value='';
@@ -1704,9 +1735,18 @@ function markAllDone(){
     }
   }
   if(!changed){ alert('Под текущий фильтр не попало ни одного заказа со статусом «Ожидает»'); return; }
+  var changedOrders = [];
+  for(var i2=0;i2<orders.length;i2++){
+    if(orders[i2].status==='Ожидает' && orderPassesFilter(orders[i2])){
+      orders[i2].status='Выполнен';
+      orders[i2].notified = true;
+      changedOrders.push(orders[i2]);
+    }
+  }
   saveState();
+  for(var i3=0;i3<changedOrders.length;i3++) notifyOrderStatus(changedOrders[i3]);
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
-  alert('Отмечено выполненными заказов: '+changed);
+  alert('Отмечено выполненными заказов: '+changed+'\nКлиентам отправлены уведомления.');
 }
 
 // ===== ПАНЕЛЬ ВЛАДЕЛЬЦА: ЗАКАЗЫ =====
@@ -1721,7 +1761,9 @@ function setOrderStatus(idx,status){
     }
   }
   o.status=status;
+  o.notified = true;
   saveState();
+  notifyOrderStatus(o);
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
 }
 
