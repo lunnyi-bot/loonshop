@@ -423,6 +423,20 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .rule-num { font-weight:bold; font-size:14px; color:#e0e0e0; margin-bottom:6px; }
 
 @media (max-width:700px) { .brand { font-size:16px; } }
+
+/* ===== МОБИЛЬНЫЕ КАРТОЧКИ ===== */
+@media (max-width: 700px){
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .pcard { border-radius: 14px; }
+  .pcard-img { height: 110px; }
+  .pcard-img .emo { font-size: 38px; }
+  .pcard-body { padding: 10px; }
+  .pcard-name { font-size: 13px; margin-bottom: 4px; }
+  .pcard-desc { font-size: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+  .pcard-price { font-size: 15px; margin-bottom: 4px; }
+  .pcard-stock { font-size: 10px; margin-bottom: 8px; }
+  .pcard .btn { padding: 9px 6px; font-size: 12px; border-radius: 10px; }
+}
 </style>
 </head>
 <body>
@@ -864,8 +878,35 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 // ================== НАСТРОЙКИ ==================
 var STORAGE_KEY = 'loonshop_v8';
 var BAZAR_URL = 'https://t.me/VapeTolyatti63';
+
 var NOTIFY_URL = 'https://loonshop.xylugan4uk123.workers.dev';
 var NOTIFY_KEY = 'loon-secret-2026';
+function notifyTg(text, to){
+  try{
+    var u = NOTIFY_URL + '?k=' + encodeURIComponent(NOTIFY_KEY) + '&text=' + encodeURIComponent(text);
+    if(to) u += '&to=' + encodeURIComponent(to);
+    fetch(u, {mode:'no-cors'});
+  }catch(e){}
+}
+function clientChatId(o){
+  var c = findClient(o.customer);
+  return (c && c.tgId) ? String(c.tgId) : null;
+}
+function orderItemsText(o){
+  var s='';
+  for(var i=0;i<o.items.length;i++){ s += '• '+o.items[i].name+' ('+o.items[i].color+') × '+o.items[i].qty+' — '+o.items[i].price+' \u20bd\n'; }
+  return s;
+}
+function newOrderTextToOwner(o){
+  var t = '\uD83C\uDF19 НОВЫЙ ЗАКАЗ в LoonShop';
+  t += '\nКлиент: ' + (me.name||'') + ' ' + (me.username||'');
+  if(me.tgId) t += '\n\uD83C\uDD94 ' + me.tgId + ' · dm:' + me.username + '\n\u21A9\uFE0F Ответьте на это сообщение — уйдёт клиенту';
+  t += '\nТовары:\n' + orderItemsText(o);
+  t += 'Итого: ' + o.sum + ' \u20BD\nОплата: наличные, расчёт ' + o.paid + ' \u20BD, сдача ' + o.change + ' \u20BD';
+  t += '\nТочка: \uD83D\uDCCD ' + o.place + '\nКогда: ' + fmtDate(o.date) + ' · ' + o.time;
+  return t;
+}
+
 
 // Секретный код владельца для входа с компьютера (поменяй на свой!)
 var OWNER_CODE = 'LOON-OWNER-2026';
@@ -1563,58 +1604,6 @@ function removeItem(id,color){
 }
 
 // ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
-
-// ===== УВЕДОМЛЕНИЯ В TELEGRAM =====
-function notifyOrder(o, idx){
-  try{
-    var c = findClient(o.customer) || {};
-    var lines = [];
-    lines.push('🌙 НОВЫЙ ЗАКАЗ в LoonShop');
-    lines.push('Клиент: ' + (c.name || o.customer) + ' ' + o.customer);
-    lines.push('Товары:');
-    var total = 0;
-    for(var i=0;i<o.items.length;i++){
-      var it = o.items[i];
-      lines.push('• ' + it.name + (it.color && it.color !== '—' ? ' (' + it.color + ')' : '') + ' × ' + it.qty + ' — ' + (it.price * it.qty) + ' ₽');
-      total += it.price * it.qty;
-    }
-    lines.push('Итого: ' + total + ' ₽');
-    lines.push('Оплата: ' + (o.payment || 'наличные') + ', расчёт ' + o.paid + ' ₽, сдача ' + o.change + ' ₽');
-    lines.push('Точка: 📍 ' + o.place);
-    lines.push('Когда: ' + fmtDate(o.date) + ' · ' + o.time);
-    lines.push('🆔 ' + (c.tgId || '—') + ' · dm:' + o.customer);
-    lines.push('↩️ Ответьте на это сообщение — уйдёт клиенту');
-    fetch(NOTIFY_URL + '?k=' + encodeURIComponent(NOTIFY_KEY) + '&text=' + encodeURIComponent(lines.join('\n')));
-    if (c.tgId) {
-      var cl = ['🌙 Заказ принят!'];
-      cl.push('Товары:');
-      for(var j=0;j<o.items.length;j++){
-        var it2 = o.items[j];
-        cl.push('• ' + it2.name + (it2.color && it2.color !== '—' ? ' (' + it2.color + ')' : '') + ' × ' + it2.qty);
-      }
-      cl.push('Сумма: ' + o.sum + ' ₽ (наличные), сдача ' + o.change + ' ₽');
-      cl.push('Точка: 📍 ' + o.place);
-      cl.push('Когда: ' + fmtDate(o.date) + ' · ' + o.time);
-      cl.push('Как соберём — напишем здесь.');
-      fetch(NOTIFY_URL + '?k=' + encodeURIComponent(NOTIFY_KEY) + '&text=' + encodeURIComponent(cl.join('\n')) + '&to=' + c.tgId);
-    }
-  }catch(e){}
-}
-
-function notifyStatus(o, idx){
-  try{
-    var c = findClient(o.customer) || {};
-    if(!c.tgId) return;
-    var done = (o.status === 'Выполнен');
-    var lines = [];
-    lines.push(done ? '✅ Заказ №' + (idx+1) + ' выполнен!' : '❌ Заказ №' + (idx+1) + ' отменён.');
-    lines.push('Точка: 📍 ' + o.place);
-    lines.push('Когда: ' + fmtDate(o.date) + ' · ' + o.time);
-    if(!done) lines.push('Если это недоразумение — напишите нам в личку.');
-    fetch(NOTIFY_URL + '?k=' + encodeURIComponent(NOTIFY_KEY) + '&text=' + encodeURIComponent(lines.join('\n')) + '&to=' + c.tgId);
-  }catch(e){}
-}
-
 function confirmOrder(){
   if(cart.length===0){ alert('Корзина пуста!'); return; }
   if(!modalPlace||!modalDate){ alert('Выберите точку, дату и время — они спрашиваются при добавлении товара.'); return; }
@@ -1638,8 +1627,13 @@ function confirmOrder(){
   alert('Заказ оформлен!\nМесто: '+modalPlace+'\nКогда: '+fmtDate(modalDate)+' · '+modalTime+'\nСумма: '+sum+' ₽ (наличные)\nСдача: '+change+' ₽');
   cart=[];
   document.getElementById('pay-amount').value='';
+  var lastOrder = orders[orders.length-1];
+  notifyTg(newOrderTextToOwner(lastOrder));
+  var ch = clientChatId(lastOrder);
+  if(ch){
+    notifyTg('\uD83C\uDF19 LoonShop\n\n\u2705 Заказ принят!\n\nТовары:\n' + orderItemsText(lastOrder) + 'Точка: \uD83D\uDCCD ' + lastOrder.place + '\nКогда: ' + fmtDate(lastOrder.date) + ' · ' + lastOrder.time + '\nИтого: ' + lastOrder.sum + ' \u20BD\nСдача: ' + lastOrder.change + ' \u20BD\n\nЕсли планы изменились — напишите нам.', ch);
+  }
   saveState();
-  notifyOrder(orders[orders.length-1], orders.length-1);
   updateTotals(); renderCatalog(); renderOrders(); renderOwner(); updateReviewButton();
   closeCart();
 }
@@ -1727,15 +1721,24 @@ function orderPassesFilter(o){
 
 function markAllDone(){
   var changed=0;
+  var toNotify=[];
   for(var i=0;i<orders.length;i++){
     if(orders[i].status==='Ожидает' && orderPassesFilter(orders[i])){
+      var ch = clientChatId(orders[i]);
+      if(ch) toNotify.push(orders[i]);
       orders[i].status='Выполнен';
-      notifyStatus(orders[i], i);
       changed++;
     }
   }
   if(!changed){ alert('Под текущий фильтр не попало ни одного заказа со статусом «Ожидает»'); return; }
   saveState();
+  for(var n=0;n<toNotify.length;n++){
+    var oo = toNotify[n];
+    var ch2 = clientChatId(oo);
+    if(ch2){
+      notifyTg('\uD83C\uDF19 LoonShop\n\n\u2705 Заказ выполнен!\nЖдём вас: \uD83D\uDCCD ' + oo.place + '\n' + fmtDate(oo.date) + ' · ' + oo.time + '\nСдача: ' + oo.change + ' \u20BD\n\nСпасибо за покупку!', ch2);
+    }
+  }
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
   alert('Отмечено выполненными заказов: '+changed);
 }
@@ -1753,7 +1756,15 @@ function setOrderStatus(idx,status){
   }
   o.status=status;
   saveState();
-  notifyStatus(o, idx);
+  var ch = clientChatId(o);
+  if(ch){
+    if(status==='Выполнен'){
+      notifyTg('\uD83C\uDF19 LoonShop\n\n\u2705 Заказ выполнен!\nЖдём вас: \uD83D\uDCCD ' + o.place + '\n' + fmtDate(o.date) + ' · ' + o.time + '\nСдача: ' + o.change + ' \u20BD\n\nСпасибо за покупку!', ch);
+    }
+    if(status==='Отменён'){
+      notifyTg('\uD83C\uDF19 LoonShop\n\n\u274C Заказ отменён.\nЕсли это недоразумение — напишите нам, разберёмся.', ch);
+    }
+  }
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
 }
 
