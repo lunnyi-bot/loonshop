@@ -500,6 +500,20 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .clash-box{background:rgba(255,120,80,0.12);border:1px solid rgba(255,120,80,0.4);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#ffb49e;}
 .clash-item{margin:3px 0;}
 .thanks-big{font-size:44px;text-align:center;margin:4px 0;}
+
+/* ===== v25: обои чата, тема Telegram, праздничная тема ===== */
+body.wall-dots .chat-msgs, body.wall-dots #dm-msgs { background-image: radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1.5px); background-size: 18px 18px; border-radius:12px; }
+body.wall-stars .chat-msgs, body.wall-stars #dm-msgs { background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.16) 1.5px, transparent 2.5px), radial-gradient(circle at 70% 60%, rgba(255,255,255,0.10) 1px, transparent 2px), radial-gradient(circle at 45% 85%, rgba(91,200,255,0.16) 1.2px, transparent 2.4px); background-size: 120px 120px, 90px 90px, 150px 150px; border-radius:12px; }
+body.wall-moon .chat-msgs, body.wall-moon #dm-msgs { background-image: radial-gradient(circle at 85% 15%, rgba(255,255,255,0.15), transparent 32%), radial-gradient(circle at 15% 80%, rgba(91,200,255,0.10), transparent 38%); border-radius:12px; }
+body.tg-style .chat-msg { border:none; }
+body.tg-style .chat-msg.client, body.tg-style .chat-msg.dm { background:rgba(42,42,52,0.95); border-radius:16px 16px 16px 4px; }
+body.tg-style .chat-msg.shop { background:rgba(46,110,70,0.5); border:none; border-radius:16px 16px 4px 16px; }
+#snow-layer { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; display:none; overflow:hidden; }
+body.festive #snow-layer { display:block; }
+#snow-layer span { position:absolute; top:-24px; color:rgba(255,255,255,0.65); animation: snowFall linear infinite; }
+@keyframes snowFall { to { transform: translateY(110vh) rotate(320deg); } }
+.off-badge { display:none; color:#ffb84d; font-size:12px; font-weight:bold; }
+.off-badge.on { display:inline; }
 </style>
 </head>
 <body>
@@ -542,6 +556,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div style="margin-top:16px; color:#6e6e6e; font-size:12px; text-align:center;">или вход для владельца:</div>
     <input type="password" class="pay-input" id="admin-code" placeholder="Код владельца" style="margin-top:10px; text-align:center;">
     <button class="login-btn" style="margin-top:10px;" onclick="ownerLogin()">🔒 Войти как владелец</button>
+    <button class="login-btn" style="margin-top:10px; background:rgba(255,255,255,0.12); color:#f0f0f0; border:1px solid rgba(255,255,255,0.22);" onclick="enterGuest()">👁 Гостевой режим (только чтение)</button>
     <div class="gate-user-line" id="login-hint">Ожидание входа…</div>
   </div>
 </div>
@@ -553,8 +568,9 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v24</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v25</span></div>
     <div class="topbar-actions">
+      <button class="icon-btn" onclick="shareShop()" title="Поделиться">↗️</button>
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
   </div>
@@ -704,6 +720,21 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <div class="d">С 23:00 до 9:00 уведомления в Telegram не отправляются.</div>
       <div class="smooth-row"><button class="quick-btn" id="dnd-btn" onclick="toggleDnd()">Вкл</button></div>
     </div>
+    <div class="smooth-setting" id="theme-settings" style="display:none;">
+      <div class="t">🎨 Оформление магазина</div>
+      <div class="d">Обои чата, стиль «как в Telegram» и праздничная тема — видно всем клиентам.</div>
+      <div class="smooth-row">
+        <button class="quick-btn" id="wall-none" onclick="setWall('none')">Обои: нет</button>
+        <button class="quick-btn" id="wall-dots" onclick="setWall('dots')">Обои: точки</button>
+        <button class="quick-btn" id="wall-stars" onclick="setWall('stars')">Обои: звёзды</button>
+        <button class="quick-btn" id="wall-moon" onclick="setWall('moon')">Обои: луна</button>
+      </div>
+      <div class="smooth-row">
+        <button class="quick-btn" id="tgstyle-btn" onclick="toggleTg()">Стиль Telegram: Выкл</button>
+        <button class="quick-btn" id="festive-btn" onclick="toggleFestive()">Праздник: Выкл</button>
+        <button class="quick-btn" id="dmclean-btn" onclick="toggleDmClean()">Автоочистка личек: Вкл</button>
+      </div>
+    </div>
     <button class="profile-btn" id="refresh-btn" onclick="refreshData()">🔄 Обновить данные</button>
     <button class="profile-btn danger" onclick="logoutDevice()">🚪 Выйти на этом устройстве</button>
     <button class="profile-btn" id="owner-btn" style="display:none;" onclick="showTab('owner')">🔒 Панель владельца</button>
@@ -757,7 +788,22 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <button class="clients-toggle-btn" onclick="toggleBlock('adm-dm-list')">
       <span>💬 Диалоги с клиентами</span><span class="cnt" id="adm-dm-cnt">0</span>
     </button>
-    <div class="hidden-block" id="adm-dm-list"></div>
+<div class="hidden-block" id="adm-dm-list"></div>
+
+    <div class="section-gap"></div>
+    <button class="clients-toggle-btn" onclick="toggleBlock('adm-broadcast')">
+      <span>📣 Рассылка по личкам</span><span class="cnt">всем</span>
+    </button>
+    <div class="hidden-block" id="adm-broadcast">
+      <textarea id="broadcast-text" class="review-textarea" placeholder="Текст рассылки — уйдёт каждому клиенту в личку как сообщение от магазина" style="min-height:90px;"></textarea>
+      <button class="btn-ok w100" style="margin-top:10px;" onclick="broadcastSend()">📨 Отправить всем</button>
+    </div>
+
+    <div class="section-gap"></div>
+    <button class="clients-toggle-btn" onclick="toggleBlock('adm-abandoned'); renderAbandoned();">
+      <span>🛒 Брошенные корзины</span><span class="cnt" id="abandoned-cnt">0</span>
+    </button>
+    <div class="hidden-block" id="adm-abandoned"></div>
 
     <div class="section-gap"></div>
     <button class="clients-toggle-btn" onclick="toggleBlock('owner-addproduct')">
@@ -1178,9 +1224,10 @@ var myTgId = null;
 var firstSyncDone = false;
 
 function saveState() {
+  updateCartInfo();
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, cart:cart, logsClearedAt:logsClearedAt
+      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, cart:cart, logsClearedAt:logsClearedAt, shopTheme:shopTheme
     }));
   } catch(e) { }
   // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
@@ -1192,7 +1239,7 @@ function saveState() {
       setTimeout(function(){ sc.abort(); }, 5000);
       var body = {
         products: products, chatMsgs: chatMsgs,
-        orders: orders, reviews: reviews, dms: dms, logs: logs, logsClearedAt: logsClearedAt
+        orders: orders, reviews: reviews, dms: dms, logs: logs, logsClearedAt: logsClearedAt, shopTheme: shopTheme
       };
       if (regCard) body['clientReg/' + safeRegKey(regCard.username)] = regCard;
       if (regCard && isAdmin(regCard.username, regCard.tgId)) { body.clients = clients; body.clientMod = modMap; }
@@ -1201,7 +1248,8 @@ function saveState() {
         signal: sc.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
-      });
+      }).then(function(){ syncPending=false; syncQueue=null; var ob=document.getElementById('off-badge'); if(ob) ob.className='off-badge'; })
+        .catch(function(){ syncPending=true; syncQueue=body; var ob=document.getElementById('off-badge'); if(ob) ob.className='off-badge on'; });
     } catch(e) { }
   }
 }
@@ -1241,6 +1289,9 @@ var logsClearedAt = 0;
 var msgStamps = [];
 var thanksIdx = -1;
 var dndEnabled = true;
+var shopTheme = { wall:"none", tg:false, festive:false, dmclean:true };
+var syncPending = false, syncQueue = null;
+
 function loadState() {
   products = JSON.parse(JSON.stringify(defaultProducts));
   clients = JSON.parse(JSON.stringify(defaultClients));
@@ -1262,12 +1313,18 @@ function loadState() {
       if (d.logs) logs = d.logs;
       if (d.logsClearedAt) logsClearedAt = d.logsClearedAt;
       if (d.cart) cart = d.cart;
+      if (d.shopTheme) shopTheme = d.shopTheme;
     }
   } catch(e) { }
   pruneLogs();
 }
 loadState();
 ensureSetProduct();
+applyTheme();
+pruneDMs();
+setInterval(pruneDMs, 6*3600*1000);
+setInterval(retrySync, 30000);
+window.addEventListener("online", function(){ retrySync(); });
 
 function findClient(username) {
   for (var i = 0; i < clients.length; i++) if (clients[i].username === username) return clients[i];
@@ -1420,6 +1477,169 @@ function closeThanks(){
 function thanksReview(){ closeThanks(); openReviewWindow(); }
 function quickPhrase(t){ var i=document.getElementById('chat-input-client'); if(i) i.value=t; }
 function quickOwner(t){ var i=document.getElementById('chat-input-owner'); if(i) i.value=t; }
+
+// ===== v25: гостевой режим, оформление, рассылка, корзины, перенос =====
+var guestMode = false;
+function enterGuest(){
+  enterAs('Гость', '@guest', null);
+  guestMode = true;
+}
+function applyTheme(){
+  document.body.classList.toggle('tg-style', !!shopTheme.tg);
+  document.body.classList.toggle('festive', !!shopTheme.festive);
+  ['wall-dots','wall-stars','wall-moon'].forEach(function(c){ document.body.classList.remove(c); });
+  if(shopTheme.wall && shopTheme.wall!=='none') document.body.classList.add('wall-'+shopTheme.wall);
+  renderSnow();
+  markThemeBtns();
+  var ob=document.getElementById('off-badge'); if(ob) ob.className='off-badge'+(syncPending?' on':'');
+}
+function renderSnow(){
+  var layer=document.getElementById('snow-layer');
+  if(!layer){ layer=document.createElement('div'); layer.id='snow-layer'; document.body.appendChild(layer); }
+  layer.innerHTML='';
+  if(!shopTheme.festive) return;
+  for(var i=0;i<26;i++){
+    var s=document.createElement('span');
+    s.textContent='❄';
+    s.style.left=(Math.random()*100)+'%';
+    s.style.animationDuration=(7+Math.random()*9)+'s';
+    s.style.animationDelay=(-Math.random()*10)+'s';
+    s.style.fontSize=(10+Math.random()*12)+'px';
+    layer.appendChild(s);
+  }
+}
+function setWall(w){ shopTheme.wall=w; persistTheme(); applyTheme(); }
+function toggleTg(){ shopTheme.tg=!shopTheme.tg; persistTheme(); applyTheme(); }
+function toggleFestive(){ shopTheme.festive=!shopTheme.festive; persistTheme(); applyTheme(); }
+function toggleDmClean(){ shopTheme.dmclean=!shopTheme.dmclean; persistTheme(); pruneDMs(); applyTheme(); }
+function persistTheme(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, cart:cart, logsClearedAt:logsClearedAt, shopTheme:shopTheme})); }catch(e){}
+  if(DB_URL && firstSyncDone){ try{ fetch(DB_URL+'.json', {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({shopTheme:shopTheme})}); }catch(e){} }
+  markThemeBtns();
+}
+function markThemeBtns(){
+  ['wall-none','wall-dots','wall-stars','wall-moon'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b) b.style.borderColor = (shopTheme.wall===id.slice(5)) ? '#e0e0e0' : 'rgba(255,255,255,0.14)';
+  });
+  var tb=document.getElementById('tgstyle-btn'); if(tb) tb.textContent='Стиль Telegram: '+(shopTheme.tg?'Вкл':'Выкл');
+  var fb=document.getElementById('festive-btn'); if(fb) fb.textContent='Праздник: '+(shopTheme.festive?'Вкл':'Выкл');
+  var db=document.getElementById('dmclean-btn'); if(db) db.textContent='Автоочистка личек: '+(shopTheme.dmclean?'Вкл':'Выкл');
+}
+function pruneDMs(){
+  if(!shopTheme.dmclean) return;
+  var cutoff = Date.now() - 14*24*3600*1000;
+  for(var k in dms){
+    var arr=dms[k]; if(!arr || !arr.length) continue;
+    var keep=[];
+    for(var i=0;i<arr.length;i++){
+      if(arr[i].ts===undefined){ keep.push(arr[i]); continue; }
+      if(arr[i].ts>=cutoff) keep.push(arr[i]);
+    }
+    if(keep.length>80) keep=keep.slice(-80);
+    if(keep.length!==arr.length) dms[k]=keep;
+  }
+}
+function updateCartInfo(){
+  if(!me || me.username==='@guest') return;
+  var info=[], sum=0;
+  for(var i=0;i<cart.length;i++){
+    var p=findProduct(cart[i].id);
+    var price=p?p.price:0;
+    info.push({id:cart[i].id, color:cart[i].color, qty:cart[i].qty, name:p?p.name:'?', price:price});
+    sum+=price*cart[i].qty;
+  }
+  me.cartInfo={items:info, sum:sum, ts:Date.now()};
+}
+function retrySync(){
+  if(!syncQueue || !DB_URL || !firstSyncDone) return;
+  var b=syncQueue;
+  try{
+    fetch(DB_URL + '.json', {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(b)})
+      .then(function(){ syncPending=false; syncQueue=null; applyTheme(); })
+      .catch(function(){ });
+  }catch(e){}
+}
+function broadcastSend(){
+  if(!me || !isAdmin(me.username, me.tgId)) return;
+  var ta=document.getElementById('broadcast-text');
+  var text=(ta.value||'').trim();
+  if(!text){ alert('Напишите текст рассылки'); return; }
+  if(!confirm('Отправить «'+text+'» всем клиентам в личку?')) return;
+  var n=0;
+  for(var i=0;i<clients.length;i++){
+    var c=clients[i];
+    if(c.username==='@guest') continue;
+    if(c.admin || isAdmin(c.username, c.tgId)) continue;
+    var key=dmKey(c.username);
+    if(!dms[key]) dms[key]=[];
+    dms[key].push({from:'shop', text:'📣 '+text, time:nowTime(), read:false, ts:Date.now()});
+    if(c.tgId) notifyTg('📣 '+text, String(c.tgId));
+    n++;
+  }
+  ta.value='';
+  addLog('📣 Рассылка: отправлено '+n+' клиентам');
+  saveState(); renderAdminDialogs(); updateClientsCount();
+  alert('Рассылка отправлена: '+n+' клиентам');
+}
+function renderAbandoned(){
+  var el=document.getElementById('adm-abandoned'); if(!el) return;
+  var list=[];
+  for(var i=0;i<clients.length;i++){
+    var c=clients[i];
+    if(c.username==='@guest') continue;
+    if(c.admin || isAdmin(c.username, c.tgId)) continue;
+    if(c.cartInfo && c.cartInfo.items && c.cartInfo.items.length>0) list.push(c);
+  }
+  var cnt=document.getElementById('abandoned-cnt'); if(cnt) cnt.textContent=String(list.length);
+  el.innerHTML='';
+  if(list.length===0){ el.innerHTML='<div class="empty-msg">Брошенных корзин нет — все совершили сделку или корзины пусты</div>'; return; }
+  for(var j=0;j<list.length;j++){
+    var c=list[j];
+    var mins=Math.round((Date.now()-c.cartInfo.ts)/60000);
+    var age = mins<60 ? mins+' мин назад' : Math.round(mins/60)+' ч назад';
+    var line='';
+    for(var k=0;k<c.cartInfo.items.length;k++){
+      var it=c.cartInfo.items[k];
+      line+='<div class="od-row"><span>'+esc(it.name)+(it.color?' ('+esc(it.color)+')':'')+' × '+it.qty+'</span><span class="dim">'+(it.price*it.qty)+' ₽</span></div>';
+    }
+    var div=document.createElement('div');
+    div.className='client-box';
+    div.innerHTML='<div class="client-row"><div><div class="client-name">'+esc(c.name)+' <span class="r-badge r-online">'+esc(c.username)+'</span></div>'+
+      '<div class="client-handle">🛒 товаров: '+c.cartInfo.items.length+' · на '+c.cartInfo.sum+' ₽ · обновлено '+age+'</div></div>'+
+      '<button class="profile-link-btn" onclick="openDM(\''+esc(c.username)+'\', \'owner\')">💬 Написать</button></div>'+line;
+    el.appendChild(div);
+  }
+}
+function moveOrder(j){
+  if(!me || !isAdmin(me.username, me.tgId)) return;
+  var o=orders[j]; if(!o) return;
+  var nd=prompt('Новая дата встречи (ГГГГ-ММ-ДД):', o.date);
+  if(nd===null) return;
+  var nt=prompt('Новое время (ЧЧ:ММ):', o.time||'');
+  if(nt===null) return;
+  nd=nd.trim(); nt=nt.trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(nd) || !/^\d{1,2}:\d{2}$/.test(nt)){ alert('Формат: дата ГГГГ-ММ-ДД и время ЧЧ:ММ'); return; }
+  o.date=nd; o.time=nt;
+  if(!o.timeline) o.timeline=[];
+  o.timeline.push({s:'Перенесён', t:nowTime()});
+  addLog('📅 Заказ клиента '+(o.customer||'?')+': встреча перенесена на '+nd+' '+nt);
+  var cid=clientChatId(o);
+  if(cid) notifyTg('🌙 LoonShop: встреча по вашему заказу перенесена на '+nd+' '+nt+'. Если время не подходит — напишите.', cid);
+  saveState(); renderOrders();
+  alert('Встреча перенесена: '+nd+' '+nt);
+}
+function shareShop(){
+  var url=location.href.split('#')[0];
+  var data={title:'LoonShop 🌙', text:'Загляни в LoonShop — тут интересно 🌙', url:url};
+  if(navigator.share){ navigator.share(data).catch(function(){}); return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){ alert('Ссылка скопирована — отправь её друзьям 🌙'); }).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    return;
+  }
+  prompt('Скопируйте ссылку:', url);
+}
+
 function dmQuick(t){ var i=document.getElementById('dm-input'); if(i) i.value=t; }
 function updateSyncLine(){
   var el=document.getElementById('sync-ok-line');
@@ -2178,6 +2398,7 @@ function removeItem(id,color){
 
 // ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
 function confirmOrder(){
+  if(me && me.username==='@guest'){ alert('Гостевой режим: заказы недоступны. Войдите через Telegram.'); return; }
   if(cart.length===0){ alert('Корзина пуста!'); return; }
   if(!modalPlace||!modalDate){ alert('Выберите точку, дату и время — они спрашиваются при добавлении товара.'); return; }
   var tchk=pickupTimeCheck();
@@ -2427,7 +2648,8 @@ function renderOwner(){
         actions='<div class="owner-actions">'+
           '<button class="btn-done" onclick="setOrderStatus('+j+',\'Выполнен\')">✓ Успешно</button>'+
           '<button class="btn-cancel-order" onclick="setOrderStatus('+j+',\'Отменён\')">✕ Отмена</button>'+
-          '<button class="details-btn" style="width:100%; margin-top:6px;" onclick="setDelay('+j+')">⏱ Задерживаюсь</button></div>';
+          '<button class="details-btn" style="width:100%; margin-top:6px;" onclick="setDelay('+j+')">⏱ Задерживаюсь</button>'+
+          '<button class="details-btn" style="width:100%; margin-top:6px;" onclick="moveOrder('+j+')">📅 Перенести встречу</button></div>';
       }
       var reviewHtml='';
       if(o.status==='Выполнен'){
@@ -2895,6 +3117,7 @@ function renderProfileLine(){
   document.getElementById('profile-num-tag').textContent='№ '+(me.num||'—');
   document.getElementById('profile-id-tag').textContent='ID: '+(me.tgId?me.tgId:'—');
   document.getElementById('owner-btn').style.display = (me.admin || isAdmin(me.username, me.tgId)) ? 'block' : 'none';
+  var tsSet = document.getElementById('theme-settings'); if(tsSet) tsSet.style.display = (me.admin || isAdmin(me.username, me.tgId)) ? 'block' : 'none';
 }
 function renderAll(){
   var steps=[rotateFeed,renderCatalog,renderOrders,renderOwner,renderReviews,renderProfileLine,renderAchievements,renderLog,renderChat,renderAdminDialogs,updateReviewButton,updateClientsCount,updateTotals,updateTopInfo];
@@ -3061,6 +3284,7 @@ function isMuted(c){
 
 function sendChat(side){
   if(!me) return;
+  if(me.username==='@guest'){ alert('Гостевой режим: только чтение. Войдите через Telegram, чтобы писать.'); return; }
   var inputId=side==='owner'?'chat-input-owner':'chat-input-client';
   var input=document.getElementById(inputId);
   var text=input.value.trim();
@@ -3194,6 +3418,7 @@ function renderDM(){
 }
 function sendDM(){
   if(!dmPeer) return;
+  if(me && me.username==='@guest'){ alert('Гостевой режим: только чтение. Войдите через Telegram, чтобы писать.'); return; }
   var input=document.getElementById('dm-input');
   var text=input.value.trim();
   if(!text) return;
@@ -3202,13 +3427,13 @@ function sendDM(){
 
   if(dmAsShop){
     if(!isAdmin(me.username, me.tgId)) return;
-    dms[key].push({from:'shop', text:text, time:nowTime(), read:true});
+    dms[key].push({from:'shop', text:text, time:nowTime(), read:true, ts:Date.now()});
   } else {
     if(me && isMuted(me)){
       alert('🔇 Вы в муте до '+fmtTime(me.mutedUntil));
       return;
     }
-    dms[key].push({from:'me', text:text, time:nowTime(), read:false});
+    dms[key].push({from:'me', text:text, time:nowTime(), read:false, ts:Date.now()});
   }
   input.value='';
   saveState();
@@ -3413,8 +3638,7 @@ syncPull();
 
 <!-- v24: заставка с луной (5 сек) -->
 <div id="splash" style="position:fixed; inset:0; background:#0b0b14; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity .8s;">
-  <style>@keyframes moonFloat{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(0,-14px,0) scale(1.03)}}</style>
-<div id="splash-moon" style="font-size:64px; will-change:transform; animation:moonFloat 3.2s ease-in-out infinite;">🌙</div>
+  <div id="splash-moon" style="font-size:64px; will-change:transform;">🌙</div>
   <div style="margin-top:18px; font-size:13px; color:#8a8aa8; letter-spacing:3px;">LOONSHOP</div>
   <div style="margin-top:22px; width:200px; height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden;">
     <div id="splash-bar" style="width:0%; height:100%; background:linear-gradient(90deg,#7c5cff,#c17cff); transition:width 5s linear;"></div>
@@ -3424,7 +3648,9 @@ syncPull();
 (function(){
   var s=document.getElementById('splash');
   requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.getElementById('splash-bar').style.width='100%'; }); });
-  setTimeout(function(){ s.style.opacity='0'; setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 900); }, 5000);
+  var up=false, y=0;
+  var iv=setInterval(function(){ y+=up?-2:2; up=y>8; document.getElementById('splash-moon').style.transform='translateY('+y+'px)'; },60);
+  setTimeout(function(){ s.style.opacity='0'; setTimeout(function(){ clearInterval(iv); if(s.parentNode) s.parentNode.removeChild(s); }, 900); }, 5000);
   setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 5900);
 })();
 </script>
