@@ -69,6 +69,13 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
   border:1px solid rgba(255,255,255,0.2); }
 .brand { font-size:18px; font-weight:bold; letter-spacing:0.3px; }
+.ver-tag { font-size:10px; color:#8a8a8a; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:1px 6px; margin-left:6px; }
+.feed-box { background:rgba(20,20,20,0.85); border:1px solid rgba(91,200,255,0.25); border-radius:14px; padding:12px 16px; margin-bottom:14px; cursor:pointer; transition:border-color 0.2s; }
+.feed-box:hover { border-color:rgba(91,200,255,0.5); }
+.feed-head { color:#5bc8ff; font-size:11px; font-weight:bold; letter-spacing:2px; margin-bottom:4px; }
+.feed-line { color:#e0e0e0; font-size:14px; }
+.happy-line { background:rgba(20,20,20,0.85); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:12px 16px; font-size:14px; margin-bottom:14px; }
+.sched-box { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:10px 14px; font-size:13px; color:#b0b0b0; margin-bottom:12px; line-height:1.6; }
 .topbar-actions { margin-left:auto; display:flex; gap:10px; align-items:center; }
 .icon-btn { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#f0f0f0;
   width:42px; height:42px; border-radius:12px; cursor:pointer; font-size:18px; position:relative; }
@@ -532,7 +539,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span style="color:#6e6e6e;font-size:11px;font-weight:normal;">🛠 v13</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v14</span></div>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
@@ -552,6 +559,10 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div class="welcome">
       <span>🌙 Добро пожаловать, <b id="welcome-name">…</b></span>
       </div>
+    <div class="feed-box" id="feed-box" onclick="openFeedWindow()">
+      <div class="feed-head">📰 СЕГОДНЯ</div>
+      <div class="feed-line" id="feed-line">Загружаем…</div>
+    </div>
     <div class="catalog-head">
       <div class="over">КОЛЛЕКЦИЯ</div>
       <div class="catalog-head-row"><h2>Каталог</h2><div class="pos-count" id="pos-count">0 поз.</div></div>
@@ -583,6 +594,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <!-- ОТЗЫВЫ -->
   <div class="tab-page" id="page-reviews">
     <div class="rating-card" id="rating-card"></div>
+    <div class="happy-line" id="happy-count"></div>
     <button class="write-review-btn" id="write-review-btn" style="display:none;" onclick="openReviewWindow()">✍️ Оставить отзыв о прошедшей сделке</button>
     <div class="empty-box" id="reviews-empty" style="padding:40px 26px;">
       🌙 Пока отзывов нет. Ваш заказ может стать первым!
@@ -649,6 +661,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <div class="achv-row" id="achv-row" style="margin:14px 0 0;"></div>
     </div>
     <button class="profile-btn" onclick="openDM('@loonshop','client')">✉️ Написать в LoonShop</button>
+    <button class="profile-btn" onclick="openManager()">💬 Связь с менеджером</button>
     <button class="profile-btn" onclick="showTab('orders')">📦 Мои заказы</button>
     <button class="profile-btn" onclick="showTab('reviews')">⭐ Отзывы</button>
     <button class="profile-btn" onclick="showTab('chat')">💬 Общий чат</button>
@@ -845,13 +858,23 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="place-info" id="place-info"></div>
   <div class="pickup-title">📅 ДАТА ВСТРЕЧИ</div>
   <input type="date" class="date-input" id="date-input-modal" onchange="updatePickupReady()" style="margin-bottom:18px;">
-  <div class="pickup-title">🕒 ВРЕМЯ ВСТРЕЧИ (с 10:00 до 20:00)</div>
+  <div class="pickup-title">🕒 ВРЕМЯ ВСТРЕЧИ</div>
+  <div class="sched-box">Пн–Ср и Пт — 16:00–20:00<br>Чт — 14:30–20:00<br>Сб и Вс — 10:00–20:00<br>⏰ Заказ принимаем за 30–60 минут до встречи</div>
   <input type="range" class="time-slider" id="time-slider-modal" min="600" max="1200" step="30" value="720" oninput="updatePickupTime()">
   <div class="time-label" id="time-label-modal">12:00</div>
+  <div class="pay-hint" id="time-hint-modal" style="margin-bottom:10px;"></div>
   <div class="modal-actions">
     <button class="btn-cancel" onclick="cancelPickup()">Отмена</button>
     <button class="btn-ok" id="pickup-add-btn" onclick="confirmPickup(event)" disabled>Добавить</button>
   </div>
+</div>
+
+<!-- Журнал заказов -->
+<div class="overlay" id="overlay-feed" onclick="overlayClose(event,'overlay-feed','feed-window')"></div>
+<div class="modal" id="feed-window">
+  <button class="close-btn" onclick="closeFeed()">✕</button>
+  <div class="pickup-title" style="margin-bottom:6px;">📰 ЖУРНАЛ ЗАКАЗОВ · СЕГОДНЯ</div>
+  <div id="feed-details" style="max-height:60vh; overflow-y:auto;"></div>
 </div>
 
 <!-- Корзина -->
@@ -1118,9 +1141,28 @@ function saveState() {
 }
 
 function ensureSetProduct() {
-  for (var i = 0; i < products.length; i++) if (products[i].category === 'sets') return;
-  products.push(JSON.parse(JSON.stringify(defaultProducts[defaultProducts.length - 1])));
-  try { saveState(); } catch(e) { }
+  var fixed = false, p = null, fallback = null;
+  for (var i = 0; i < products.length; i++) {
+    if (products[i].category !== 'sets') continue;
+    if (products[i].id === 5) { p = products[i]; break; }
+    if (!fallback) fallback = products[i];
+  }
+  if (!p) p = fallback;
+  if (!p) { p = JSON.parse(JSON.stringify(defaultProducts[defaultProducts.length - 1])); products.push(p); fixed = true; }
+  if (p.name !== 'Feelin 2 + жидкость') { p.name = 'Feelin 2 + жидкость'; fixed = true; }
+  if (p.price !== 900) { p.price = 900; fixed = true; }
+  if (!p.flavors || !p.flavors.length) { p.flavors = SET_FLAVORS; fixed = true; }
+  if (p.colors && (!Array.isArray(p.colors) || p.colors.length)) { p.colors = []; fixed = true; }
+  if (typeof p.stock !== 'number') { p.stock = 10; fixed = true; }
+  // старая мусорная карточка «XROS 6 mini» из базы — убираем
+  var keep = [];
+  for (var j = 0; j < products.length; j++) {
+    var pr = products[j];
+    if (pr !== p && pr.category === 'sets' && pr.name === 'XROS 6 mini') { fixed = true; continue; }
+    keep.push(pr);
+  }
+  if (keep.length !== products.length) products = keep;
+  if (fixed) { try { saveState(); } catch(e) { } if (typeof renderCatalog === 'function') renderCatalog(); }
 }
 
 function loadState() {
@@ -1531,6 +1573,11 @@ function openChoose(id){
       box.appendChild(btn);
     }
   } else if(hasFlavors){
+    var dev=document.createElement('div');
+    dev.className='color-option selected';
+    dev.innerHTML='<span><span class="color-dot" style="background:#a05ee0"></span>Цвет устройства: Фиолетовый</span>'+
+      '<span class="color-left">входит в сет</span>';
+    box.appendChild(dev);
     for(var b=0;b<chooseProduct.flavors.length;b++){
       var grp=chooseProduct.flavors[b];
       var hdr=document.createElement('div');
@@ -1574,7 +1621,7 @@ function selectColor(index){
 }
 function selectFlavor(b,fi){
   var grp=chooseProduct.flavors[b];
-  chooseColor=grp.brand+' '+grp.items[fi];
+  chooseColor='Фиолетовый · '+grp.brand+' '+grp.items[fi];
   var box=document.getElementById('choose-colors');
   for(var i=0;i<box.children.length;i++){
     if(String(box.children[i].id||'').indexOf('flavor-')===0) box.children[i].className='color-option';
@@ -1612,6 +1659,92 @@ function updateChooseView(){
 // ===== «ОТКУДА БУДЕТЕ ЗАБИРАТЬ?» =====
 var pendingAdd=null, modalPlace=null, modalTime='12:00', modalDate='';
 
+// ===== ГРАФИК ВСТРЕЧ =====
+var SCHEDULE = {0:[600,1200],1:[960,1200],2:[960,1200],3:[960,1200],4:[870,1200],5:[960,1200],6:[600,1200]};
+var SCHEDULE_TEXT = 'График: Пн–Ср и Пт 16:00–20:00 · Чт 14:30–20:00 · Сб–Вс 10:00–20:00';
+function fmtMin(m){ var h=Math.floor(m/60), mm=m%60; return (h<10?'0':'')+h+':'+(mm<10?'0':'')+mm; }
+function pickupTimeCheck(){
+  if(!modalDate) return {ok:false, msg:'Сначала выберите дату встречи'};
+  var parts=modalDate.split('-');
+  if(parts.length!==3) return {ok:false, msg:'Выберите дату встречи'};
+  var d=new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+  var sch=SCHEDULE[d.getDay()] || [600,1200];
+  var t=parseInt(document.getElementById('time-slider-modal').value,10);
+  if(t<sch[0]||t>=sch[1]) return {ok:false, msg:'В этот день работаем с '+fmtMin(sch[0])+' до '+fmtMin(sch[1])};
+  var now=new Date();
+  var sameDay=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+  if(sameDay){
+    var nowMin=now.getHours()*60+now.getMinutes();
+    if(t<=nowMin) return {ok:false, msg:'Это время уже прошло — выберите позже'};
+    if(t-nowMin<30) return {ok:false, msg:'Заказывайте за 30–60 минут до встречи'};
+  }
+  return {ok:true, msg:''};
+}
+function openManager(){
+  window.open('https://t.me/Loonshop_mngr','_blank');
+}
+
+// ===== ЖУРНАЛ ЗАКАЗОВ НАД КАТАЛОГОМ =====
+var feedIdx=0;
+function feedOrdersToday(){
+  var t=todayISO(), list=[];
+  for(var i=0;i<orders.length;i++) if(orders[i].date===t) list.push(orders[i]);
+  if(list.length===0){ for(var j=orders.length-1;j>=0&&list.length<1;j--){ if(orders[j].status!=='Отменён') list.push(orders[j]); } }
+  return list;
+}
+function rotateFeed(){
+  var el=document.getElementById('feed-line'); if(!el) return;
+  var list=feedOrdersToday();
+  if(list.length===0){ el.textContent='Пока тихо — заказы появятся здесь 🌙'; return; }
+  if(feedIdx>=list.length) feedIdx=0;
+  var o=list[list.length-1-feedIdx]||list[0];
+  var itemsTxt='';
+  if(o.items&&o.items.length){
+    var parts=[];
+    for(var k=0;k<o.items.length;k++){
+      var it=o.items[k];
+      var s=it.name;
+      if(it.color&&it.color!=='—') s+=' ('+it.color+')';
+      parts.push(s+' ×'+it.qty);
+    }
+    itemsTxt=parts.join(' + ');
+  }
+  el.textContent='Недавно заказали: '+itemsTxt+' — '+Math.round(o.sum)+' ₽';
+  feedIdx++;
+}
+function openFeedWindow(){
+  var el=document.getElementById('feed-details'); if(!el) return;
+  var list=feedOrdersToday();
+  var html='';
+  if(list.length===0) html='<div class="empty-msg" style="padding:20px;">Сегодня заказов пока нет 🌙</div>';
+  for(var i=list.length-1;i>=0;i--){
+    var o=list[i];
+    var cc=findClient(o.customer);
+    var nm=cc?cc.name:o.customer;
+    var lines='';
+    if(o.items&&o.items.length){
+      for(var k=0;k<o.items.length;k++){
+        var it=o.items[k];
+        lines+='<div>• '+esc(it.name)+(it.color&&it.color!=='—'?' <span style="color:#8a8a8a;">('+esc(it.color)+')</span>':'')+' × '+it.qty+'</div>';
+      }
+    }
+    html+='<div style="border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 14px;margin-bottom:10px;">'+
+      '<div style="color:#8a8a8a;font-size:12px;margin-bottom:6px;">🕒 '+esc(o.time)+(o.status?' · '+esc(o.status):'')+'</div>'+
+      '<div style="font-weight:bold;margin-bottom:6px;">'+esc(nm)+' <span style="color:#8a8a8a;font-weight:normal;">'+esc(o.customer)+'</span></div>'+
+      lines+
+      '<div style="margin-top:8px;font-weight:bold;">Итого: '+Math.round(o.sum)+' ₽ · 📍 '+esc(o.place)+'</div>'+
+      '</div>';
+  }
+  el.innerHTML=html;
+  document.getElementById('overlay-feed').className='overlay open';
+  document.getElementById('feed-window').style.display='block';
+}
+function closeFeed(){
+  document.getElementById('overlay-feed').className='overlay';
+  document.getElementById('feed-window').style.display='none';
+}
+setInterval(rotateFeed,10000);
+
 function confirmAddToCart(){
   var hasColors = chooseProduct.colors && chooseProduct.colors.length>0;
   if(hasColors && !chooseColor){
@@ -1630,7 +1763,7 @@ function confirmAddToCart(){
   document.getElementById('date-input-modal').value=todayISO();
   document.getElementById('time-slider-modal').value=720;
   document.getElementById('time-label-modal').textContent='12:00';
-  document.getElementById('pickup-add-btn').disabled=true;
+  updatePickupReady();
   renderPlaceInfo(null);
   closeChoose();
   document.getElementById('overlay-pickup').className='overlay open';
@@ -1645,13 +1778,17 @@ function selectPickupModal(index){
 }
 function updatePickupReady(){
   modalDate=document.getElementById('date-input-modal').value;
-  document.getElementById('pickup-add-btn').disabled=!(modalPlace&&modalDate);
+  var chk=pickupTimeCheck();
+  var hint=document.getElementById('time-hint-modal');
+  if(hint){ hint.textContent = chk.ok ? SCHEDULE_TEXT : chk.msg; hint.className = chk.ok ? 'pay-hint' : 'pay-hint bad'; }
+  document.getElementById('pickup-add-btn').disabled=!(modalPlace&&modalDate&&chk.ok);
 }
 function updatePickupTime(){
   var m=parseInt(document.getElementById('time-slider-modal').value,10);
   var h=Math.floor(m/60), mm=m%60;
   modalTime=(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;
   document.getElementById('time-label-modal').textContent=modalTime;
+  updatePickupReady();
 }
 function cancelPickup(){
   pendingAdd=null; modalPlace=null; modalDate='';
@@ -1792,6 +1929,8 @@ function removeItem(id,color){
 function confirmOrder(){
   if(cart.length===0){ alert('Корзина пуста!'); return; }
   if(!modalPlace||!modalDate){ alert('Выберите точку, дату и время — они спрашиваются при добавлении товара.'); return; }
+  var tchk=pickupTimeCheck();
+  if(!tchk.ok){ alert('Время встречи недоступно: '+tchk.msg); return; }
   var paid=parseFloat(document.getElementById('pay-amount').value);
   var sum=getCartSum();
   if(isNaN(paid)||paid<=0){ alert('Укажите сумму, которой расплатитесь наличными!'); return; }
@@ -2373,6 +2512,7 @@ function renderProfileLine(){
   document.getElementById('owner-btn').style.display = (me.admin || isAdmin(me.username, me.tgId)) ? 'block' : 'none';
 }
 function renderAll(){
+  rotateFeed();
   renderCatalog();
   renderOrders();
   renderOwner();
@@ -2482,6 +2622,16 @@ function submitReview(){
 }
 function renderReviews(){
   var list=document.getElementById('reviews-list');
+  var happyEl=document.getElementById('happy-count');
+  if(happyEl){
+    var seen={}, hn=0;
+    for(var h=0;h<orders.length;h++){
+      if(orders[h].status==='Отменён') continue;
+      var cu=orders[h].customer;
+      if(cu&&!seen[cu]){ seen[cu]=1; hn++; }
+    }
+    happyEl.textContent='😊 Довольных клиентов: '+hn;
+  }
   list.innerHTML='';
   if(reviews.length===0){
     document.getElementById('reviews-empty').style.display='block';
