@@ -539,7 +539,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v21</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v22</span></div>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
@@ -720,6 +720,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <button class="clients-toggle-btn" onclick="toggleBlock('adm-log')">
       <span>📜 Журнал событий</span><span class="cnt" id="adm-log-cnt">0</span>
     </button>
+    <button class="btn-done w100" style="margin-bottom:16px;" onclick="clearLogs()">🗑 Очистить журнал</button>
     <div class="hidden-block" id="adm-log"></div>
 
     <div class="section-gap"></div>
@@ -1128,7 +1129,7 @@ var defaultClients = [];
 var defaultChatMsgs = [];
 
 var products, clients, chatMsgs, orders, reviews, dms, cart;
-var logs = [];
+var logs = []; var logsStamp = 0;
 var me = null;
 var modMap = {};
 var myTgId = null;
@@ -1137,7 +1138,7 @@ var firstSyncDone = false;
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs
+      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, logsStamp:logsStamp
     }));
   } catch(e) { }
   // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
@@ -1149,7 +1150,7 @@ function saveState() {
       setTimeout(function(){ sc.abort(); }, 5000);
       var body = {
         products: products, chatMsgs: chatMsgs,
-        orders: orders, reviews: reviews, dms: dms, logs: logs
+        orders: orders, reviews: reviews, dms: dms, logs: logs, logsStamp: logsStamp
       };
       if (regCard) body['clientReg/' + safeRegKey(regCard.username)] = regCard;
       if (regCard && isAdmin(regCard.username, regCard.tgId)) { body.clients = clients; body.clientMod = modMap; }
@@ -1213,6 +1214,7 @@ function loadState() {
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
       if (d.logs) logs = d.logs;
+      if (d.logsStamp) logsStamp = d.logsStamp;
     }
   } catch(e) { }
 }
@@ -3044,7 +3046,8 @@ function syncPull(){
       if (d.orders) orders = d.orders;
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
-      if (d.logs) logs = d.logs;
+      if (d.logsStamp && d.logsStamp > (logsStamp||0)) { logs = d.logs || []; logsStamp = d.logsStamp; }
+      else if (!d.logsStamp && d.logs) logs = d.logs;
       ensureSetProduct();
       var myName = me ? me.username : null;
       me = null;
@@ -3083,6 +3086,7 @@ function addLog(txt){
   var t = nowTime() + ' ' + d.getDate() + '.' + (d.getMonth()+1);
   logs.unshift({ t:t, txt:txt });
   if (logs.length > 50) logs.length = 50;
+  logsStamp = Date.now();
   renderLog();
 }
 function renderLog(){
@@ -3097,6 +3101,13 @@ function renderLog(){
     d.innerHTML = '<span class="lt">'+esc(logs[i].t)+'</span>'+esc(logs[i].txt);
     el.appendChild(d);
   }
+}
+function clearLogs(){
+  if (!logs.length) return;
+  if (!confirm('Очистить журнал у всех устройств?')) return;
+  logs = []; logsStamp = Date.now();
+  renderLog();
+  saveState();
 }
 
 // ===== АЧИВКИ КЛИЕНТА =====
