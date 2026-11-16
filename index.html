@@ -145,10 +145,10 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
 .dock-wrap { position:fixed; bottom:16px; left:0; right:0; display:flex; justify-content:center; z-index:90; padding:0 15px; }
 .dock { background:rgba(24,24,24,0.94); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.14);
-  border-radius:26px; padding:8px; display:flex; gap:6px; box-shadow:0 14px 44px rgba(0,0,0,0.6); }
-.dock-btn { background:transparent; border:none; color:#8a8a8a; padding:10px 20px; border-radius:18px;
-  cursor:pointer; font-size:12px; display:flex; flex-direction:column; align-items:center; gap:5px; position:relative; }
-.dock-btn .ic { font-size:20px; }
+  border-radius:18px; padding:6px; display:flex; gap:4px; box-shadow:0 10px 32px rgba(0,0,0,0.55); }
+.dock-btn { background:transparent; border:none; color:#8a8a8a; padding:6px 13px; border-radius:12px;
+  cursor:pointer; font-size:11px; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative; }
+.dock-btn .ic { font-size:16px; }
 .dock-btn:hover { color:#e0e0e0; background:rgba(255,255,255,0.06); }
 .dock-btn.active { background:#e0e0e0; color:#0a0a0a; }
 
@@ -539,7 +539,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v20</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v21</span></div>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
@@ -1130,6 +1130,8 @@ var defaultChatMsgs = [];
 var products, clients, chatMsgs, orders, reviews, dms, cart;
 var logs = [];
 var me = null;
+var modMap = {};
+var myTgId = null;
 var firstSyncDone = false;
 
 function saveState() {
@@ -1140,23 +1142,17 @@ function saveState() {
   } catch(e) { }
   // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
   // чтобы не затереть чужие данные пустотой. Таймаут 5 секунд — не зависаем.
+  var regCard = (me && !me.banned) ? (findClient(me.username) || me) : null;
   if (DB_URL && firstSyncDone) {
     try {
       var sc = new AbortController();
       setTimeout(function(){ sc.abort(); }, 5000);
-      // PATCH вместо PUT: обновляем только свои ключи базы.
-      // Свою карточку клиента пишем в отдельный реестр clientReg —
-      // чужие записи никто не затирает, даже если список пришёл неполным.
       var body = {
-        products: products, chatMsgs: chatMsgs, orders: orders,
-        reviews: reviews, dms: dms, logs: logs
+        products: products, chatMsgs: chatMsgs,
+        orders: orders, reviews: reviews, dms: dms, logs: logs
       };
-      if (me) {
-        var rk = me.tgId ? 'id' + me.tgId : String(me.username || 'guest').replace(/[.#$\[\]\/]/g, '_');
-        body.clientReg = {};
-        body.clientReg[rk] = JSON.parse(JSON.stringify(me));
-        if (me.admin) body.clients = clients;
-      }
+      if (regCard) body['clientReg/' + safeRegKey(regCard.username)] = regCard;
+      if (regCard && isAdmin(regCard.username, regCard.tgId)) { body.clients = clients; body.clientMod = modMap; }
       fetch(DB_URL + '.json', {
         method: 'PATCH',
         signal: sc.signal,
@@ -1233,40 +1229,73 @@ function nextClientNum() {
   for (var i = 0; i < clients.length; i++) if (clients[i].num && clients[i].num > m) m = clients[i].num;
   return m + 1;
 }
-
-function canSeeHandle(username){
-  if (!me) return false;
-  if (username === me.username) return true;
-  return !!(me.admin || isAdmin(me.username, me.tgId));
+function safeRegKey(u){ return String(u||'anon').replace(/[.#$/\[\]"]/g,'_'); }
+function patchReg(card){
+  if(!DB_URL || !card) return;
+  try{
+    var sc=new AbortController(); setTimeout(function(){ sc.abort(); }, 5000);
+    var o={}; o['clientReg/'+safeRegKey(card.username)]=card;
+    fetch(DB_URL+'.json',{method:'PATCH',signal:sc.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify(o)});
+  }catch(e){}
+}
+function patchMod(){
+  if(!DB_URL || !me || !isAdmin(me.username, me.tgId)) return;
+  try{
+    var sc=new AbortController(); setTimeout(function(){ sc.abort(); }, 5000);
+    var o={}; o['clientMod']=modMap;
+    fetch(DB_URL+'.json',{method:'PATCH',signal:sc.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify(o)});
+  }catch(e){}
+}
+function setMod(c){
+  if(!c) return;
+  modMap[safeRegKey(c.username)]={ banned:!!c.banned, mutedUntil:c.mutedUntil||0, verified:!!c.verified, vip:!!c.vip, girl:!!c.girl, mod:!!c.mod };
+}
+function delMod(username){ delete modMap[safeRegKey(username)]; }
+function mergeClientsList(arr){
+  if(!arr||!arr.length) return;
+  for(var i=0;i<arr.length;i++){
+    var r=arr[i]; if(!r||!r.username) continue;
+    var l=findClient(r.username);
+    if(!l){ clients.push(r); continue; }
+    if(r.name) l.name=r.name;
+    if(r.tgId&&!l.tgId) l.tgId=r.tgId;
+    if(!l.num&&r.num) l.num=r.num;
+  }
 }
 function mergeClientReg(reg){
-  if (!reg) return;
-  var modFields = { banned:1, mutedUntil:1, verified:1, vip:1, girl:1, mod:1, admin:1 };
-  for (var rk in reg) {
-    var cc = reg[rk];
-    if (!cc || !cc.username) continue;
-    var ex = findClient(cc.username);
-    if (!ex) { clients.push(cc); continue; }
-    for (var f in cc) {
-      if (f === 'num' && ex.num) continue;
-      if (modFields[f] && ex[f] !== undefined) continue;
-      ex[f] = cc[f];
-    }
+  if(!reg) return;
+  for(var k in reg){
+    var r=reg[k]; if(!r||!r.username) continue;
+    if(!findClient(r.username)) clients.push(r);
+  }
+}
+function applyMod(m){
+  if(!m) return;
+  for(var k in m){
+    var c=findClient(k); if(!c) continue;
+    var v=m[k]||{};
+    if(typeof v.banned==='boolean') c.banned=v.banned;
+    if(typeof v.mutedUntil==='number') c.mutedUntil=v.mutedUntil;
+    if(v.verified) c.verified=true;
+    if(v.vip) c.vip=true;
+    if(v.girl) c.girl=true;
+    if(v.mod) c.mod=true;
   }
 }
 function fixClientNums(){
-  if (!me || !me.num) return;
-  var mine = String(me.username || '');
-  for (var i = 0; i < clients.length; i++) {
-    var c = clients[i];
-    if (!c || c.username === mine) continue;
-    if (c.num && c.num === me.num) {
-      // Дубль номера: уступает тот, чей юзернейм старше по алфавиту
-      if (mine > String(c.username || '')) me.num = nextClientNum();
-      return;
+  if(!me||!me.username) return;
+  for(var i=0;i<clients.length;i++){
+    var c=clients[i];
+    if(c===me||!c.num||!me.num) continue;
+    if(c.num===me.num){
+      if(String(me.username)<String(c.username)) c.num=nextClientNum();
+      else me.num=nextClientNum();
     }
   }
 }
+function canSeeHandle(c){ return !!(me && (isAdmin(me.username, me.tgId) || (c && me.username===c.username))); }
+function handleOf(c){ return canSeeHandle(c) ? esc(c.username) : 'Юзернейм скрыт'; }
+function idOf(c){ return canSeeHandle(c) ? (c.tgId?String(c.tgId):'—') : 'скрыт'; }
 
 // ===== ХЕЛПЕРЫ =====
 function esc(s) {
@@ -1396,8 +1425,9 @@ function enterAs(name, username, tgId) {
   }
   c.online = true;
   me = c;
-  fixClientNums();
+  myTgId = tgId||null;
   saveState();
+  try { patchReg(c); } catch(e) { }
 
   document.getElementById('login-screen').classList.remove('open');
   document.getElementById('app-root').style.display = 'block';
@@ -1805,7 +1835,7 @@ function openFeedWindow(){
     }
     html+='<div style="border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 14px;margin-bottom:10px;">'+
       '<div style="color:#8a8a8a;font-size:12px;margin-bottom:6px;">🕒 '+esc(o.time)+(o.status?' · '+esc(o.status):'')+'</div>'+
-      '<div style="font-weight:bold;margin-bottom:6px;">'+esc(nm)+' <span style="color:#8a8a8a;font-weight:normal;">'+esc(o.customer)+'</span></div>'+
+      '<div style="font-weight:bold;margin-bottom:6px;">'+esc(nm)+(canSeeHandle(cc)?' <span style="color:#8a8a8a;font-weight:normal;">'+esc(o.customer)+'</span>':'')+'</div>'+
       lines+
       '<div style="margin-top:8px;font-weight:bold;">Итого: '+Math.round(o.sum)+' ₽ · 📍 '+esc(o.place)+'</div>'+
       '</div>';
@@ -2365,6 +2395,8 @@ function togglePerk(clientIdx,perk){
   if(!c) return;
   c[perk]=!c[perk];
   saveState();
+  setMod(c);
+  patchMod();
   renderProfileLine();
   renderOwnerClients();
   renderChat();
@@ -2381,6 +2413,8 @@ function banClient(username){
     c.banned=true;
   }
   saveState();
+  setMod(c);
+  patchMod();
   renderOwnerClients();
   renderAdminDialogs();
 }
@@ -2393,6 +2427,8 @@ function muteClient(username){
   if(isNaN(mins)||mins<=0){ alert('Введите число минут'); return; }
   c.mutedUntil = Date.now() + mins*60*1000;
   saveState();
+  setMod(c);
+  patchMod();
   renderOwnerClients();
   renderAdminDialogs();
   renderChat();
@@ -2402,6 +2438,8 @@ function unmuteClient(username){
   if(!c) return;
   c.mutedUntil=0;
   saveState();
+  setMod(c);
+  patchMod();
   renderOwnerClients();
   renderAdminDialogs();
   renderChat();
@@ -2415,6 +2453,8 @@ function deleteClient(username){
   for(var i=0;i<clients.length;i++) if(clients[i].username!==username) nc.push(clients[i]);
   clients=nc;
   delete dms[dmKey(username)];
+  delMod(username);
+  patchMod();
   saveState();
   renderOwnerClients();
   renderAdminDialogs();
@@ -2472,7 +2512,6 @@ function clientStats(username){
 function openClientProfile(idx){
   var c=clients[idx];
   if(!c) return;
-  var canSeeId = canSeeHandle(c.username);
   var st=clientStats(c.username);
 
   var histHtml='';
@@ -2513,12 +2552,12 @@ function openClientProfile(idx){
       '<div class="member-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
       '<div>'+
         '<div class="member-name" style="font-size:20px;">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
-        '<div class="member-handle">'+(canSeeId?esc(c.username)+' · ':'Юзернейм скрыт · ')+onlineBadge(c)+'</div>'+
+        '<div class="member-handle">'+handleOf(c)+' · '+onlineBadge(c)+'</div>'+
       '</div>'+
     '</div>'+
     '<div class="member-tags" style="margin-bottom:16px;">'+
       '<span class="tag" style="background:rgba(255,255,255,0.12); color:#fff; font-weight:bold;">№ '+(c.num||'—')+'</span>'+
-      (canSeeId?'<span class="tag">ID: '+(c.tgId?c.tgId:'—')+'</span>':'<span class="tag">ID скрыт</span>')+
+      '<span class="tag">ID: '+idOf(c)+'</span>'+
       (c.verified?'<span class="tag" style="color:#7ef0a8;">✓ Верифицирован</span>':'<span class="tag">Не верифицирован</span>')+
     '</div>'+
     '<div class="cp-stats">'+
@@ -2792,7 +2831,7 @@ function renderReviews(){
     box.innerHTML=
       '<div class="review-head">'+
         '<div class="client-avatar" style="width:44px; height:44px; font-size:18px;"><span>'+(c.girl?'🌸':'🌙')+'</span></div>'+
-        '<div><div class="review-name">'+esc(c.name)+(canSeeHandle(c.username)?' <span style="color:#8a8a8a; font-weight:normal;">'+esc(c.username)+'</span>':'')+' '+clientBadges(c)+'</div>'+
+        '<div><div class="review-name">'+esc(c.name)+' <span style="color:#8a8a8a; font-weight:normal;">'+(canSeeHandle(c)?esc(c.username):'')+'</span> '+clientBadges(c)+'</div>'+
         '<div class="review-date">Дата покупки '+r.date+'</div></div>'+
         '<div class="review-stars">'+stars+'</div>'+
       '</div>'+
@@ -2901,7 +2940,7 @@ function openDM(username, asSide){
       '<div class="member-row" style="margin-bottom:10px;">'+
         '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
         '<div><div class="client-name">'+esc(c.name)+' '+clientBadges(c)+'</div>'+
-        '<div class="client-handle">'+(canSeeHandle(c.username)?esc(c.username)+' · ':'')+onlineBadge(c)+'</div>'+
+        '<div class="client-handle">'+handleOf(c)+' · '+onlineBadge(c)+'</div>'+
         '<div style="margin-top:6px;"><button class="profile-link-btn" style="margin:0;" onclick="openChatProfile(\''+esc(c.username)+'\')">📋 Профиль и покупки</button></div></div></div>';
   } else {
     head='<div class="pickup-title" style="margin-bottom:6px;">ЛИЧНЫЙ ЧАТ</div>'+
@@ -2998,9 +3037,9 @@ function syncPull(){
       if (s === lastRemote) return;
       lastRemote = s;
       if (d.products) products = d.products;
-      if (d.clients) clients = d.clients;
+      if (d.clients) mergeClientsList(d.clients);
       mergeClientReg(d.clientReg);
-      fixClientNums();
+      if (d.clientMod) { modMap = d.clientMod; applyMod(d.clientMod); }
       if (d.chatMsgs) chatMsgs = d.chatMsgs;
       if (d.orders) orders = d.orders;
       if (d.reviews) reviews = d.reviews;
@@ -3008,15 +3047,22 @@ function syncPull(){
       if (d.logs) logs = d.logs;
       ensureSetProduct();
       var myName = me ? me.username : null;
-      var myCard = me ? me : null;
       me = null;
       if (myName) {
         for (var i = 0; i < clients.length; i++) {
           if (clients[i].username === myName) { me = clients[i]; break; }
         }
-        // Себя в базе не нашли — возвращаем свою карточку и сразу пишем её в реестр:
-        // регистрация доезжает даже если в момент входа база не прочиталась.
-        if (!me && myCard) { me = myCard; clients.push(me); saveState(); }
+        if (!me) {
+          me = { name: myName, username: myName, tgId: myTgId||null, num: nextClientNum(),
+                 verified:false, vip:false, girl:false, mod:false,
+                 online:true, banned:false, mutedUntil:0, admin:isAdmin(myName, myTgId) };
+          clients.push(me);
+        }
+        me.online = true;
+      }
+      if (me && !me.banned) {
+        fixClientNums();
+        if (!d.clientReg || !d.clientReg[safeRegKey(me.username)]) { try { patchReg(me); } catch(e) { } }
       }
       if (me && me.banned) {
         document.getElementById('app-root').style.display = 'none';
