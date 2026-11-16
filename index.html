@@ -486,34 +486,23 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 .smooth-btn.selected { background:#e0e0e0; color:#0a0a0a; border-color:#e0e0e0; }
 #smooth-note { color:#8a8a8a; font-size:12px; margin-top:8px; }
 .profile-btn.danger { background:rgba(255,123,123,.1); border-color:rgba(255,123,123,.4); color:#ff7b7b; }
+/* v24: служебные стили */
+.quick-row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px;}
+.quick-btn{background:rgba(124,92,255,0.15);border:1px solid rgba(124,92,255,0.4);color:#cfc6ff;border-radius:16px;padding:6px 12px;font-size:12px;cursor:pointer;}
+.quick-btn:active{background:rgba(124,92,255,0.35);}
+.sync-line{font-size:12px;color:#7ef0a8;margin:6px 0 10px;}
+.history-line{margin-top:10px;font-size:13px;color:#9a92c8;}
+.draft-banner{display:none;background:rgba(124,92,255,0.18);border:1px solid rgba(124,92,255,0.45);border-radius:14px;padding:12px 14px;margin:10px 0;cursor:pointer;}
+.tl-row{margin-top:8px;font-size:12px;color:#9a92c8;}
+.tl-row .lt{color:#6e6794;}
+.imhere-badge{display:inline-block;margin-top:6px;font-size:12px;color:#7ef0a8;}
+.delay-note{margin-top:6px;font-size:12px;color:#ffcf6e;}
+.clash-box{background:rgba(255,120,80,0.12);border:1px solid rgba(255,120,80,0.4);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#ffb49e;}
+.clash-item{margin:3px 0;}
+.thanks-big{font-size:44px;text-align:center;margin:4px 0;}
 </style>
 </head>
 <body>
-<div id="boot-splash" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#0d0d10;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease;">
-  <style>
-    @keyframes bootFloat{0%,100%{transform:translateY(-7px)}50%{transform:translateY(7px)}}
-    @keyframes bootFill{to{width:100%}}
-    #boot-splash .moon{font-size:64px;animation:bootFloat 2.6s ease-in-out infinite}
-    #boot-splash .bar{width:190px;height:5px;border-radius:3px;background:rgba(255,255,255,0.12);margin-top:28px;overflow:hidden}
-    #boot-splash .bar i{display:block;height:100%;width:0;border-radius:3px;background:#a78bfa;animation:bootFill 5s linear forwards}
-    #boot-splash .t{color:#8a8a8a;font-size:11px;letter-spacing:3px;margin-top:14px}
-  </style>
-  <div class="moon">🌙</div>
-  <div class="bar"><i></i></div>
-  <div class="t">LOONSHOP</div>
-</div>
-<script>
-(function(){
-  var s=document.getElementById('boot-splash');
-  function bootEnd(){
-    if(!s) return;
-    s.style.opacity='0';
-    setTimeout(function(){ if(s&&s.parentNode) s.parentNode.removeChild(s); s=null; },650);
-  }
-  setTimeout(bootEnd,5000);
-  setTimeout(function(){ if(s){ if(s.parentNode) s.parentNode.removeChild(s); s=null; } },5900);
-})();
-</script>
 
 <canvas id="particles"></canvas>
 
@@ -564,7 +553,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v23</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v24</span></div>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
@@ -575,6 +564,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
   <!-- КАТАЛОГ -->
   <div class="tab-page visible" id="page-catalog">
+    <div class="draft-banner" id="draft-banner" onclick="openCart()">🧺 У тебя неоформленный заказ — нажми, чтобы открыть корзину</div>
     <div class="top-info">
       <span id="info-datetime">—</span>
       <span class="dot-on">🟢 В сети: <b id="info-online">0</b></span>
@@ -634,11 +624,11 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <div class="chat-title">💬 Общий чат LoonShop</div>
       <div class="chat-sub">Нажми на имя — откроется профиль с историей покупок. Оттуда можно написать в личку.</div>
       <div class="chat-msgs" id="chat-msgs-client"></div>
-      <div class="qf-row">
-        <button class="qf-btn" onclick="qfIns('chat-input-client','На месте 📍')">На месте 📍</button>
-        <button class="qf-btn" onclick="qfIns('chat-input-client','Выхожу')">Выхожу</button>
-        <button class="qf-btn" onclick="qfIns('chat-input-client','5 минут')">5 минут</button>
-        <button class="qf-btn" onclick="qfIns('chat-input-client','Спасибо!')">Спасибо!</button>
+      <div class="quick-row">
+        <button class="quick-btn" onclick="quickPhrase('На месте 📍')">На месте 📍</button>
+        <button class="quick-btn" onclick="quickPhrase('Выхожу')">Выхожу</button>
+        <button class="quick-btn" onclick="quickPhrase('5 минут')">5 минут</button>
+        <button class="quick-btn" onclick="quickPhrase('Спасибо!')">Спасибо!</button>
       </div>
       <div class="chat-input-row">
         <input class="chat-input" id="chat-input-client" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')sendChat('client')">
@@ -689,8 +679,8 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
         <div class="stat"><div class="l">Заказы</div><div class="v" id="stat-orders">0</div></div>
         <div class="stat"><div class="l">Сделки</div><div class="v" id="stat-deals">0</div></div>
       </div>
-      <div class="hint" id="shop-history-line" style="text-align:center;margin:10px 0 0;"></div>
       <div class="achv-row" id="achv-row" style="margin:14px 0 0;"></div>
+      <div class="history-line" id="shop-history"></div>
     </div>
     <button class="profile-btn" onclick="openDM('@loonshop','client')">✉️ Написать в LoonShop</button>
     <button class="profile-btn" onclick="openManager()">💬 Связь с менеджером</button>
@@ -709,13 +699,10 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       </div>
       <div id="smooth-note"></div>
     </div>
-    <div class="smooth-setting" style="margin-top:12px;">
+    <div class="smooth-setting">
       <div class="t">🔕 Не беспокоить</div>
       <div class="d">С 23:00 до 9:00 уведомления в Telegram не отправляются.</div>
-      <div class="smooth-row">
-        <button class="dnd-btn" data-m="on" onclick="setDnd(true)">Вкл</button>
-        <button class="dnd-btn" data-m="off" onclick="setDnd(false)">Выкл</button>
-      </div>
+      <div class="smooth-row"><button class="quick-btn" id="dnd-btn" onclick="toggleDnd()">Вкл</button></div>
     </div>
     <button class="profile-btn" id="refresh-btn" onclick="refreshData()">🔄 Обновить данные</button>
     <button class="profile-btn danger" onclick="logoutDevice()">🚪 Выйти на этом устройстве</button>
@@ -727,7 +714,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="tab-page" id="page-owner">
     <h2 class="owner-head">Панель владельца <span class="owner-tag">ТОЛЬКО ДЛЯ АДМИНА</span></h2>
     <p class="owner-hint">Заказы, диалоги, модерация клиентов, добавление товаров и фото.</p>
-    <div class="hint" id="db-sync-line" style="text-align:center;margin:-4px 0 12px;">⏳ База: ожидание…</div>
+    <div class="sync-line" id="sync-ok-line">⏳ База: ожидание синхронизации…</div>
 
     <div class="sort-row" style="margin-bottom:14px;">
       <select class="sort-select" id="adm-date-filter" onchange="renderOwner()">
@@ -740,6 +727,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     </div>
 
     <button class="btn-done w100" style="margin-bottom:16px;" onclick="markAllDone()">✅ Отметить все «Ожидает» как «Выполнен»</button>
+    <div id="adm-clash-banner"></div>
 
     <button class="clients-toggle-btn wait" onclick="toggleBlock('adm-wait')">
       <span>⏳ Заказы ожидают</span><span class="cnt" id="adm-wait-cnt">0</span>
@@ -762,7 +750,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
       <span>📜 Журнал событий</span><span class="cnt" id="adm-log-cnt">0</span>
     </button>
     <div class="hidden-block" id="adm-log"></div>
-    <button class="profile-btn danger" style="margin:10px 0 0;" onclick="clearLogs()">🗑 Очистить журнал и ленту «СЕГОДНЯ»</button>
+    <button class="quick-btn" style="margin-top:8px; width:100%; border-radius:10px; padding:10px;" onclick="clearLogs()">🗑 Очистить журнал и ленту «СЕГОДНЯ»</button>
 
     <div class="section-gap"></div>
 
@@ -835,6 +823,12 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <div class="hidden-block" id="adm-chat">
       <div class="chat-box" style="margin-top:0;">
         <div class="chat-msgs" id="chat-msgs-owner"></div>
+        <div class="quick-row">
+          <button class="quick-btn" onclick="quickOwner('Заказ готов ✅')">Готов ✅</button>
+          <button class="quick-btn" onclick="quickOwner('Выхожу к точке')">Выхожу к точке</button>
+          <button class="quick-btn" onclick="quickOwner('Прибуду через 5 минут')">5 минут</button>
+          <button class="quick-btn" onclick="quickOwner('Свяжитесь со мной, уточним детали')">Связь</button>
+        </div>
         <div class="chat-input-row">
           <input class="chat-input" id="chat-input-owner" placeholder="Ответить как LoonShop..." onkeydown="if(event.key==='Enter')sendChat('owner')">
           <button class="chat-send" onclick="sendChat('owner')">Отправить</button>
@@ -1014,7 +1008,12 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <button class="close-btn" onclick="closeDM()">✕</button>
   <div id="dm-head"></div>
   <div class="chat-msgs" id="dm-msgs" style="max-height:260px;"></div>
-  <div class="qf-row" id="dm-tpl-row" style="display:none;"></div>
+  <div class="quick-row" id="dm-tpl-row" style="display:none;">
+    <button class="quick-btn" onclick="dmQuick('Заказ готов ✅')">Готов ✅</button>
+    <button class="quick-btn" onclick="dmQuick('Выхожу к точке')">Выхожу к точке</button>
+    <button class="quick-btn" onclick="dmQuick('Прибуду через 5 минут')">5 минут</button>
+    <button class="quick-btn" onclick="dmQuick('Свяжитесь со мной, уточним детали')">Связь</button>
+  </div>
   <div class="chat-input-row">
     <input class="chat-input" id="dm-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')sendDM()">
     <button class="chat-send" onclick="sendDM()">Отправить</button>
@@ -1032,7 +1031,7 @@ var NOTIFY_URL = 'https://loonshop.xylugan4uk123.workers.dev';
 var NOTIFY_KEY = 'loon-secret-2026';
 function notifyTg(text, to){
   try{
-    if(dndOn){ var hh=new Date().getHours(); if(hh>=23||hh<9) return; }
+    if (dndEnabled){ var h=new Date().getHours(); if(h>=23||h<9) return; }
     var u = NOTIFY_URL + '?k=' + encodeURIComponent(NOTIFY_KEY) + '&text=' + encodeURIComponent(text);
     if(to) u += '&to=' + encodeURIComponent(to);
     fetch(u, {mode:'no-cors'});
@@ -1173,7 +1172,6 @@ var defaultChatMsgs = [];
 
 var products, clients, chatMsgs, orders, reviews, dms, cart;
 var logs = [];
-var logsClearedAt = 0;
 var me = null;
 var modMap = {};
 var myTgId = null;
@@ -1182,7 +1180,7 @@ var firstSyncDone = false;
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, logsClearedAt:logsClearedAt
+      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, cart:cart, logsClearedAt:logsClearedAt
     }));
   } catch(e) { }
   // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
@@ -1239,6 +1237,10 @@ function ensureSetProduct() {
   if (fixed) { try { saveState(); } catch(e) { } if (typeof renderCatalog === 'function') renderCatalog(); }
 }
 
+var logsClearedAt = 0;
+var msgStamps = [];
+var thanksIdx = -1;
+var dndEnabled = true;
 function loadState() {
   products = JSON.parse(JSON.stringify(defaultProducts));
   clients = JSON.parse(JSON.stringify(defaultClients));
@@ -1258,10 +1260,11 @@ function loadState() {
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
       if (d.logs) logs = d.logs;
-      if (typeof d.logsClearedAt === 'number') logsClearedAt = d.logsClearedAt;
-      pruneLogs();
+      if (d.logsClearedAt) logsClearedAt = d.logsClearedAt;
+      if (d.cart) cart = d.cart;
     }
   } catch(e) { }
+  pruneLogs();
 }
 loadState();
 ensureSetProduct();
@@ -1347,6 +1350,100 @@ function idOf(c){ return canSeeHandle(c) ? (c.tgId?String(c.tgId):'—') : 'ск
 // ===== ХЕЛПЕРЫ =====
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// ===== v24: СЛУЖЕБНЫЕ ФУНКЦИИ =====
+function pruneLogs(){
+  if (!logsClearedAt) return;
+  var keep=[];
+  for (var i=0;i<logs.length;i++){ var l=logs[i]; if (l.ts && l.ts > logsClearedAt) keep.push(l); }
+  logs = keep;
+}
+function hasFeedToday(){
+  var t = todayISO();
+  for (var i=0;i<orders.length;i++) if (orders[i].date===t && !orders[i].feedHidden) return true;
+  return false;
+}
+function clearLogs(){
+  if (!logs.length && !hasFeedToday()){ alert('Журнал и лента уже пусты'); return; }
+  if (!confirm('Очистить журнал и ленту «СЕГОДНЯ» на всех устройствах?')) return;
+  logs = [];
+  logsClearedAt = Date.now();
+  var t = todayISO();
+  for (var i=0;i<orders.length;i++) if (orders[i].date===t) orders[i].feedHidden = true;
+  saveState();
+  renderLog(); renderCatalog();
+  alert('Готово: журнал и лента очищены на всех устройствах 🌙');
+}
+function timelineHtml(o){
+  if(!o||!o.timeline||!o.timeline.length) return '';
+  var s='<div class="tl-row">🕐 ';
+  for(var i=0;i<o.timeline.length;i++){
+    s+=esc(o.timeline[i].s)+' <span class="lt">'+esc(o.timeline[i].t)+'</span>';
+    if(i<o.timeline.length-1) s+=' → ';
+  }
+  return s+'</div>';
+}
+function imHere(idx){
+  var o=orders[idx]; if(!o) return;
+  if(o.imHere) return;
+  o.imHere = true;
+  addLog('📍 '+o.customer+': на месте встречи (заказ №'+(idx+1)+')');
+  saveState();
+  renderOrders();
+  notifyTg('🌙 LoonShop\n\n📍 Клиент на месте встречи.\nКто: '+o.customer+'\nТочка: '+o.place+'\nВремя: '+o.time);
+  alert('Отметка «Я на месте» отправлена владельцу 📍');
+}
+function setDelay(idx){
+  var o=orders[idx]; if(!o) return;
+  var mins = prompt('На сколько задерживаетесь? (минут)', '15');
+  if(mins===null) return;
+  var m = parseInt(mins,10); if(isNaN(m)||m<=0) m=15;
+  o.delayNote = '~'+m+' мин';
+  addLog('⏱ Владелец: задержка на встрече ('+o.delayNote+') — клиент '+o.customer);
+  saveState();
+  var ch=clientChatId(o);
+  if(ch) notifyTg('🌙 LoonShop\n\n⏱ Небольшая задержка на встрече: ~'+m+' мин. Извините!', ch);
+  renderOwner(); renderOrders();
+}
+function showThanks(idx){
+  var o=orders[idx]; if(!o) return;
+  o.thanked = true; saveState();
+  thanksIdx = idx;
+  var num=document.getElementById('thanks-order-num'); if(num) num.textContent='№'+(idx+1);
+  document.getElementById('overlay-thanks').className='overlay open';
+  document.getElementById('thanks-window').style.display='block';
+}
+function closeThanks(){
+  document.getElementById('overlay-thanks').className='overlay';
+  document.getElementById('thanks-window').style.display='none';
+}
+function thanksReview(){ closeThanks(); openReviewWindow(); }
+function quickPhrase(t){ var i=document.getElementById('chat-input-client'); if(i) i.value=t; }
+function quickOwner(t){ var i=document.getElementById('chat-input-owner'); if(i) i.value=t; }
+function dmQuick(t){ var i=document.getElementById('dm-input'); if(i) i.value=t; }
+function updateSyncLine(){
+  var el=document.getElementById('sync-ok-line');
+  if(el) el.textContent='✅ База синхронна · '+nowTime();
+}
+function renderDraftBanner(){
+  var b=document.getElementById('draft-banner');
+  if(!b) return;
+  b.style.display = cart.length>0 ? 'block' : 'none';
+}
+function toggleDnd(){
+  dndEnabled = !dndEnabled;
+  try { localStorage.setItem('loonshop_dnd', dndEnabled?'1':'0'); } catch(e){}
+  renderDndBtn();
+}
+function renderDndBtn(){
+  var b=document.getElementById('dnd-btn');
+  if(b) b.textContent = dndEnabled ? 'Вкл' : 'Выкл';
+}
+function pluralDays(n){
+  var m10=n%10, m100=n%100;
+  if(m10===1&&m100!==11) return 'день';
+  if(m10>=2&&m10<=4&&(m100<10||m100>=20)) return 'дня';
+  return 'дней';
 }
 function nowTime() { return new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); }
 function fmtTime(ts) { return new Date(ts).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); }
@@ -1555,7 +1652,6 @@ function findCartItem(id,color){
 
 // ===== НАВИГАЦИЯ =====
 function showTab(tab){
-  window.__curTab=tab;
   var pages=['catalog','orders','reviews','chat','profile','owner'];
   for(var i=0;i<pages.length;i++){
     document.getElementById('page-'+pages[i]).className='tab-page'+(pages[i]===tab?' visible':'');
@@ -2018,6 +2114,7 @@ function updateChange(){
 function updateTotals(){
   document.getElementById('cart-badge').textContent=getCartCount();
   document.getElementById('cart-sum').textContent=getCartSum()+' ₽';
+  renderDraftBanner();
 }
 function openCart(){
   var box=document.getElementById('cart-items');
@@ -2100,7 +2197,8 @@ function confirmOrder(){
     customer:me.username, items:items, count:getCartCount(), sum:sum,
     place:modalPlace, date:modalDate, time:modalTime,
     paid:Math.floor(paid), change:change,
-    payment:'Наличные', status:'Ожидает', reviewIdx:-1
+    payment:'Наличные', status:'Ожидает', reviewIdx:-1,
+    timeline:[{s:'Оформлен', t:nowTime()}]
   });
   alert('Заказ оформлен!\nМесто: '+modalPlace+'\nКогда: '+fmtDate(modalDate)+' · '+modalTime+'\nСумма: '+sum+' ₽ (наличные)\nСдача: '+change+' ₽');
   cart=[];
@@ -2133,16 +2231,20 @@ function renderOrders(){
   document.getElementById('stat-purchases').textContent=totalSpent+' ₽';
   document.getElementById('stat-orders').textContent=orders.length;
   document.getElementById('stat-deals').textContent=doneCount;
-  var histEl=document.getElementById('shop-history-line');
-  if(histEl){
-    var minD=null;
-    for(var h=0;h<orders.length;h++){ var dt=orders[h].date; if(dt && (!minD || dt<minD)) minD=dt; }
-    if(minD){
-      var dd=new Date(minD+'T00:00:00');
-      var days=Math.max(1,Math.floor((Date.now()-dd.getTime())/86400000)+1);
-      var dw=(days%10===1&&days%100!==11)?'день':((days%10>=2&&days%10<=4&&(days%100<10||days%100>=20))?'дня':'дней');
-      histEl.textContent='🌙 Нам '+days+' '+dw+' · выполнено сделок: '+doneCount;
-    } else histEl.textContent='🌙 Магазин открыт — сделки впереди';
+  var hist=document.getElementById('shop-history');
+  if(hist){
+    var first=null;
+    for(var h=0;h<orders.length;h++){ var dd=orders[h].date; if(dd && (!first || dd<first)) first=dd; }
+    if(first){
+      var fd=new Date(first+'T00:00:00'), days=Math.max(1, Math.round((Date.now()-fd.getTime())/86400000));
+      hist.textContent='🌙 Нам '+days+' '+pluralDays(days)+' · выполнено сделок: '+doneCount;
+    } else hist.textContent='🌙 Магазин только открылся — история начнётся с первого заказа';
+  }
+  if(me){
+    for(var t=0;t<orders.length;t++){
+      var to=orders[t];
+      if(to.status==='Выполнен'&&to.customer===me.username&&to.reviewIdx<0&&!to.thanked){ showThanks(t); break; }
+    }
   }
 
   var groups = [
@@ -2172,9 +2274,13 @@ function renderOrders(){
         '<div class="order-top"><div>'+
           '<div class="order-name">Заказ №'+(j+1)+statusBadge(o.status)+'</div>'+
           '<div class="order-sub">📍 '+esc(o.place)+' · 📅 '+fmtDate(o.date)+' · 🕒 '+o.time+'<br>'+
-          '💵 Наличные · отдаст: '+o.paid+' ₽ · сдача: '+o.change+' ₽</div>'+
+          '💵 Наличные · отдаст: '+o.paid+' ₽ · сдача: '+o.change+' ₽'+
+          (o.imHere?'<div class="imhere-badge">📍 Я на месте</div>':'')+
+          (o.delayNote?'<div class="delay-note">⏱ Владелец задерживается: '+esc(o.delayNote)+'</div>':'')+
+          timelineHtml(o)+'</div>'+
         '</div><div class="order-sum">'+o.sum+' ₽</div></div>'+
         '<button class="details-btn" onclick="toggleDetailsById(\'my'+j+'\')">Что в заказе ▾</button>'+
+        ((o.status==='Ожидает'&&!o.imHere)?'<button class="details-btn" onclick="imHere('+j+')">📍 Я на месте</button>':'')+
         '<div class="order-details" id="od-my'+j+'">'+itemsHtml+'</div>';
       listEl.appendChild(box);
     }
@@ -2210,22 +2316,25 @@ function orderPassesFilter(o){
 }
 
 function markAllDone(){
-  var n0=0;
-  for(var i0=0;i0<orders.length;i0++) if(orders[i0].status==='Ожидает' && orderPassesFilter(orders[i0])) n0++;
-  if(!n0){ alert('Под текущий фильтр нет заказов со статусом «Ожидает»'); return; }
-  if(!confirm('Отметить выполненными заказов: '+n0+'?')) return;
-  var changed=0;
+  var cnt=0;
+  for(var i=0;i<orders.length;i++) if(orders[i].status==='Ожидает' && orderPassesFilter(orders[i])) cnt++;
+  if(!cnt){ alert('Под текущий фильтр не попало ни одного заказа со статусом «Ожидает»'); return; }
+  if(!confirm('Отметить выполненными заказов: '+cnt+'?')) return;
+  if(!confirm('Товар проверен при продавце и деньги получены?')) return;
   var toNotify=[];
   for(var i=0;i<orders.length;i++){
     if(orders[i].status==='Ожидает' && orderPassesFilter(orders[i])){
-      var ch = clientChatId(orders[i]);
-      if(ch) toNotify.push(orders[i]);
-      orders[i].status='Выполнен';
-      changed++;
+      var o=orders[i];
+      var ch = clientChatId(o);
+      if(ch) toNotify.push(o);
+      o.status='Выполнен';
+      o.verifiedOnSpot=true;
+      if(!o.timeline) o.timeline=[];
+      o.timeline.push({s:'Выполнен', t:nowTime()});
+      addLog('🛡 Проверено при продавце: заказ клиента '+o.customer);
     }
   }
-  if(!changed){ alert('Под текущий фильтр не попало ни одного заказа со статусом «Ожидает»'); return; }
-  addLog('✅ Владелец: отмечено выполненными заказов: '+changed);
+  addLog('✅ Владелец: отмечено выполненными заказов: '+cnt);
   saveState();
   for(var n=0;n<toNotify.length;n++){
     var oo = toNotify[n];
@@ -2235,13 +2344,25 @@ function markAllDone(){
     }
   }
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
-  alert('Отмечено выполненными заказов: '+changed);
+  alert('Отмечено выполненными заказов: '+cnt);
 }
-
 // ===== ПАНЕЛЬ ВЛАДЕЛЬЦА: ЗАКАЗЫ =====
 function setOrderStatus(idx,status){
   var o=orders[idx];
   if(!o||o.status!=='Ожидает') return;
+  if(status==='Отменён'){
+    var reason = prompt('Причина отказа:\n1 — клиент не пришёл\n2 — клиент отменил сам\n3 — другое (напишите словами)', '1');
+    if (reason===null) return;
+    var map={'1':'клиент не пришёл','2':'клиент отменил сам'};
+    var r=map[String(reason).trim()]||String(reason).trim();
+    if(!r) r='без причины';
+    o.cancelReason=r;
+  }
+  if(status==='Выполнен'){
+    if(!confirm('Товар проверен при продавце и деньги получены?')) return;
+    o.verifiedOnSpot=true;
+    addLog('🛡 Проверено при продавце: заказ клиента '+o.customer);
+  }
   if(status==='Отменён'){
     for(var i=0;i<o.items.length;i++){
       var it=o.items[i], p=null;
@@ -2250,7 +2371,9 @@ function setOrderStatus(idx,status){
     }
   }
   o.status=status;
-  addLog((status==='Выполнен'?'✅':'✖')+' Владелец: заказ клиента '+o.customer+' — '+status);
+  if(!o.timeline) o.timeline=[];
+  o.timeline.push({s:status, t:nowTime()});
+  addLog((status==='Выполнен'?'✅':'✖')+' Владелец: заказ клиента '+o.customer+' — '+status+(status==='Отменён'?' ('+o.cancelReason+')':''));
   saveState();
   var ch = clientChatId(o);
   if(ch){
@@ -2258,13 +2381,24 @@ function setOrderStatus(idx,status){
       notifyTg('\uD83C\uDF19 LoonShop\n\n\u2705 Заказ выполнен!\nЖдём вас: \uD83D\uDCCD ' + o.place + '\n' + fmtDate(o.date) + ' · ' + o.time + '\nСдача: ' + o.change + ' \u20BD\n\nСпасибо за покупку!', ch);
     }
     if(status==='Отменён'){
-      notifyTg('\uD83C\uDF19 LoonShop\n\n\u274C Заказ отменён.\nЕсли это недоразумение — напишите нам, разберёмся.', ch);
+      notifyTg('\uD83C\uDF19 LoonShop\n\n\u274C Заказ отменён.\nПричина: '+o.cancelReason+'.\nЕсли это недоразумение — напишите нам, разберёмся.', ch);
     }
   }
   renderOwner(); renderOrders(); renderCatalog(); updateReviewButton();
 }
 
 function renderOwner(){
+  var clash={};
+  for(var c=0;c<orders.length;c++){
+    var oo=orders[c];
+    if(oo.status!=='Ожидает') continue;
+    var kk=oo.place+'|'+oo.date+'|'+oo.time;
+    clash[kk]=(clash[kk]||0)+1;
+  }
+  var clashHtml='';
+  for(var k2 in clash){ if(clash[k2]>=2){ var pp=k2.split('|'); clashHtml+='<div class="clash-item">⚠ '+esc(pp[0])+' · '+fmtDate(pp[1])+' · '+pp[2]+' — встреч: '+clash[k2]+'</div>'; } }
+  var cb=document.getElementById('adm-clash-banner');
+  if(cb) cb.innerHTML = clashHtml;
   var groups = [
     {id:'adm-wait',  st:'Ожидает'},
     {id:'adm-done',  st:'Выполнен'},
@@ -2292,7 +2426,8 @@ function renderOwner(){
       if(o.status==='Ожидает'){
         actions='<div class="owner-actions">'+
           '<button class="btn-done" onclick="setOrderStatus('+j+',\'Выполнен\')">✓ Успешно</button>'+
-          '<button class="btn-cancel-order" onclick="setOrderStatus('+j+',\'Отменён\')">✕ Отмена</button></div>';
+          '<button class="btn-cancel-order" onclick="setOrderStatus('+j+',\'Отменён\')">✕ Отмена</button>'+
+          '<button class="details-btn" style="width:100%; margin-top:6px;" onclick="setDelay('+j+')">⏱ Задерживаюсь</button></div>';
       }
       var reviewHtml='';
       if(o.status==='Выполнен'){
@@ -2309,7 +2444,11 @@ function renderOwner(){
         '<div class="order-top"><div>'+
           '<div class="order-name">Заказ №'+(j+1)+' · '+esc(o.customer)+statusBadge(o.status)+'</div>'+
           '<div class="order-sub">📍 '+esc(o.place)+' · 📅 '+fmtDate(o.date)+' · 🕒 '+o.time+'<br>'+
-          '💵 '+o.payment+' · отдаст: '+o.paid+' ₽ · <span style="color:#7ef0a8;">сдача: '+o.change+' ₽</span></div>'+
+          '💵 '+o.payment+' · отдаст: '+o.paid+' ₽ · <span style="color:#7ef0a8;">сдача: '+o.change+' ₽</span>'+
+          (o.cancelReason?'<div class="delay-note">✖ Причина отказа: '+esc(o.cancelReason)+'</div>':'')+
+          (o.imHere?'<div class="imhere-badge">📍 Клиент на месте</div>':'')+
+          (o.delayNote?'<div class="delay-note">⏱ Задержка: '+esc(o.delayNote)+'</div>':'')+
+          timelineHtml(o)+'</div>'+
         '</div><div class="order-sum">'+o.sum+' ₽</div></div>'+
         '<div class="order-details open" style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.1); padding-top:12px;">'+itemsHtml+'</div>'+
         actions+reviewHtml;
@@ -2931,10 +3070,10 @@ function sendChat(side){
     if(!isAdmin(me.username, me.tgId)) return;
     chatMsgs.push({name:'LoonShop',username:'@loonshop',shop:true,verified:true,vip:false,girl:false,mod:false,online:true,text:text,time:nowTime()});
   } else {
-    var nowC=Date.now();
-    window.__chatTimes=(window.__chatTimes||[]).filter(function(x){ return nowC-x<60000; });
-    if(window.__chatTimes.length>=5){ alert('⏳ Не так быстро — не больше 5 сообщений в минуту'); return; }
-    window.__chatTimes.push(nowC);
+    var _now=Date.now();
+    msgStamps = msgStamps.filter(function(ts){ return _now - ts < 60000; });
+    if (!isAdmin(me.username, me.tgId) && msgStamps.length >= 5){ alert('⏳ Не так быстро — не больше 5 сообщений в минуту'); return; }
+    msgStamps.push(_now);
     if(isMuted(me)){
       alert('🔇 Вы в муте до '+fmtTime(me.mutedUntil));
       return;
@@ -2991,6 +3130,7 @@ function openDM(username, asSide){
     document.getElementById('dm-head').innerHTML=head;
     document.getElementById('dm-input').value='';
     document.getElementById('dm-hint-line').textContent='Ваше сообщение получит владелец магазина.';
+    var dtr0=document.getElementById('dm-tpl-row'); if(dtr0) dtr0.style.display='none';
     renderDM();
     document.getElementById('overlay-dm').className='overlay open';
     document.getElementById('dm-window').style.display='block';
@@ -3018,6 +3158,7 @@ function openDM(username, asSide){
   document.getElementById('dm-hint-line').textContent = dmAsShop
     ? 'Вы отвечаете от имени LoonShop. Сообщение увидит клиент.'
     : 'Личные сообщения видят только вы и собеседник.';
+  var dtr2=document.getElementById('dm-tpl-row'); if(dtr2) dtr2.style.display = dmAsShop ? 'flex' : 'none';
   renderDM();
   document.getElementById('overlay-dm').className='overlay open';
   document.getElementById('dm-window').style.display='block';
@@ -3029,8 +3170,6 @@ function closeDM(){
 }
 function renderDM(){
   if(!dmPeer) return;
-  var tplEl=document.getElementById('dm-tpl-row');
-  if(tplEl){ var showT=dmAsShop&&me&&isAdmin(me.username,me.tgId); tplEl.style.display=showT?'flex':'none'; }
   var key=dmKey(dmPeer);
   var msgs=dms[key]||[];
   var el=document.getElementById('dm-msgs');
@@ -3101,7 +3240,7 @@ function syncPull(){
     .then(function(d){
       syncing = false;
       firstSyncDone = true;
-      window.__lastSync = Date.now();
+      updateSyncLine();
       if (!d) return;
       var s = JSON.stringify(d);
       if (s === lastRemote) return;
@@ -3115,8 +3254,7 @@ function syncPull(){
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
       if (d.logs) logs = d.logs;
-      if (typeof d.logsClearedAt === 'number' && d.logsClearedAt > (logsClearedAt||0)) logsClearedAt = d.logsClearedAt;
-      pruneLogs();
+      if (d.logsClearedAt && d.logsClearedAt > logsClearedAt) { logsClearedAt = d.logsClearedAt; pruneLogs(); }
       ensureSetProduct();
       var myName = me ? me.username : null;
       me = null;
@@ -3157,29 +3295,8 @@ function addLog(txt){
   if (logs.length > 50) logs.length = 50;
   renderLog();
 }
-function pruneLogs(){
-  if(!logsClearedAt) return;
-  var keep=[];
-  for(var i=0;i<logs.length;i++){ var L=logs[i]; if(!L.ts || L.ts>=logsClearedAt) keep.push(L); }
-  if(keep.length!==logs.length) logs=keep;
-}
-function clearLogs(){
-  if(!logs.length && !hasHiddenFeed()) return;
-  if(!confirm('Очистить журнал и ленту «СЕГОДНЯ» у всех устройств?')) return;
-  logsClearedAt = Date.now();
-  logs = [];
-  var t = todayISO();
-  for(var i=0;i<orders.length;i++){ if(orders[i].date===t) orders[i].feedHidden = true; }
-  saveState(); renderLog(); rotateFeed(); openFeedWindow();
-}
-function hasHiddenFeed(){
-  var t=todayISO();
-  for(var i=0;i<orders.length;i++){ if(orders[i].date===t && !orders[i].feedHidden) return true; }
-  return false;
-}
 function renderLog(){
   var el = document.getElementById('adm-log'); if(!el) return;
-  pruneLogs();
   var cnt = document.getElementById('adm-log-cnt');
   if (cnt) cnt.textContent = logs.length;
   el.innerHTML = '';
@@ -3280,76 +3397,87 @@ renderLog();
 updateTopInfo();
 syncPull();
 </script>
-<style>
-.qf-row{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px;}
-.qf-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#eee;border-radius:14px;padding:5px 11px;font-size:12px;cursor:pointer;}
-.qf-btn:active{background:rgba(167,139,250,0.25);}
-.dnd-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#eee;border-radius:12px;padding:6px 16px;font-size:12px;cursor:pointer;}
-.dnd-btn.on{background:rgba(167,139,250,0.28);border-color:#a78bfa;}
-</style>
+
+<!-- v24: карточка благодарности -->
+<div class="overlay" id="overlay-thanks" onclick="overlayClose(event,'overlay-thanks','thanks-window')"></div>
+<div class="modal" id="thanks-window" style="display:none;">
+  <button class="close-btn" onclick="closeThanks()">✕</button>
+  <div class="thanks-big">🌙</div>
+  <h2 style="text-align:center;">Спасибо за сделку!</h2>
+  <p class="m-sub" style="text-align:center;">Сделка <b id="thanks-order-num">№—</b> выполнена. Будем рады отзыву — это очень помогает магазину 🌙</p>
+  <div class="modal-actions">
+    <button class="btn-cancel" onclick="closeThanks()">Позже</button>
+    <button class="btn-ok" onclick="thanksReview()">✍️ Оставить отзыв</button>
+  </div>
+</div>
+
+<!-- v24: заставка с луной (5 сек) -->
+<div id="splash" style="position:fixed; inset:0; background:#0b0b14; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity .8s;">
+  <div id="splash-moon" style="font-size:64px; will-change:transform;">🌙</div>
+  <div style="margin-top:18px; font-size:13px; color:#8a8aa8; letter-spacing:3px;">LOONSHOP</div>
+  <div style="margin-top:22px; width:200px; height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden;">
+    <div id="splash-bar" style="width:0%; height:100%; background:linear-gradient(90deg,#7c5cff,#c17cff); transition:width 5s linear;"></div>
+  </div>
+</div>
 <script>
-// ===== БЫСТРЫЕ ФРАЗЫ =====
-function qfIns(id,txt){ var el=document.getElementById(id); if(!el) return; el.value=txt; el.focus(); }
 (function(){
-  var t=document.getElementById('dm-tpl-row'); if(!t) return;
-  var arr=['Заказ готов ✅','Выхожу','Буду через 5 минут','На связи'];
-  var h='';
-  for(var i=0;i<arr.length;i++) h+='<button class="qf-btn" onclick="qfIns(\'dm-input\',\''+arr[i]+'\')">'+arr[i]+'</button>';
-  t.innerHTML=h;
+  var s=document.getElementById('splash');
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.getElementById('splash-bar').style.width='100%'; }); });
+  var up=false, y=0;
+  var iv=setInterval(function(){ y+=up?-2:2; up=y>8; document.getElementById('splash-moon').style.transform='translateY('+y+'px)'; },60);
+  setTimeout(function(){ s.style.opacity='0'; setTimeout(function(){ clearInterval(iv); if(s.parentNode) s.parentNode.removeChild(s); }, 900); }, 5000);
+  setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 5900);
 })();
-// ===== НЕ БЕСПОКОИТЬ =====
-var dndOn = true;
-try{ dndOn = localStorage.getItem('loonshop_dnd')!=='off'; }catch(e){}
-function setDnd(v){ dndOn=v; try{ localStorage.setItem('loonshop_dnd', v?'on':'off'); }catch(e){} paintDnd(); }
-function paintDnd(){
-  var bs=document.querySelectorAll('.dnd-btn');
-  for(var i=0;i<bs.length;i++) bs[i].className='dnd-btn'+(((bs[i].getAttribute('data-m')==='on')===dndOn)?' on':'');
-}
-paintDnd();
-// ===== СЧЁТЧИК ЦЕЛОСТНОСТИ БАЗЫ =====
-setInterval(function(){
-  var el=document.getElementById('db-sync-line'); if(!el) return;
-  if(!firstSyncDone){ el.textContent='⏳ База: ожидание…'; return; }
-  var s=Math.floor((Date.now()-(window.__lastSync||0))/1000);
-  el.textContent='✅ База синхронна · '+(s<60? s+' сек назад' : Math.floor(s/60)+' мин назад');
-},2000);
-// ===== СВАЙП МЕЖДУ ВКЛАДКАМИ =====
+</script>
+
+<!-- v24: свайп между вкладками (с защитой от горизонтальных прокруток) -->
+<script>
 (function(){
-  var sx=0,sy=0,skip=true,active=false;
-  function hScroll(t){
-    var n=t;
-    while(n && n!==document.body){
-      try{
-        if(n.scrollWidth>n.clientWidth+4){
-          var ov=window.getComputedStyle(n).overflowX;
-          if(ov==='auto'||ov==='scroll') return true;
-        }
-      }catch(e){}
-      n=n.parentElement;
+  var tabs=['catalog','reviews','orders','chat','profile'];
+  var sx=0, sy=0, allow=false;
+  function hScrollable(el){
+    while(el && el!==document.documentElement){
+      if(el.scrollWidth>el.clientWidth+2){
+        var ox=window.getComputedStyle(el).overflowX;
+        if(ox==='auto'||ox==='scroll'||ox==='overlay') return true;
+      }
+      el=el.parentElement;
     }
     return false;
   }
+  function busy(){
+    if(document.getElementById('splash')) return true;
+    if(document.querySelectorAll('.overlay.open').length>0) return true;
+    var po=document.getElementById('page-owner');
+    if(po && po.className.indexOf('visible')>=0) return true;
+    return false;
+  }
   document.addEventListener('touchstart',function(e){
-    active=true;
-    sx=e.touches[0].clientX; sy=e.touches[0].clientY;
-    skip = e.touches.length!==1
-        || hScroll(e.target)
-        || !!document.querySelector('.modal.open')
-        || !!document.querySelector('.overlay.open')
-        || window.__curTab==='owner';
+    if(e.touches.length>1){ allow=false; return; }
+    if(busy()){ allow=false; return; }
+    if(hScrollable(e.target)){ allow=false; return; }
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY; allow=true;
   },{passive:true});
-  document.addEventListener('touchend',function(e){
-    if(!active) return; active=false;
-    if(skip) return;
-    var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
-    if(Math.abs(dx)<60 || Math.abs(dy)>Math.abs(dx)) return;
-    var order=['catalog','reviews','orders','chat','profile'];
-    var i=order.indexOf(window.__curTab); if(i<0) return;
-    var ni = dx>0 ? i-1 : i+1;
-    if(ni<0 || ni>=order.length) return;
-    showTab(order[ni]);
+  document.addEventListener('touchmove',function(e){
+    if(!allow) return;
+    var dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+    if(Math.abs(dx)<60 || Math.abs(dy)>Math.abs(dx)*0.8) return;
+    allow=false;
+    var cur=null;
+    for(var i=0;i<tabs.length;i++){ var p=document.getElementById('page-'+tabs[i]); if(p && p.className.indexOf('visible')>=0) cur=tabs[i]; }
+    if(!cur) return;
+    var ni=tabs.indexOf(cur)+(dx<0?1:-1);
+    if(ni<0||ni>=tabs.length) return;
+    showTab(tabs[ni]);
   },{passive:true});
 })();
+</script>
+
+<!-- v24: инициализация -->
+<script>
+try{ var _d=localStorage.getItem('loonshop_dnd'); if(_d!==null) dndEnabled=_d==='1'; }catch(e){}
+renderDndBtn();
+renderDraftBanner();
 </script>
 </body>
 </html>
