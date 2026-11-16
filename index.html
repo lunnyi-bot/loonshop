@@ -539,7 +539,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v18</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v19</span></div>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
@@ -1138,8 +1138,8 @@ function saveState() {
       products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs
     }));
   } catch(e) { }
-  // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
-  // чтобы не затереть чужие данные пустотой. Таймаут 5 секунд — не зависаем.
+  // Записываем в базу частями: товары/заказы/чат — целиком, а клиенты — по карточкам.
+  // Пока база не прочитана хотя бы раз — не пишем, чтобы не затереть чужие данные пустотой.
   if (DB_URL && firstSyncDone) {
     try {
       var sc = new AbortController();
@@ -1149,11 +1149,13 @@ function saveState() {
         signal: sc.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          products: products, clients: clients, chatMsgs: chatMsgs,
-          orders: orders, reviews: reviews, dms: dms, logs: logs
+          products: products, chatMsgs: chatMsgs, orders: orders,
+          reviews: reviews, dms: dms, logs: logs
         })
       });
     } catch(e) { }
+    if (me) pushMe();
+    if (me && (me.admin || isAdmin(me.username, me.tgId))) pushAllClients();
   }
 }
 
@@ -1318,7 +1320,7 @@ function doLogin() {
     name = tgUser.first_name || tgUser.username || 'Клиент';
     username = '@' + (tgUser.username || ('id' + tgUser.id));
     tgId = tgUser.id;
-    enterAs(name, username, tgId);
+    enterAs(name, username, tgId, tgUser.photo_url || null);
     return;
   }
 
@@ -1330,7 +1332,7 @@ function doLogin() {
   enterAs(name, username, null);
 }
 
-function enterAs(name, username, tgId) {
+function enterAs(name, username, tgId, photoUrl) {
   var c = findClient(username);
   if (!c) {
     c = { name:name, username:username, tgId:tgId||null, num:nextClientNum(),
@@ -1339,6 +1341,8 @@ function enterAs(name, username, tgId) {
     clients.push(c);
   }
   if (tgId && !c.tgId) c.tgId = tgId;
+  if (photoUrl) c.photo = photoUrl;
+  fixMyNumber(c);
   if (!c.num) c.num = nextClientNum();
   c.admin = isAdmin(c.username, c.tgId);
   c.name = name;
@@ -1352,12 +1356,80 @@ function enterAs(name, username, tgId) {
   }
   c.online = true;
   me = c;
+  meSnapshot = { name:c.name, username:c.username, tgId:c.tgId||null, num:c.num||null,
+    photo:c.photo||null, admin:c.admin, girl:c.girl, verified:c.verified, vip:c.vip, mod:c.mod };
   saveState();
 
   document.getElementById('login-screen').classList.remove('open');
   document.getElementById('app-root').style.display = 'block';
   document.getElementById('welcome-name').textContent = name || username;
   renderAll();
+}
+
+// ===== ЗАЩИТА РЕЕСТРА КЛИЕНТОВ И АВАТАРОВ =====
+var meSnapshot = null;
+
+function regKey(u){ return encodeURIComponent(String(u||'').replace(/\./g,'_')); }
+
+function avaBg(c){
+  if(!c || !c.photo) return '';
+  return ' style="background-image:url(\''+String(c.photo).replace(/'/g,'%27')+'\');background-size:cover;background-position:center;"';
+}
+
+function fixMyNumber(c){
+  if(!c || !c.num) return;
+  for(var i=0;i<clients.length;i++){
+    var o=clients[i];
+    if(!o || o===c || !o.num || o.username===c.username) continue;
+    if(o.num!==c.num) continue;
+    if(String(c.username)>String(o.username)){
+      c.num=nextClientNum();
+      if(c===me) pushMe();
+    }
+    return;
+  }
+}
+
+function pushMe(){
+  if(!DB_URL || !firstSyncDone || !me) return;
+  try {
+    var sc=new AbortController();
+    setTimeout(function(){ sc.abort(); }, 5000);
+    fetch(DB_URL+'/clientReg/'+regKey(me.username)+'.json', {
+      method:'PUT', signal:sc.signal, headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(me)
+    });
+  } catch(e) { }
+}
+
+function pushAllClients(){
+  if(!DB_URL || !firstSyncDone) return;
+  try {
+    var sc=new AbortController();
+    setTimeout(function(){ sc.abort(); }, 5000);
+    var map={};
+    for(var i=0;i<clients.length;i++){ var c=clients[i]; if(c && c.username) map[regKey(c.username)]=c; }
+    fetch(DB_URL+'/clientReg.json', {
+      method:'PUT', signal:sc.signal, headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(map)
+    });
+  } catch(e) { }
+}
+
+function mergeClients(d){
+  var map={};
+  for(var i=0;i<clients.length;i++){ var lc=clients[i]; if(lc && lc.username) map[lc.username]=lc; }
+  if(d){
+    if(d.clients && d.clients.length){
+      for(var j=0;j<d.clients.length;j++){ var rc=d.clients[j]; if(rc && rc.username && !map[rc.username]) map[rc.username]=rc; }
+    }
+    if(d.clientReg){
+      for(var k in d.clientReg){ var q=d.clientReg[k]; if(q && q.username) map[q.username]=q; }
+    }
+  }
+  var arr=[];
+  for(var u in map) arr.push(map[u]);
+  clients = arr;
 }
 
 // ===== ЧАСТИЦЫ =====
@@ -2603,6 +2675,11 @@ function savePhoto(id){
 // ===== СВОЙ ПРОФИЛЬ =====
 function renderProfileLine(){
   if(!me) return;
+  var mav=document.getElementById('member-avatar-main');
+  if(mav){
+    if(me.photo){ mav.style.backgroundImage='url("'+String(me.photo).replace(/"/g,'%22')+'")'; mav.style.backgroundSize='cover'; mav.style.backgroundPosition='center'; }
+    else { mav.style.backgroundImage='none'; }
+  }
   document.getElementById('profile-name-line').innerHTML=esc(me.name)+clientBadges(me);
   document.getElementById('profile-handle-line').textContent=me.username;
   document.getElementById('profile-num-tag').textContent='№ '+(me.num||'—');
@@ -2958,6 +3035,7 @@ function syncPull(){
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
       if (d.logs) logs = d.logs;
+      mergeClients(d);
       ensureSetProduct();
       var myName = me ? me.username : null;
       me = null;
@@ -2972,6 +3050,7 @@ function syncPull(){
         document.querySelector('.denied-card .t').textContent = '🚫 Аккаунт заблокирован';
         return;
       }
+      if (me) fixMyNumber(me);
       renderAll();
     })
     .catch(function(){ clearTimeout(timer); syncing = false; });
