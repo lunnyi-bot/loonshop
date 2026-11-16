@@ -145,10 +145,10 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
 
 .dock-wrap { position:fixed; bottom:16px; left:0; right:0; display:flex; justify-content:center; z-index:90; padding:0 15px; }
 .dock { background:rgba(24,24,24,0.94); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.14);
-  border-radius:26px; padding:8px; display:flex; gap:6px; box-shadow:0 14px 44px rgba(0,0,0,0.6); }
-.dock-btn { background:transparent; border:none; color:#8a8a8a; padding:10px 20px; border-radius:18px;
-  cursor:pointer; font-size:12px; display:flex; flex-direction:column; align-items:center; gap:5px; position:relative; }
-.dock-btn .ic { font-size:20px; }
+  border-radius:18px; padding:6px; display:flex; gap:4px; box-shadow:0 10px 32px rgba(0,0,0,0.55); }
+.dock-btn { background:transparent; border:none; color:#8a8a8a; padding:6px 13px; border-radius:12px;
+  cursor:pointer; font-size:11px; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative; }
+.dock-btn .ic { font-size:16px; }
 .dock-btn:hover { color:#e0e0e0; background:rgba(255,255,255,0.06); }
 .dock-btn.active { background:#e0e0e0; color:#0a0a0a; }
 
@@ -539,7 +539,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v17</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v18</span></div>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
