@@ -720,8 +720,8 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     <button class="clients-toggle-btn" onclick="toggleBlock('adm-log')">
       <span>📜 Журнал событий</span><span class="cnt" id="adm-log-cnt">0</span>
     </button>
-    <button class="btn-done w100" style="margin-bottom:16px;" onclick="clearLogs()">🗑 Очистить журнал</button>
     <div class="hidden-block" id="adm-log"></div>
+    <button class="btn-done w100" style="margin-top:10px; margin-bottom:16px;" onclick="clearLogs()">🗑 Очистить журнал и ленту «СЕГОДНЯ»</button>
 
     <div class="section-gap"></div>
 
@@ -1129,7 +1129,8 @@ var defaultClients = [];
 var defaultChatMsgs = [];
 
 var products, clients, chatMsgs, orders, reviews, dms, cart;
-var logs = []; var logsStamp = 0;
+var logs = [];
+var logsClearedAt = 0;
 var me = null;
 var modMap = {};
 var myTgId = null;
@@ -1138,7 +1139,7 @@ var firstSyncDone = false;
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, logsStamp:logsStamp
+      products:products, clients:clients, chatMsgs:chatMsgs, orders:orders, reviews:reviews, dms:dms, logs:logs, logsClearedAt:logsClearedAt
     }));
   } catch(e) { }
   // Отправляем всё состояние в общую базу. Пока база не прочитана хотя бы раз — не пишем,
@@ -1150,7 +1151,7 @@ function saveState() {
       setTimeout(function(){ sc.abort(); }, 5000);
       var body = {
         products: products, chatMsgs: chatMsgs,
-        orders: orders, reviews: reviews, dms: dms, logs: logs, logsStamp: logsStamp
+        orders: orders, reviews: reviews, dms: dms, logs: logs, logsClearedAt: logsClearedAt
       };
       if (regCard) body['clientReg/' + safeRegKey(regCard.username)] = regCard;
       if (regCard && isAdmin(regCard.username, regCard.tgId)) { body.clients = clients; body.clientMod = modMap; }
@@ -1214,11 +1215,12 @@ function loadState() {
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
       if (d.logs) logs = d.logs;
-      if (d.logsStamp) logsStamp = d.logsStamp;
+      if (d.logsClearedAt) logsClearedAt = d.logsClearedAt;
     }
   } catch(e) { }
 }
 loadState();
+pruneLogs();
 ensureSetProduct();
 
 function findClient(username) {
@@ -1795,8 +1797,8 @@ function openManager(){
 var feedIdx=0;
 function feedOrdersToday(){
   var t=todayISO(), list=[];
-  for(var i=0;i<orders.length;i++) if(orders[i].date===t) list.push(orders[i]);
-  if(list.length===0){ for(var j=orders.length-1;j>=0&&list.length<1;j--){ if(orders[j].status!=='Отменён') list.push(orders[j]); } }
+  for(var i=0;i<orders.length;i++) if(orders[i].date===t && !orders[i].feedHidden) list.push(orders[i]);
+  if(list.length===0){ for(var j=orders.length-1;j>=0&&list.length<1;j--){ if(orders[j].status!=='Отменён' && !orders[j].feedHidden) list.push(orders[j]); } }
   return list;
 }
 function rotateFeed(){
@@ -3046,8 +3048,12 @@ function syncPull(){
       if (d.orders) orders = d.orders;
       if (d.reviews) reviews = d.reviews;
       if (d.dms) dms = d.dms;
-      if (d.logsStamp && d.logsStamp > (logsStamp||0)) { logs = d.logs || []; logsStamp = d.logsStamp; }
-      else if (!d.logsStamp && d.logs) logs = d.logs;
+      if (d.logs) logs = d.logs;
+      if (typeof d.logsClearedAt !== 'undefined' && (d.logsClearedAt||0) > 0 && (d.logsClearedAt||0) >= (logsClearedAt||0)) {
+        logsClearedAt = d.logsClearedAt;
+        pruneLogs();
+        renderLog(); feedIdx = 0; rotateFeed();
+      }
       ensureSetProduct();
       var myName = me ? me.username : null;
       me = null;
@@ -3084,10 +3090,21 @@ setInterval(syncPull, 3000);
 function addLog(txt){
   var d = new Date();
   var t = nowTime() + ' ' + d.getDate() + '.' + (d.getMonth()+1);
-  logs.unshift({ t:t, txt:txt });
+  logs.unshift({ t:t, ts:Date.now(), txt:txt });
   if (logs.length > 50) logs.length = 50;
-  logsStamp = Date.now();
   renderLog();
+}
+function pruneLogs(){
+  if (!logsClearedAt) return;
+  var keep=[];
+  for (var i=0;i<logs.length;i++){ var L=logs[i]; if (L.ts && L.ts>logsClearedAt) keep.push(L); }
+  logs = keep;
+}
+function clearLogs(){
+  if(!confirm('Очистить журнал событий и ленту «СЕГОДНЯ» у всех устройств?')) return;
+  logs = []; logsClearedAt = Date.now();
+  for (var i=0;i<orders.length;i++) orders[i].feedHidden = true;
+  renderLog(); feedIdx = 0; rotateFeed(); saveState();
 }
 function renderLog(){
   var el = document.getElementById('adm-log'); if(!el) return;
@@ -3101,13 +3118,6 @@ function renderLog(){
     d.innerHTML = '<span class="lt">'+esc(logs[i].t)+'</span>'+esc(logs[i].txt);
     el.appendChild(d);
   }
-}
-function clearLogs(){
-  if (!logs.length) return;
-  if (!confirm('Очистить журнал у всех устройств?')) return;
-  logs = []; logsStamp = Date.now();
-  renderLog();
-  saveState();
 }
 
 // ===== АЧИВКИ КЛИЕНТА =====
