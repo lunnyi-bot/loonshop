@@ -539,7 +539,7 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v14</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v15</span></div>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
     </div>
@@ -755,6 +755,21 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
         <p class="owner-hint" style="margin-top:10px;">Цвета — необязательно. Формат: <b>Название,#hex,количество</b>, несколько цветов через точку с запятой. Если цвета заданы — общее количество не нужно, оно берётся по цветам.</p>
         <button class="btn w100" onclick="addProduct()">Добавить товар в каталог</button>
       </div>
+    </div>
+
+    <div class="section-gap"></div>
+    <button class="clients-toggle-btn" onclick="toggleBlock('owner-liquids')">
+      <span>💧 Жидкости (вкусы сета)</span><span class="cnt" id="liquids-count">0</span>
+    </button>
+    <div class="hidden-block" id="owner-liquids">
+      <div id="liquids-list"></div>
+      <div class="photo-row" style="margin-top:10px;">
+        <input class="inp" id="liq-name" placeholder="Название вкуса" style="flex:2;">
+        <input class="inp" id="liq-qty" type="number" min="0" placeholder="Шт." style="flex:1;">
+      </div>
+      <button class="btn w100" style="margin-top:8px;" onclick="addLiquid()">➕ Добавить вкус</button>
+      <button class="btn w100" style="margin-top:8px;" onclick="fillLiquidsTemplate()">📋 Заполнить списком 33 вкуса (по 1 шт.)</button>
+      <p class="owner-hint" style="margin-top:10px;">Вкус с остатком 0 автоматически исчезает из выбора у клиентов.</p>
     </div>
 
     <div class="section-gap"></div>
@@ -1151,7 +1166,8 @@ function ensureSetProduct() {
   if (!p) { p = JSON.parse(JSON.stringify(defaultProducts[defaultProducts.length - 1])); products.push(p); fixed = true; }
   if (p.name !== 'Feelin 2 + жидкость') { p.name = 'Feelin 2 + жидкость'; fixed = true; }
   if (p.price !== 900) { p.price = 900; fixed = true; }
-  if (!p.flavors || !p.flavors.length) { p.flavors = SET_FLAVORS; fixed = true; }
+  if (p.flavors && p.flavors.length) { p.flavors = []; fixed = true; }
+  if (!Array.isArray(p.liquids)) { p.liquids = []; fixed = true; }
   if (p.colors && (!Array.isArray(p.colors) || p.colors.length)) { p.colors = []; fixed = true; }
   if (typeof p.stock !== 'number') { p.stock = 10; fixed = true; }
   // старая мусорная карточка «XROS 6 mini» из базы — убираем
@@ -1382,15 +1398,26 @@ setInterval(updateTopInfo, 1000);
 
 // ===== СКЛАД =====
 function getStock(p,colorName){
+  if(p.liquids&&colorName&&String(colorName).indexOf('Фиолетовый · ')===0){
+    var ln=String(colorName).slice('Фиолетовый · '.length);
+    for(var li=0;li<p.liquids.length;li++) if(p.liquids[li].name===ln) return p.liquids[li].qty;
+    return 0;
+  }
   if(!p.colors||!colorName) return p.stock;
   for(var i=0;i<p.colors.length;i++) if(p.colors[i].name===colorName) return p.colors[i].stock;
   return 0;
 }
 function changeStock(p,colorName,delta){
+  if(p.liquids&&colorName&&String(colorName).indexOf('Фиолетовый · ')===0){
+    var ln2=String(colorName).slice('Фиолетовый · '.length);
+    for(var li2=0;li2<p.liquids.length;li2++) if(p.liquids[li2].name===ln2){ p.liquids[li2].qty+=delta; return; }
+    return;
+  }
   if(!p.colors||!colorName){ p.stock=(p.stock||0)+delta; return; }
   for(var i=0;i<p.colors.length;i++) if(p.colors[i].name===colorName){ p.colors[i].stock+=delta; return; }
 }
 function getTotalStock(p){
+  if(p.liquids&&p.liquids.length){ var t=0; for(var lt=0;lt<p.liquids.length;lt++) t+=(p.liquids[lt].qty||0); return t; }
   if(!p.colors) return p.stock||0;
   var s=0; for(var i=0;i<p.colors.length;i++) s+=p.colors[i].stock; return s;
 }
@@ -1559,7 +1586,8 @@ function openChoose(id){
   document.getElementById('choose-title').textContent=chooseProduct.name;
   var box=document.getElementById('choose-colors');
   box.innerHTML='';
-  var hasFlavors=chooseProduct.flavors&&chooseProduct.flavors.length>0;
+  var liqList=(chooseProduct.liquids||[]).filter(function(Lq){return Lq.qty>0;});
+  var hasFlavors=liqList.length>0;
   document.getElementById('choose-label').textContent=hasFlavors?'Выберите вкус жидкости:':'Выберите цвет:';
   if(chooseProduct.colors&&chooseProduct.colors.length>0){
     for(var i=0;i<chooseProduct.colors.length;i++){
@@ -1578,20 +1606,24 @@ function openChoose(id){
     dev.innerHTML='<span><span class="color-dot" style="background:#a05ee0"></span>Цвет устройства: Фиолетовый</span>'+
       '<span class="color-left">входит в сет</span>';
     box.appendChild(dev);
-    for(var b=0;b<chooseProduct.flavors.length;b++){
-      var grp=chooseProduct.flavors[b];
-      var hdr=document.createElement('div');
-      hdr.className='flavor-group-title';
-      hdr.textContent=grp.brand;
-      box.appendChild(hdr);
-      for(var fi=0;fi<grp.items.length;fi++){
-        var fbtn=document.createElement('div');
-        fbtn.className='color-option'; fbtn.id='flavor-'+b+'-'+fi;
-        fbtn.innerHTML='<span>'+esc(grp.items[fi])+'</span>';
-        fbtn.setAttribute('onclick','selectFlavor('+b+','+fi+')');
-        box.appendChild(fbtn);
-      }
+    for(var liq=0;liq<liqList.length;liq++){
+      var Lq=liqList[liq];
+      var fbtn=document.createElement('div');
+      fbtn.className='color-option'; fbtn.id='liq-'+liq;
+      fbtn.innerHTML='<span>'+esc(Lq.name)+'</span><span class="color-left">Осталось: '+Lq.qty+' шт.</span>';
+      fbtn.setAttribute('onclick','selectLiquid('+liq+')');
+      box.appendChild(fbtn);
     }
+  } else if(chooseProduct.id===5){
+    var dev2=document.createElement('div');
+    dev2.className='color-option selected';
+    dev2.innerHTML='<span><span class="color-dot" style="background:#a05ee0"></span>Цвет устройства: Фиолетовый</span>'+
+      '<span class="color-left">входит в сет</span>';
+    box.appendChild(dev2);
+    var note=document.createElement('div');
+    note.className='flavor-group-title';
+    note.textContent='Вкусы жидкостей скоро появятся';
+    box.appendChild(note);
   } else {
     var b2=document.createElement('div');
     b2.className='color-option selected';
@@ -1619,14 +1651,15 @@ function selectColor(index){
   }
   updateChooseView();
 }
-function selectFlavor(b,fi){
-  var grp=chooseProduct.flavors[b];
-  chooseColor='Фиолетовый · '+grp.brand+' '+grp.items[fi];
+function selectLiquid(idx){
+  var L=(chooseProduct.liquids||[])[idx];
+  if(!L||L.qty<=0) return;
+  chooseColor='Фиолетовый · '+L.name;
   var box=document.getElementById('choose-colors');
   for(var i=0;i<box.children.length;i++){
-    if(String(box.children[i].id||'').indexOf('flavor-')===0) box.children[i].className='color-option';
+    if(String(box.children[i].id||'').indexOf('liq-')===0) box.children[i].className='color-option';
   }
-  document.getElementById('flavor-'+b+'-'+fi).className='color-option selected';
+  document.getElementById('liq-'+idx).className='color-option selected';
   updateChooseView();
 }
 function chooseMinus(){ if(chooseQty>1) chooseQty--; updateChooseView(); }
@@ -1640,13 +1673,17 @@ function updateChooseView(){
   var hint=document.getElementById('choose-stock-hint');
   var confirmBtn=document.getElementById('confirm-add-btn');
   var hasColors = chooseProduct.colors && chooseProduct.colors.length>0;
-  var hasFlavors = chooseProduct.flavors && chooseProduct.flavors.length>0;
+  var hasFlavors = chooseProduct.liquids ? chooseProduct.liquids.some(function(Lq2){return Lq2.qty>0;}) : false;
   if(hasColors && !chooseColor){
     hint.textContent='Сначала выберите цвет';
     confirmBtn.disabled=true;
     confirmBtn.textContent='Добавить в корзину';
   } else if(hasFlavors && !chooseColor){
     hint.textContent='Сначала выберите вкус';
+    confirmBtn.disabled=true;
+    confirmBtn.textContent='Добавить в корзину';
+  } else if(chooseProduct.id===5 && !(chooseProduct.liquids&&chooseProduct.liquids.length)){
+    hint.textContent='Вкусы жидкостей скоро появятся';
     confirmBtn.disabled=true;
     confirmBtn.textContent='Добавить в корзину';
   } else {
@@ -1750,7 +1787,7 @@ function confirmAddToCart(){
   if(hasColors && !chooseColor){
     alert('Сначала выберите цвет!'); return;
   }
-  if(chooseProduct.flavors && chooseProduct.flavors.length>0 && !chooseColor){
+  if(chooseProduct.liquids && chooseProduct.liquids.length>0 && !chooseColor){
     alert('Сначала выберите вкус!'); return;
   }
   if(chooseQty>getStock(chooseProduct,chooseColor)){
@@ -2152,6 +2189,7 @@ function renderOwner(){
   renderAdminDialogs();
   renderOwnerClients();
   renderOwnerPhotos();
+  renderLiquids();
   renderChat();
 }
 
@@ -2279,6 +2317,50 @@ function deleteClient(username){
   updateClientsCount();
 }
 
+function getSetLiquids(){
+  var p=ensureSetProduct();
+  if(!Array.isArray(p.liquids)) p.liquids=[];
+  return p.liquids;
+}
+function renderLiquids(){
+  var el=document.getElementById('liquids-list');
+  var cnt=document.getElementById('liquids-count');
+  if(!el) return;
+  var L=getSetLiquids();
+  if(cnt) cnt.textContent=L.length;
+  if(!L.length){ el.innerHTML='<div class="empty-msg">Список пуст — добавьте вкусы или нажмите «Заполнить списком»</div>'; return; }
+  var h='';
+  for(var i=0;i<L.length;i++){
+    h+='<div class="photo-row" style="margin-bottom:6px;"><span class="nm" style="flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(L[i].name)+'</span>'+
+      '<input class="inp" type="number" min="0" value="'+L[i].qty+'" style="flex:1;max-width:90px;" onchange="setLiquidQty('+i+',this.value)">'+
+      '<button class="remove-btn" onclick="deleteLiquid('+i+')">✕</button></div>';
+  }
+  el.innerHTML=h;
+}
+function setLiquidQty(i,v){
+  var L=getSetLiquids(); if(!L[i]) return;
+  var n=parseInt(v,10); if(isNaN(n)||n<0) n=0;
+  L[i].qty=n; saveState(); renderCatalog();
+}
+function addLiquid(){
+  var el=document.getElementById('liq-name'), q=document.getElementById('liq-qty');
+  var name=(el.value||'').trim(); if(!name) return;
+  var n=parseInt(q.value,10); if(isNaN(n)||n<0) n=1;
+  var L=getSetLiquids();
+  for(var i=0;i<L.length;i++) if(L[i].name.toLowerCase()===name.toLowerCase()){ L[i].qty=n; el.value=''; q.value=''; saveState(); renderLiquids(); renderCatalog(); return; }
+  L.push({name:name, qty:n}); el.value=''; q.value=''; saveState(); renderLiquids(); renderCatalog();
+}
+function deleteLiquid(i){
+  var L=getSetLiquids(); L.splice(i,1); saveState(); renderLiquids(); renderCatalog();
+}
+function fillLiquidsTemplate(){
+  var L=getSetLiquids();
+  for(var i=0;i<SET_FLAVORS.length;i++){
+    var g=SET_FLAVORS[i];
+    for(var j=0;j<g.items.length;j++) L.push({name:g.brand+' '+g.items[j], qty:1});
+  }
+  saveState(); renderLiquids(); renderCatalog();
+}
 function renderOwnerClients(){
   var list=document.getElementById('owner-clients');
   list.innerHTML='';
