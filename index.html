@@ -568,7 +568,7 @@ body.festive #snow-layer { display:block; }
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v25</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v26</span></div>
     <div class="topbar-actions">
       
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
@@ -1790,31 +1790,93 @@ function enterAs(name, username, tgId) {
   renderAll();
 }
 
-// ===== ЧАСТИЦЫ =====
+// ===== ЧАСТИЦЫ (v26: живое звёздное небо) =====
 var cv = document.getElementById('particles');
 var ctx = cv.getContext('2d');
 var dots = [];
 function resizeCv(){ cv.width=window.innerWidth; cv.height=window.innerHeight; }
 window.addEventListener('resize', resizeCv);
 resizeCv();
-for (var i=0;i<45;i++) dots.push({
-  x:Math.random()*cv.width, y:Math.random()*cv.height, r:Math.random()*3+1,
-  speed:Math.random()*0.4+0.1, drift:Math.random()*0.4-0.2, opacity:Math.random()*0.5+0.15
+for (var i=0;i<70;i++) dots.push({
+  x:Math.random()*cv.width, y:Math.random()*cv.height, r:Math.random()*1.6+0.6,
+  speed:Math.random()*0.22+0.05, drift:Math.random()*0.3-0.15,
+  base:Math.random()*0.35+0.25, amp:Math.random()*0.3+0.15,
+  tw:Math.random()*1.6+0.4, ph:Math.random()*6.28,
+  col:'#ffffff', big:(Math.random()<0.08)
 });
+var meteor = null;
+var nextMeteor = 4000 + Math.random()*8000;
+var skyStart = null;
+function spawnMeteor(){
+  meteor = { x: cv.width*0.1 + Math.random()*cv.width*0.7, y: Math.random()*cv.height*0.35,
+    vx:(Math.random()<0.5?1:-1)*(5+Math.random()*4), vy:2.2+Math.random()*1.6, life:1 };
+}
 (function drawDots(){
   ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.fillStyle = '#e0e0e0';
+  if(skyStart===null) skyStart = performance.now();
+  var now = performance.now();
+  var t = (now - skyStart)/1000;
   for (var i=0;i<dots.length;i++){
     var d=dots[i];
-    ctx.globalAlpha=d.opacity;
+    var a = d.base + d.amp*Math.sin(t*d.tw + d.ph);
+    if (a < 0.06) a = 0.06;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = d.col;
     ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill();
+    if (d.big && a > 0.5){
+      ctx.globalAlpha = (a-0.5)*0.5;
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r*3,0,Math.PI*2); ctx.fill();
+    }
     d.y+=d.speed; d.x+=d.drift;
     if(d.y>cv.height){d.y=-10;d.x=Math.random()*cv.width;}
     if(d.x>cv.width)d.x=0; if(d.x<0)d.x=cv.width;
   }
+  if (!(typeof smoothMode !== 'undefined' && smoothMode === 'lite')){
+    if (!meteor && now - skyStart > nextMeteor) spawnMeteor();
+    if (meteor){
+      ctx.globalAlpha = meteor.life;
+      var g = ctx.createLinearGradient(meteor.x, meteor.y, meteor.x-meteor.vx*10, meteor.y-meteor.vy*10);
+      g.addColorStop(0,'rgba(255,250,230,0.9)');
+      g.addColorStop(1,'rgba(255,250,230,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(meteor.x,meteor.y);
+      ctx.lineTo(meteor.x-meteor.vx*10, meteor.y-meteor.vy*10); ctx.stroke();
+      meteor.x += meteor.vx; meteor.y += meteor.vy; meteor.life -= 0.016;
+      if (meteor.life <= 0 || meteor.y > cv.height || meteor.x < -60 || meteor.x > cv.width+60){
+        meteor = null;
+        nextMeteor = (now - skyStart) + 9000 + Math.random()*14000;
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
   if(particleOn) requestAnimationFrame(drawDots);
   else window.__resumeDots = function(){ requestAnimationFrame(drawDots); };
 })();
+
+// ===== СЕЗОННЫЕ ФОНЫ (v26) =====
+var seasons = [
+  {n:'зима',   g1:'rgba(150,190,255,0.22)', g2:'rgba(110,160,255,0.16)', star:'#cfe4ff', rate:0.55},
+  {n:'весна',  g1:'rgba(180,255,190,0.16)', g2:'rgba(255,180,220,0.14)', star:'#eaffea', rate:0.85},
+  {n:'лето',   g1:'rgba(255,230,150,0.20)', g2:'rgba(255,180,120,0.14)', star:'#fff2c9', rate:1.0},
+  {n:'осень',  g1:'rgba(255,180,100,0.18)', g2:'rgba(220,120,80,0.14)',  star:'#ffe0c0', rate:0.8}
+];
+var season = (function(){
+  var m = new Date().getMonth();
+  if (m <= 1 || m === 11) return seasons[0];
+  if (m <= 4) return seasons[1];
+  if (m <= 7) return seasons[2];
+  return seasons[3];
+})();
+function applySeason(){
+  var g1=document.getElementById('glow-1'), g2=document.getElementById('glow-2');
+  if(g1) g1.style.background='radial-gradient(circle, '+season.g1+', transparent 70%)';
+  if(g2) g2.style.background='radial-gradient(circle, '+season.g2+', transparent 70%)';
+  for(var i=0;i<dots.length;i++){
+    dots[i].col = (Math.random()<0.6 ? season.star : '#ffffff');
+    dots[i].speed = dots[i].speed * season.rate;
+  }
+}
+applySeason();
 
 // ===== ВЕРХНЯЯ СТРОЧКА =====
 function updateTopInfo() {
@@ -1970,6 +2032,14 @@ function saveEdit(){
   var price = parseInt(document.getElementById('ed-price').value,10);
   if(!name){ alert('Введите название'); return; }
   if(isNaN(price) || price<=0){ alert('Укажите цену больше нуля'); return; }
+
+  var nmEd = name.toLowerCase();
+  for(var di=0; di<products.length; di++){
+    if(products[di].id !== p.id && products[di].name.toLowerCase() === nmEd){
+      alert('Товар с названием «'+products[di].name+'» уже есть в каталоге (категория: '+catName(products[di].category)+'). Выберите другое имя.');
+      return;
+    }
+  }
 
   p.name = name;
   p.category = document.getElementById('ed-cat').value;
@@ -3028,6 +3098,14 @@ function addProduct(){
   if(!name){ alert('Введите название товара'); return; }
   if(isNaN(price)||price<=0){ alert('Укажите цену больше нуля'); return; }
 
+  var nmNew = name.toLowerCase();
+  for(var di=0; di<products.length; di++){
+    if(products[di].name.toLowerCase() === nmNew){
+      alert('Такой товар уже есть: «'+products[di].name+'» (категория: '+catName(products[di].category)+', '+products[di].price+' ₽). Дубли не добавляю — отредактируйте существующий.');
+      return;
+    }
+  }
+
   var colors=parseColors(colorsRaw);
   var maxId=0;
   for(var i=0;i<products.length;i++) if(products[i].id>maxId) maxId=products[i].id;
@@ -3629,7 +3707,7 @@ syncPull();
 
 <!-- v24: заставка с луной (5 сек) — плавная версия -->
 <div id="splash" style="position:fixed; inset:0; background:#0b0b14; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity .8s;">
-  <div id="splash-moon" style="font-size:64px;line-height:1;will-change:transform;transform:translateZ(0);animation:moonFloat2 4.5s ease-in-out infinite;filter:drop-shadow(0 0 26px rgba(255,214,110,.5));">🌙</div>
+  <div id="splash-moon" style="width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fdf8e4,#cfc8a8);box-shadow:inset -14px -6px 0 rgba(0,0,0,.16),0 0 46px rgba(255,244,200,.35);will-change:transform;transform:translateZ(0);animation:moonFloat2 4.5s ease-in-out infinite;"></div>
   <div style="margin-top:18px; font-size:13px; color:#8a8aa8; letter-spacing:3px;">LOONSHOP</div>
   <div style="margin-top:22px; width:200px; height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden;">
     <div id="splash-bar" style="width:0%; height:100%; background:linear-gradient(90deg,#7c5cff,#c17cff); transition:width 5s linear;"></div>
