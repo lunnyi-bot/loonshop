@@ -568,7 +568,7 @@ body.festive #snow-layer { display:block; }
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v26</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v25</span></div>
     <div class="topbar-actions">
       
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
@@ -1669,6 +1669,12 @@ function clientBadges(c) {
   if (c.mutedUntil && Date.now() < c.mutedUntil) h += '<span class="r-badge r-muted">🔇 мут до ' + fmtTime(c.mutedUntil) + '</span>';
   return h;
 }
+function dupIdBadge(c) {
+  if(!c.tgId) return '';
+  var n = 0;
+  for(var i=0;i<clients.length;i++) if(clients[i].tgId && String(clients[i].tgId)===String(c.tgId)) n++;
+  return n>1 ? ' <span class="r-badge r-muted">🔁 дубль ×'+n+'</span>' : '';
+}
 function onlineBadge(c) {
   return isFresh(c) ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
 }
@@ -1760,13 +1766,35 @@ function doLogin() {
 
 function enterAs(name, username, tgId) {
   var c = findClient(username);
+  // Блокировка дублей ID: один Telegram — один аккаунт.
+  if (!c && tgId) {
+    for(var di=0; di<clients.length; di++){
+      var dc = clients[di];
+      if(dc.tgId && String(dc.tgId)===String(tgId)){
+        // Забаненный не может уйти от бана сменой имени.
+        if(dc.banned){
+          document.getElementById('login-screen').classList.remove('open');
+          document.getElementById('denied-screen').classList.add('open');
+          document.querySelector('.denied-card .t').textContent = '🚫 Аккаунт заблокирован';
+          document.querySelector('.denied-card .d').innerHTML = 'Этот Telegram уже забанен в магазине (дубль ID: '+esc(dc.username)+').<br>Свяжитесь с владельцем.';
+          addLog('🚫 Дубль ID заблокирован: '+name+' ('+username+') — совпадение с '+dc.username);
+          return;
+        }
+        // Тот же человек сменил имя — входим в его прежний аккаунт, а не создаём дубль.
+        c = dc;
+        if(c.username !== username) addLog('🔁 Дубль ID: '+name+' ('+username+') вошёл как №'+(c.num||'—')+' ('+c.username+') — аккаунт объединён');
+        c.username = username;
+        break;
+      }
+    }
+  }
   if (!c) {
     c = { name:name, username:username, tgId:tgId||null, num:nextClientNum(),
           verified:false, vip:false, girl:false, mod:false,
           online:true, banned:false, mutedUntil:0, admin:isAdmin(username, tgId) };
     clients.push(c);
   }
-  if (tgId && !c.tgId) c.tgId = tgId;
+  if (tgId) c.tgId = tgId;
   if (!c.num) c.num = nextClientNum();
   c.admin = isAdmin(c.username, c.tgId);
   c.name = name;
@@ -1790,93 +1818,102 @@ function enterAs(name, username, tgId) {
   renderAll();
 }
 
-// ===== ЧАСТИЦЫ (v26: живое звёздное небо) =====
+// ===== ЖИВОЁ ЗВЁЗДНОЕ НЕБО + СЕЗОНЫ =====
 var cv = document.getElementById('particles');
 var ctx = cv.getContext('2d');
 var dots = [];
 function resizeCv(){ cv.width=window.innerWidth; cv.height=window.innerHeight; }
 window.addEventListener('resize', resizeCv);
 resizeCv();
-for (var i=0;i<70;i++) dots.push({
-  x:Math.random()*cv.width, y:Math.random()*cv.height, r:Math.random()*1.6+0.6,
-  speed:Math.random()*0.22+0.05, drift:Math.random()*0.3-0.15,
-  base:Math.random()*0.35+0.25, amp:Math.random()*0.3+0.15,
-  tw:Math.random()*1.6+0.4, ph:Math.random()*6.28,
-  col:'#ffffff', big:(Math.random()<0.08)
-});
-var meteor = null;
-var nextMeteor = 4000 + Math.random()*8000;
-var skyStart = null;
+
+// Сезонная палитра: зима / весна / лето / осень
+var season = (function(){
+  var m = new Date().getMonth();
+  if(m<=1||m===11) return 'winter';
+  if(m<=4) return 'spring';
+  if(m<=7) return 'summer';
+  return 'autumn';
+})();
+var seasonCfg = {
+  winter: { star:'rgba(190,215,255,',
+            glow1:'radial-gradient(circle, rgba(160,200,255,0.18), transparent 70%)',
+            glow2:'radial-gradient(circle, rgba(120,160,255,0.12), transparent 70%)', speed:0.5 },
+  spring: { star:'rgba(200,255,210,',
+            glow1:'radial-gradient(circle, rgba(180,255,200,0.16), transparent 70%)',
+            glow2:'radial-gradient(circle, rgba(255,190,220,0.13), transparent 70%)', speed:0.85 },
+  summer: { star:'rgba(255,235,180,',
+            glow1:'radial-gradient(circle, rgba(255,220,160,0.17), transparent 70%)',
+            glow2:'radial-gradient(circle, rgba(255,190,120,0.12), transparent 70%)', speed:1.2 },
+  autumn: { star:'rgba(255,205,160,',
+            glow1:'radial-gradient(circle, rgba(255,190,130,0.17), transparent 70%)',
+            glow2:'radial-gradient(circle, rgba(255,120,90,0.12), transparent 70%)', speed:0.85 }
+};
+(function applySeason(){
+  var sc = seasonCfg[season];
+  var g1=document.getElementById('glow-1'), g2=document.getElementById('glow-2');
+  if(g1) g1.style.background = sc.glow1;
+  if(g2) g2.style.background = sc.glow2;
+})();
+
+var meteors = [];
 function spawnMeteor(){
-  meteor = { x: cv.width*0.1 + Math.random()*cv.width*0.7, y: Math.random()*cv.height*0.35,
-    vx:(Math.random()<0.5?1:-1)*(5+Math.random()*4), vy:2.2+Math.random()*1.6, life:1 };
+  if(meteors.length<3) meteors.push({ x:Math.random()*cv.width*0.8, y:-20,
+    vx:2.2+Math.random()*1.6, vy:2.2+Math.random()*1.6, life:1 });
+  setTimeout(spawnMeteor, 9000+Math.random()*14000);
 }
-(function drawDots(){
+setTimeout(spawnMeteor, 4000);
+
+for (var i=0;i<70;i++){
+  var big = (i%8===0);
+  dots.push({
+    x:Math.random()*cv.width, y:Math.random()*cv.height,
+    r: big ? Math.random()*1.6+1.8 : Math.random()*1.2+0.4,
+    speed:(Math.random()*0.35+0.06)*seasonCfg[season].speed,
+    drift:Math.random()*0.25-0.125,
+    tw:Math.random()*0.05+0.008,
+    phase:Math.random()*Math.PI*2,
+    halo:big,
+    tinted:(i%5!==0)
+  });
+}
+(function drawStars(){
+  var sc = seasonCfg[season];
   ctx.clearRect(0,0,cv.width,cv.height);
-  if(skyStart===null) skyStart = performance.now();
-  var now = performance.now();
-  var t = (now - skyStart)/1000;
   for (var i=0;i<dots.length;i++){
     var d=dots[i];
-    var a = d.base + d.amp*Math.sin(t*d.tw + d.ph);
-    if (a < 0.06) a = 0.06;
-    ctx.globalAlpha = a;
-    ctx.fillStyle = d.col;
-    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill();
-    if (d.big && a > 0.5){
-      ctx.globalAlpha = (a-0.5)*0.5;
+    d.phase += d.tw;
+    var a = 0.25 + 0.6*(0.5+0.5*Math.sin(d.phase));
+    var col = d.tinted ? sc.star : 'rgba(235,235,235,';
+    if(d.halo){
+      ctx.globalAlpha = a*0.35;
+      ctx.fillStyle = col+'1)';
       ctx.beginPath(); ctx.arc(d.x,d.y,d.r*3,0,Math.PI*2); ctx.fill();
     }
+    ctx.globalAlpha = a;
+    ctx.fillStyle = col+'1)';
+    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill();
     d.y+=d.speed; d.x+=d.drift;
     if(d.y>cv.height){d.y=-10;d.x=Math.random()*cv.width;}
     if(d.x>cv.width)d.x=0; if(d.x<0)d.x=cv.width;
   }
-  if (!(typeof smoothMode !== 'undefined' && smoothMode === 'lite')){
-    if (!meteor && now - skyStart > nextMeteor) spawnMeteor();
-    if (meteor){
-      ctx.globalAlpha = meteor.life;
-      var g = ctx.createLinearGradient(meteor.x, meteor.y, meteor.x-meteor.vx*10, meteor.y-meteor.vy*10);
-      g.addColorStop(0,'rgba(255,250,230,0.9)');
-      g.addColorStop(1,'rgba(255,250,230,0)');
-      ctx.strokeStyle = g; ctx.lineWidth = 1.6;
-      ctx.beginPath(); ctx.moveTo(meteor.x,meteor.y);
-      ctx.lineTo(meteor.x-meteor.vx*10, meteor.y-meteor.vy*10); ctx.stroke();
-      meteor.x += meteor.vx; meteor.y += meteor.vy; meteor.life -= 0.016;
-      if (meteor.life <= 0 || meteor.y > cv.height || meteor.x < -60 || meteor.x > cv.width+60){
-        meteor = null;
-        nextMeteor = (now - skyStart) + 9000 + Math.random()*14000;
-      }
-    }
+  for (var j=meteors.length-1;j>=0;j--){
+    var m=meteors[j];
+    var grad = ctx.createLinearGradient(m.x, m.y, m.x-m.vx*14, m.y-m.vy*14);
+    grad.addColorStop(0,'rgba(255,255,255,0.9)');
+    grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.globalAlpha = Math.max(0,m.life)*0.9;
+    ctx.strokeStyle = grad; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(m.x,m.y); ctx.lineTo(m.x-m.vx*14, m.y-m.vy*14); ctx.stroke();
+    ctx.globalAlpha = Math.max(0,m.life);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(m.x,m.y,1.8,0,Math.PI*2); ctx.fill();
+    m.x+=m.vx; m.y+=m.vy; m.life-=0.012;
+    if(m.life<=0 || m.x>cv.width+60 || m.y>cv.height+60) meteors.splice(j,1);
   }
   ctx.globalAlpha = 1;
-  if(particleOn) requestAnimationFrame(drawDots);
-  else window.__resumeDots = function(){ requestAnimationFrame(drawDots); };
+  if(particleOn) requestAnimationFrame(drawStars);
+  else window.__resumeDots = function(){ requestAnimationFrame(drawStars); };
 })();
-
-// ===== СЕЗОННЫЕ ФОНЫ (v26) =====
-var seasons = [
-  {n:'зима',   g1:'rgba(150,190,255,0.22)', g2:'rgba(110,160,255,0.16)', star:'#cfe4ff', rate:0.55},
-  {n:'весна',  g1:'rgba(180,255,190,0.16)', g2:'rgba(255,180,220,0.14)', star:'#eaffea', rate:0.85},
-  {n:'лето',   g1:'rgba(255,230,150,0.20)', g2:'rgba(255,180,120,0.14)', star:'#fff2c9', rate:1.0},
-  {n:'осень',  g1:'rgba(255,180,100,0.18)', g2:'rgba(220,120,80,0.14)',  star:'#ffe0c0', rate:0.8}
-];
-var season = (function(){
-  var m = new Date().getMonth();
-  if (m <= 1 || m === 11) return seasons[0];
-  if (m <= 4) return seasons[1];
-  if (m <= 7) return seasons[2];
-  return seasons[3];
-})();
-function applySeason(){
-  var g1=document.getElementById('glow-1'), g2=document.getElementById('glow-2');
-  if(g1) g1.style.background='radial-gradient(circle, '+season.g1+', transparent 70%)';
-  if(g2) g2.style.background='radial-gradient(circle, '+season.g2+', transparent 70%)';
-  for(var i=0;i<dots.length;i++){
-    dots[i].col = (Math.random()<0.6 ? season.star : '#ffffff');
-    dots[i].speed = dots[i].speed * season.rate;
-  }
-}
-applySeason();
 
 // ===== ВЕРХНЯЯ СТРОЧКА =====
 function updateTopInfo() {
@@ -2032,14 +2069,6 @@ function saveEdit(){
   var price = parseInt(document.getElementById('ed-price').value,10);
   if(!name){ alert('Введите название'); return; }
   if(isNaN(price) || price<=0){ alert('Укажите цену больше нуля'); return; }
-
-  var nmEd = name.toLowerCase();
-  for(var di=0; di<products.length; di++){
-    if(products[di].id !== p.id && products[di].name.toLowerCase() === nmEd){
-      alert('Товар с названием «'+products[di].name+'» уже есть в каталоге (категория: '+catName(products[di].category)+'). Выберите другое имя.');
-      return;
-    }
-  }
 
   p.name = name;
   p.category = document.getElementById('ed-cat').value;
@@ -2963,7 +2992,7 @@ function renderOwnerClients(){
       '<div class="client-row">'+
         '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
-          '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+'</div>'+
+          '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+dupIdBadge(c)+'</div>'+
           '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
         '</div>'+
         '<button class="profile-link-btn" onclick="openClientProfile('+i+')">Профиль ›</button>'+
@@ -3097,14 +3126,6 @@ function addProduct(){
 
   if(!name){ alert('Введите название товара'); return; }
   if(isNaN(price)||price<=0){ alert('Укажите цену больше нуля'); return; }
-
-  var nmNew = name.toLowerCase();
-  for(var di=0; di<products.length; di++){
-    if(products[di].name.toLowerCase() === nmNew){
-      alert('Такой товар уже есть: «'+products[di].name+'» (категория: '+catName(products[di].category)+', '+products[di].price+' ₽). Дубли не добавляю — отредактируйте существующий.');
-      return;
-    }
-  }
 
   var colors=parseColors(colorsRaw);
   var maxId=0;
