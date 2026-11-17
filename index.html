@@ -568,7 +568,7 @@ body.festive #snow-layer { display:block; }
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v25</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v26</span></div>
     <div class="topbar-actions">
       
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
@@ -1660,6 +1660,9 @@ function nowTime() { return new Date().toLocaleTimeString('ru-RU',{hour:'2-digit
 function fmtTime(ts) { return new Date(ts).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); }
 function clientBadges(c) {
   var h = '';
+  var dup = 0;
+  if (c.tgId) for (var di = 0; di < clients.length; di++) if (clients[di].tgId === c.tgId) dup++;
+  if (dup > 1) h += '<span class="r-badge r-admin">🔁 дубль ×' + dup + '</span>';
   if (c.admin || isAdmin(c.username, c.tgId)) h += '<span class="r-badge r-admin">👑 Админ</span>';
   if (c.vip) h += '<span class="r-badge r-vip">VIP</span>';
   if (c.girl) h += '<span class="r-badge r-girl">Девушка</span>';
@@ -1668,12 +1671,6 @@ function clientBadges(c) {
   if (c.banned) h += '<span class="r-badge r-banned">🚫 Забанен</span>';
   if (c.mutedUntil && Date.now() < c.mutedUntil) h += '<span class="r-badge r-muted">🔇 мут до ' + fmtTime(c.mutedUntil) + '</span>';
   return h;
-}
-function dupIdBadge(c) {
-  if(!c.tgId) return '';
-  var n = 0;
-  for(var i=0;i<clients.length;i++) if(clients[i].tgId && String(clients[i].tgId)===String(c.tgId)) n++;
-  return n>1 ? ' <span class="r-badge r-muted">🔁 дубль ×'+n+'</span>' : '';
 }
 function onlineBadge(c) {
   return isFresh(c) ? '<span class="r-badge r-online">🟢 онлайн</span>' : '<span class="r-badge" style="color:#6e6e6e;">⚪ не в сети</span>';
@@ -1766,26 +1763,13 @@ function doLogin() {
 
 function enterAs(name, username, tgId) {
   var c = findClient(username);
-  // Блокировка дублей ID: один Telegram — один аккаунт.
   if (!c && tgId) {
-    for(var di=0; di<clients.length; di++){
-      var dc = clients[di];
-      if(dc.tgId && String(dc.tgId)===String(tgId)){
-        // Забаненный не может уйти от бана сменой имени.
-        if(dc.banned){
-          document.getElementById('login-screen').classList.remove('open');
-          document.getElementById('denied-screen').classList.add('open');
-          document.querySelector('.denied-card .t').textContent = '🚫 Аккаунт заблокирован';
-          document.querySelector('.denied-card .d').innerHTML = 'Этот Telegram уже забанен в магазине (дубль ID: '+esc(dc.username)+').<br>Свяжитесь с владельцем.';
-          addLog('🚫 Дубль ID заблокирован: '+name+' ('+username+') — совпадение с '+dc.username);
-          return;
-        }
-        // Тот же человек сменил имя — входим в его прежний аккаунт, а не создаём дубль.
-        c = dc;
-        if(c.username !== username) addLog('🔁 Дубль ID: '+name+' ('+username+') вошёл как №'+(c.num||'—')+' ('+c.username+') — аккаунт объединён');
-        c.username = username;
-        break;
-      }
+    for (var di = 0; di < clients.length; di++) {
+      if (clients[di].tgId && clients[di].tgId === tgId) { c = clients[di]; break; }
+    }
+    if (c) {
+      c.username = username;
+      addLog('🔁 Дубль ID ' + tgId + ' — аккаунт объединён (' + (name || username) + ')');
     }
   }
   if (!c) {
@@ -1794,7 +1778,7 @@ function enterAs(name, username, tgId) {
           online:true, banned:false, mutedUntil:0, admin:isAdmin(username, tgId) };
     clients.push(c);
   }
-  if (tgId) c.tgId = tgId;
+  if (tgId && !c.tgId) c.tgId = tgId;
   if (!c.num) c.num = nextClientNum();
   c.admin = isAdmin(c.username, c.tgId);
   c.name = name;
@@ -1818,101 +1802,71 @@ function enterAs(name, username, tgId) {
   renderAll();
 }
 
-// ===== ЖИВОЁ ЗВЁЗДНОЕ НЕБО + СЕЗОНЫ =====
+// ===== ЖИВОЕ ЗВЁЗДНОЕ НЕБО =====
 var cv = document.getElementById('particles');
 var ctx = cv.getContext('2d');
-var dots = [];
+var stars = [];
 function resizeCv(){ cv.width=window.innerWidth; cv.height=window.innerHeight; }
 window.addEventListener('resize', resizeCv);
 resizeCv();
-
-// Сезонная палитра: зима / весна / лето / осень
-var season = (function(){
-  var m = new Date().getMonth();
-  if(m<=1||m===11) return 'winter';
-  if(m<=4) return 'spring';
-  if(m<=7) return 'summer';
-  return 'autumn';
-})();
-var seasonCfg = {
-  winter: { star:'rgba(190,215,255,',
-            glow1:'radial-gradient(circle, rgba(160,200,255,0.18), transparent 70%)',
-            glow2:'radial-gradient(circle, rgba(120,160,255,0.12), transparent 70%)', speed:0.5 },
-  spring: { star:'rgba(200,255,210,',
-            glow1:'radial-gradient(circle, rgba(180,255,200,0.16), transparent 70%)',
-            glow2:'radial-gradient(circle, rgba(255,190,220,0.13), transparent 70%)', speed:0.85 },
-  summer: { star:'rgba(255,235,180,',
-            glow1:'radial-gradient(circle, rgba(255,220,160,0.17), transparent 70%)',
-            glow2:'radial-gradient(circle, rgba(255,190,120,0.12), transparent 70%)', speed:1.2 },
-  autumn: { star:'rgba(255,205,160,',
-            glow1:'radial-gradient(circle, rgba(255,190,130,0.17), transparent 70%)',
-            glow2:'radial-gradient(circle, rgba(255,120,90,0.12), transparent 70%)', speed:0.85 }
-};
-(function applySeason(){
-  var sc = seasonCfg[season];
-  var g1=document.getElementById('glow-1'), g2=document.getElementById('glow-2');
-  if(g1) g1.style.background = sc.glow1;
-  if(g2) g2.style.background = sc.glow2;
-})();
-
-var meteors = [];
-function spawnMeteor(){
-  if(meteors.length<3) meteors.push({ x:Math.random()*cv.width*0.8, y:-20,
-    vx:2.2+Math.random()*1.6, vy:2.2+Math.random()*1.6, life:1 });
-  setTimeout(spawnMeteor, 9000+Math.random()*14000);
-}
-setTimeout(spawnMeteor, 4000);
-
 for (var i=0;i<70;i++){
-  var big = (i%8===0);
-  dots.push({
+  var big = (i % 8 === 0);
+  stars.push({
     x:Math.random()*cv.width, y:Math.random()*cv.height,
-    r: big ? Math.random()*1.6+1.8 : Math.random()*1.2+0.4,
-    speed:(Math.random()*0.35+0.06)*seasonCfg[season].speed,
-    drift:Math.random()*0.25-0.125,
-    tw:Math.random()*0.05+0.008,
-    phase:Math.random()*Math.PI*2,
-    halo:big,
-    tinted:(i%5!==0)
+    r: big ? (Math.random()*1.6+1.4) : (Math.random()*1.2+0.4),
+    speed:Math.random()*0.18+0.05,
+    drift:Math.random()*0.3-0.15,
+    tw:Math.random()*Math.PI*2,
+    twSpd:Math.random()*0.03+0.008,
+    big:big,
+    hue: Math.random()<0.25 ? (Math.random()<0.5 ? 'rgba(91,200,255,1)' : 'rgba(255,200,120,1)') : 'rgba(230,230,235,1)'
   });
 }
-(function drawStars(){
-  var sc = seasonCfg[season];
+var meteors = [];
+var nextMeteor = Date.now() + 9000 + Math.random()*14000;
+(function drawSky(){
   ctx.clearRect(0,0,cv.width,cv.height);
-  for (var i=0;i<dots.length;i++){
-    var d=dots[i];
-    d.phase += d.tw;
-    var a = 0.25 + 0.6*(0.5+0.5*Math.sin(d.phase));
-    var col = d.tinted ? sc.star : 'rgba(235,235,235,';
-    if(d.halo){
+  var lite = document.body.classList.contains('smooth-lite');
+  var heavy = document.body.classList.contains('smooth-off');
+  for (var i=0;i<stars.length;i++){
+    var s = stars[i];
+    s.y += s.speed; s.x += s.drift;
+    if (s.y > cv.height + 4) { s.y = -4; s.x = Math.random()*cv.width; }
+    if (s.x > cv.width) s.x = 0;
+    if (s.x < 0) s.x = cv.width;
+    s.tw += s.twSpd;
+    var a = 0.35 + 0.6*(0.5+0.5*Math.sin(s.tw));
+    ctx.globalAlpha = Math.min(a, 1);
+    ctx.fillStyle = s.hue;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+    if (s.big && !heavy){
       ctx.globalAlpha = a*0.35;
-      ctx.fillStyle = col+'1)';
-      ctx.beginPath(); ctx.arc(d.x,d.y,d.r*3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r*3.2, 0, Math.PI*2); ctx.fill();
     }
-    ctx.globalAlpha = a;
-    ctx.fillStyle = col+'1)';
-    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill();
-    d.y+=d.speed; d.x+=d.drift;
-    if(d.y>cv.height){d.y=-10;d.x=Math.random()*cv.width;}
-    if(d.x>cv.width)d.x=0; if(d.x<0)d.x=cv.width;
   }
-  for (var j=meteors.length-1;j>=0;j--){
-    var m=meteors[j];
-    var grad = ctx.createLinearGradient(m.x, m.y, m.x-m.vx*14, m.y-m.vy*14);
-    grad.addColorStop(0,'rgba(255,255,255,0.9)');
-    grad.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.globalAlpha = Math.max(0,m.life)*0.9;
-    ctx.strokeStyle = grad; ctx.lineWidth = 1.6;
-    ctx.beginPath(); ctx.moveTo(m.x,m.y); ctx.lineTo(m.x-m.vx*14, m.y-m.vy*14); ctx.stroke();
-    ctx.globalAlpha = Math.max(0,m.life);
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(m.x,m.y,1.8,0,Math.PI*2); ctx.fill();
-    m.x+=m.vx; m.y+=m.vy; m.life-=0.012;
-    if(m.life<=0 || m.x>cv.width+60 || m.y>cv.height+60) meteors.splice(j,1);
+  if (!heavy && !lite){
+    var now = Date.now();
+    if (now > nextMeteor){
+      nextMeteor = now + 9000 + Math.random()*14000;
+      meteors.push({ x:Math.random()*cv.width*0.8+cv.width*0.1, y:-20,
+                     vx:-(2.5+Math.random()*2), vy:(3+Math.random()*2), life:1 });
+    }
+    for (var m=meteors.length-1;m>=0;m--){
+      var mt = meteors[m];
+      mt.x += mt.vx; mt.y += mt.vy; mt.life -= 0.012;
+      if (mt.life <= 0 || mt.y > cv.height+40){ meteors.splice(m,1); continue; }
+      ctx.globalAlpha = Math.min(mt.life, 1)*0.9;
+      var grad = ctx.createLinearGradient(mt.x, mt.y, mt.x - mt.vx*12, mt.y - mt.vy*12);
+      grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.strokeStyle = grad; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(mt.x, mt.y);
+      ctx.lineTo(mt.x - mt.vx*12, mt.y - mt.vy*12); ctx.stroke();
+    }
   }
   ctx.globalAlpha = 1;
-  if(particleOn) requestAnimationFrame(drawStars);
-  else window.__resumeDots = function(){ requestAnimationFrame(drawStars); };
+  if(particleOn) requestAnimationFrame(drawSky);
+  else window.__resumeDots = function(){ requestAnimationFrame(drawSky); };
 })();
 
 // ===== ВЕРХНЯЯ СТРОЧКА =====
@@ -2992,7 +2946,7 @@ function renderOwnerClients(){
       '<div class="client-row">'+
         '<div class="client-avatar"><span>'+(c.girl?'🌸':'🌙')+'</span><span class="on-dot'+(isFresh(c)?'':' off')+'"></span></div>'+
         '<div style="flex:1;">'+
-          '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+dupIdBadge(c)+'</div>'+
+          '<div class="client-name">№'+(c.num||'—')+' · '+esc(c.name)+' '+clientBadges(c)+'</div>'+
           '<div class="client-handle">'+esc(c.username)+(c.tgId?' · ID: '+c.tgId:'')+' · '+onlineBadge(c)+'</div>'+
         '</div>'+
         '<button class="profile-link-btn" onclick="openClientProfile('+i+')">Профиль ›</button>'+
