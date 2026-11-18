@@ -12,7 +12,6 @@ body { margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; color:#f0f0
     radial-gradient(900px 600px at 80% 10%, rgba(255,255,255,0.05), transparent 60%),
     radial-gradient(800px 600px at 15% 35%, rgba(255,255,255,0.04), transparent 60%),
     #0a0a0a; }
-#particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
 
 .moon-glow { position:fixed; border-radius:50%; pointer-events:none; z-index:0;
   filter:blur(60px); opacity:0.35; animation:glowPulse 8s ease-in-out infinite; }
@@ -518,7 +517,6 @@ body.festive #snow-layer { display:block; }
 </head>
 <body>
 
-<canvas id="particles"></canvas>
 
 <!-- Лунное свечение на фоне -->
 <div class="moon-glow" id="glow-1"></div>
@@ -568,7 +566,7 @@ body.festive #snow-layer { display:block; }
   <div class="topbar">
     <button class="back-btn" id="back-btn" onclick="goBack()">‹ Назад</button>
     <div class="logo">🌙</div>
-    <div class="brand">LoonShop <span class="ver-tag">🛠 v26</span></div>
+    <div class="brand">LoonShop <span class="ver-tag">🛠 v27</span></div>
     <div class="topbar-actions">
       
       <button class="icon-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cart-badge">0</span></button>
@@ -1802,72 +1800,6 @@ function enterAs(name, username, tgId) {
   renderAll();
 }
 
-// ===== ЖИВОЕ ЗВЁЗДНОЕ НЕБО =====
-var cv = document.getElementById('particles');
-var ctx = cv.getContext('2d');
-var stars = [];
-function resizeCv(){ cv.width=window.innerWidth; cv.height=window.innerHeight; }
-window.addEventListener('resize', resizeCv);
-resizeCv();
-for (var i=0;i<70;i++){
-  var big = (i % 8 === 0);
-  stars.push({
-    x:Math.random()*cv.width, y:Math.random()*cv.height,
-    r: big ? (Math.random()*1.6+1.4) : (Math.random()*1.2+0.4),
-    speed:Math.random()*0.18+0.05,
-    drift:Math.random()*0.3-0.15,
-    tw:Math.random()*Math.PI*2,
-    twSpd:Math.random()*0.03+0.008,
-    big:big,
-    hue: Math.random()<0.25 ? (Math.random()<0.5 ? 'rgba(91,200,255,1)' : 'rgba(255,200,120,1)') : 'rgba(230,230,235,1)'
-  });
-}
-var meteors = [];
-var nextMeteor = Date.now() + 9000 + Math.random()*14000;
-(function drawSky(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  var lite = document.body.classList.contains('smooth-lite');
-  var heavy = document.body.classList.contains('smooth-off');
-  for (var i=0;i<stars.length;i++){
-    var s = stars[i];
-    s.y += s.speed; s.x += s.drift;
-    if (s.y > cv.height + 4) { s.y = -4; s.x = Math.random()*cv.width; }
-    if (s.x > cv.width) s.x = 0;
-    if (s.x < 0) s.x = cv.width;
-    s.tw += s.twSpd;
-    var a = 0.35 + 0.6*(0.5+0.5*Math.sin(s.tw));
-    ctx.globalAlpha = Math.min(a, 1);
-    ctx.fillStyle = s.hue;
-    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
-    if (s.big && !heavy){
-      ctx.globalAlpha = a*0.35;
-      ctx.beginPath(); ctx.arc(s.x, s.y, s.r*3.2, 0, Math.PI*2); ctx.fill();
-    }
-  }
-  if (!heavy && !lite){
-    var now = Date.now();
-    if (now > nextMeteor){
-      nextMeteor = now + 9000 + Math.random()*14000;
-      meteors.push({ x:Math.random()*cv.width*0.8+cv.width*0.1, y:-20,
-                     vx:-(2.5+Math.random()*2), vy:(3+Math.random()*2), life:1 });
-    }
-    for (var m=meteors.length-1;m>=0;m--){
-      var mt = meteors[m];
-      mt.x += mt.vx; mt.y += mt.vy; mt.life -= 0.012;
-      if (mt.life <= 0 || mt.y > cv.height+40){ meteors.splice(m,1); continue; }
-      ctx.globalAlpha = Math.min(mt.life, 1)*0.9;
-      var grad = ctx.createLinearGradient(mt.x, mt.y, mt.x - mt.vx*12, mt.y - mt.vy*12);
-      grad.addColorStop(0, 'rgba(255,255,255,0.9)');
-      grad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.strokeStyle = grad; ctx.lineWidth = 1.6;
-      ctx.beginPath(); ctx.moveTo(mt.x, mt.y);
-      ctx.lineTo(mt.x - mt.vx*12, mt.y - mt.vy*12); ctx.stroke();
-    }
-  }
-  ctx.globalAlpha = 1;
-  if(particleOn) requestAnimationFrame(drawSky);
-  else window.__resumeDots = function(){ requestAnimationFrame(drawSky); };
-})();
 
 // ===== ВЕРХНЯЯ СТРОЧКА =====
 function updateTopInfo() {
@@ -3600,12 +3532,10 @@ function renderAchievements(){
 // ===== ПЛАВНОСТЬ =====
 var smoothMode = 'auto';
 var autoDowngraded = false;
-var particleOn = true;
 try { smoothMode = localStorage.getItem('ls_smooth') || 'auto'; } catch(e){}
 function applySmooth(){
   document.body.classList.toggle('smooth-off', smoothMode==='off');
   document.body.classList.toggle('smooth-lite', smoothMode==='lite');
-  particleOn = (smoothMode !== 'off');
   var note = document.getElementById('smooth-note');
   if (note) note.textContent =
     smoothMode==='auto' ? (autoDowngraded ? 'Авто: телефон не справляется — включён облегчённый режим' : 'Авто: следим за плавностью')
@@ -3613,7 +3543,6 @@ function applySmooth(){
     : 'Выкл: анимация отключена полностью';
   var btns = document.querySelectorAll('.smooth-btn');
   for (var i=0;i<btns.length;i++) btns[i].classList.toggle('selected', btns[i].getAttribute('data-m')===smoothMode);
-  if (particleOn && window.__resumeDots){ window.__resumeDots(); window.__resumeDots = null; }
 }
 function setSmooth(m){
   smoothMode = m;
